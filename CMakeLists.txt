@@ -19,3 +19,10 @@ find_package(math_tools REQUIRED)
 find_package(OSNI REQUIRED)
 
 
+add_library(${PROJECT_NAME} include/cosserat_rod.hpp
+                            src/cosserat_rod.cpp)
+target_link_libraries(${PROJECT_NAME} math_tools Eigen3::Eigen OSNI)
+
+
+add_executable(tests tests/tests.cpp)
+target_link_libraries(tests Eigen3::Eigen math_tools OSNI)
