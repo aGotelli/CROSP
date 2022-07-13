@@ -59,7 +59,7 @@ struct PositionIntegrator : public OSNI::ODEb {
                                                                           m_quaternion_integrator(t_quaternion_integrator),
                                                                           m_Lambda_stack(t_Lambda_stack){}
 
-    virtual Eigen::RowVectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
         m_rotation_matrix_at_point = Eigen::Quaterniond(m_quaternion_integrator->getStateAtPoint(t_point).data()).toRotationMatrix();
 
@@ -74,6 +74,50 @@ struct PositionIntegrator : public OSNI::ODEb {
     Eigen::Quaterniond m_rotation_matrix_at_point;
 
 };
+
+
+
+
+struct AngularVelocityIntegrator : public OSNI::ODEAb {
+
+    AngularVelocityIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                              const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack) : OSNI::ODEAb(3),
+                                                                                                         m_K_stack(t_K_stack),
+                                                                                                         m_dot_K_stack(t_dot_K_stack) {}
+
+    AngularVelocityIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                              const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                              const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEAb(3, t_number_of_Chebyshev_points),
+                                                                                 m_K_stack(t_K_stack),
+                                                                                 m_dot_K_stack(t_dot_K_stack) {}
+
+
+    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final
+    {
+        return -skew( m_K_stack->at(t_point) );
+    }
+
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
+    {
+        return m_dot_K_stack->at(t_point);
+    }
+
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack;
+
+
+};
+
+
+
+
+
+
+
+
 
 }   //  namespace CROSP
 
