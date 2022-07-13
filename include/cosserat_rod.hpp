@@ -26,14 +26,33 @@ class CosseratRod
 public:
     CosseratRod();
 
-    void updateParameterisation(const Eigen::VectorXd t_q,
-                                const Eigen::VectorXd t_dot_q,
-                                const Eigen::VectorXd t_ddot_q);
+    void updateParameterisation(const Eigen::VectorXd &t_qe,
+                                const Eigen::VectorXd &t_dot_qe,
+                                const Eigen::VectorXd &t_ddot_qe);
+
+    void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion=Eigen::Vector4d(1, 0, 0, 0),
+                           const Eigen::Vector3d &t_initial_position=Eigen::Vector3d::Zero());
 
 private:
 
 
+
+    const unsigned int m_ne { 3 };
+    const unsigned int m_na { 3 };
+
+
     const unsigned int m_number_of_chebyshev_points { 16 };
+
+    const std::vector<double> m_Chebyshev_points;
+
+    const std::function<double(const unsigned int, const double&)> m_polynomial_base;
+
+    Eigen::MatrixXd getPhi(const double& t_X,
+                            const double& t_begin=0,
+                            const double& t_end=1) const;
+
+
+
 
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack;
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack;
@@ -43,6 +62,7 @@ private:
 
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack;
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack;
+
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_quaternion_integrator;
