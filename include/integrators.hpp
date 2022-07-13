@@ -36,7 +36,7 @@ struct QuaternionIntegrator : public OSNI::ODEA {
                                     m_K_stack->at(t_point)(1) ,   -m_K_stack->at(t_point)(2),                0            ,    m_K_stack->at(t_point)(0),
                                     m_K_stack->at(t_point)(2) ,    m_K_stack->at(t_point)(1),   -m_K_stack->at(t_point)(0),                0            ;
 
-        return m_A_at_chebychev_point;
+        return 0.5*m_A_at_chebychev_point;
     }
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
