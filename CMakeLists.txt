@@ -10,19 +10,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Eigen3 3.4 NO_MODULE REQUIRED)
 
+find_package(math_tools REQUIRED)
+
+find_package(OSNI REQUIRED)
 
 
 include_directories(include)
 
 
-find_package(math_tools REQUIRED)
-find_package(OSNI REQUIRED)
 
-
-add_library(${PROJECT_NAME} include/cosserat_rod.hpp
+add_library(${PROJECT_NAME} include/integrators.hpp
+                            include/cosserat_rod.hpp
                             src/cosserat_rod.cpp)
 target_link_libraries(${PROJECT_NAME} math_tools Eigen3::Eigen OSNI)
 
 
 add_executable(tests tests/tests.cpp)
-target_link_libraries(tests Eigen3::Eigen math_tools OSNI)
+target_link_libraries(tests ${PROJECT_NAME} math_tools)
