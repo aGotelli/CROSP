@@ -11,7 +11,13 @@
 
 #include "cosserat_rod.hpp"
 
-CosseratRod::CosseratRod()
-{
+namespace CROSP {
 
-}
+CosseratRod::CosseratRod() :
+    m_quaternion_integrator(std::make_shared<QuaternionIntegrator>(m_K_stack)),
+    m_position_integrator(std::make_shared<PositionIntegrator>(m_quaternion_integrator, m_Lambda_stack))
+{}
+
+
+
+}   //  namespace CROSP

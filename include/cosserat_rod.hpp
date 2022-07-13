@@ -14,21 +14,11 @@
 #ifndef COSSERAT_ROD_HPP
 #define COSSERAT_ROD_HPP
 
-
-#include "OSNI/include/OSNI.hpp"
 #include <Eigen/Dense>
 
+#include "integrators.hpp"
 
-//struct QuaternionIntegrator : public OSNI::ODEA {
-
-//    QuaternionIntegrator() : OSNI::ODEA(4) {}
-
-//    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(unsigned int t_point)
-//    {
-//        return Eigen::MatrixXd();
-//    }
-//};
-
+namespace CROSP {
 
 
 class CosseratRod
@@ -36,8 +26,33 @@ class CosseratRod
 public:
     CosseratRod();
 
+    void updateParameterisation(const Eigen::VectorXd t_q,
+                                const Eigen::VectorXd t_dot_q,
+                                const Eigen::VectorXd t_ddot_q);
 
+private:
+
+
+    const unsigned int m_number_of_chebyshev_points { 16 };
+
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack;
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack;
+
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack;
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack;
+
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack;
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack;
+
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_quaternion_integrator;
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_position_integrator;
 
 };
+
+
+
+}   //  namespace CROSP
 
 #endif // COSSERAT_ROD_HPP
