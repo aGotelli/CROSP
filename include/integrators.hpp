@@ -63,9 +63,12 @@ struct PositionIntegrator : public OSNI::ODEb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
-        m_rotation_matrix_at_point = Eigen::Quaterniond(m_quaternion_integrator->getStateAtPoint(t_point).data()).toRotationMatrix();
+        m_quaternion_at_point = {m_quaternion_integrator->getStateAtPoint(t_point)(0),
+                                m_quaternion_integrator->getStateAtPoint(t_point)(1),
+                                m_quaternion_integrator->getStateAtPoint(t_point)(2),
+                                m_quaternion_integrator->getStateAtPoint(t_point)(3)};
 
-        return m_rotation_matrix_at_point * m_Lambda_stack->at(t_point);
+        return m_quaternion_at_point.toRotationMatrix() * m_Lambda_stack->at(t_point);
     }
 
 
@@ -73,7 +76,7 @@ struct PositionIntegrator : public OSNI::ODEb {
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack;
 
-    Eigen::Quaterniond m_rotation_matrix_at_point;
+    Eigen::Quaterniond m_quaternion_at_point;
 
 };
 
