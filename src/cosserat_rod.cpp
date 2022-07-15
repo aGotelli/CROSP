@@ -44,6 +44,7 @@ void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
         m_K_stack->at(i) = Phi*t_qe;
         m_dot_K_stack->at(i) = Phi*t_dot_qe;
         m_ddot_K_stack->at(i) = Phi*t_ddot_qe;
+
     }
 
     for(unsigned int i=0; i<m_number_of_chebyshev_points; i++){
