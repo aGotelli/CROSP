@@ -115,9 +115,26 @@ int main(int argc, char *argv[])
     dot_qe = generalised_coordinates(Eigen::all, 1);
     ddot_qe = generalised_coordinates(Eigen::all, 2);
 
+    std::cout << "qe : \n" << qe << "\n\n\n";
+    std::cout << "dot_qe : \n" << dot_qe << "\n\n\n";
+    std::cout << "ddot_qe : \n" << ddot_qe << "\n\n\n";
+
     cosserat_rod.updateParameterisation(qe, dot_qe, ddot_qe);
 
-    cosserat_rod.forwardKinematics();
+    Eigen::MatrixXd init_quaternion;
+    Eigen::MatrixXd init_position;
+    Eigen::MatrixXd init_eta;
+    Eigen::MatrixXd init_angular_velocity;
+
+    LoadEigenMatrixFromFile(init_quaternion, "Q0.csv", "../../tests/data/");
+    LoadEigenMatrixFromFile(init_position, "r0.csv", "../../tests/data/");
+    LoadEigenMatrixFromFile(init_eta, "eta0.csv", "../../tests/data/");
+
+    init_angular_velocity = init_eta.block<3,1>(0, 0);
+
+    cosserat_rod.forwardKinematics(init_quaternion,
+                                   init_position,
+                                   init_angular_velocity);
 
 
     Eigen::MatrixXd quaternion_stack_from_ode45;
