@@ -34,8 +34,11 @@ public:
                            const Eigen::Vector3d &t_initial_position=Eigen::Vector3d::Zero(),
                            const Eigen::Vector3d &t_initial_angular_velocity=Eigen::Vector3d::Zero());
 
-private:
 
+
+#ifndef DEVELOPER
+private:
+#endif
 
 
     const unsigned int m_ne { 3 };
