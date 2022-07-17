@@ -17,19 +17,21 @@
 namespace CROSP {
 
 CosseratRod::CosseratRod() :
-    m_quaternion_integrator(std::make_shared<QuaternionIntegrator>(m_K_stack)),
-    m_position_integrator(std::make_shared<PositionIntegrator>(m_quaternion_integrator, m_Lambda_stack)),
-    m_angular_velocity_integrator(std::make_shared<AngularVelocityIntegrator>(m_K_stack, m_dot_K_stack)),
+    m_Chebyshev_points( ComputeChebyshevPoints(m_number_of_chebyshev_points) ),
     m_polynomial_base([](const unsigned int t_point, const double& t_x) {
                             return boost::math::legendre_p(t_point, t_x);
                         }),
-    m_Chebyshev_points( ComputeChebyshevPoints(m_number_of_chebyshev_points) ),
     m_K_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
     m_Lambda_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
     m_dot_K_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
     m_dot_Lambda_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
     m_ddot_K_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
-    m_ddot_Lambda_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) )
+    m_ddot_Lambda_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
+    //  The integrators
+    m_quaternion_integrator(std::make_shared<QuaternionIntegrator>(m_K_stack)),
+    m_position_integrator(std::make_shared<PositionIntegrator>(m_quaternion_integrator, m_Lambda_stack)),
+    m_angular_velocity_integrator(std::make_shared<AngularVelocityIntegrator>(m_K_stack, m_dot_K_stack)),
+    m_linear_velocity_integrator(std::make_shared<LinearVelocityIntegrator>(m_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_angular_velocity_integrator))
 {}
 
 void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
@@ -56,7 +58,8 @@ void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
 
 void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                                     const Eigen::Vector3d &t_initial_position,
-                                    const Eigen::Vector3d &t_initial_angular_velocity)
+                                    const Eigen::Vector3d &t_initial_angular_velocity,
+                                    const Eigen::Vector3d &t_initial_linear_velocity)
 {
     m_quaternion_integrator->integrate(t_initial_quaternion);
 
@@ -64,11 +67,15 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 
     m_angular_velocity_integrator->integrate(t_initial_angular_velocity);
 
+    m_linear_velocity_integrator->integrate(t_initial_linear_velocity);
+
     std::cout << "Quaternions : \n" << m_quaternion_integrator->getStack() << std::endl;
 
     std::cout << "Positiions : \n" << m_position_integrator->getStack() << std::endl;
 
     std::cout << "Angular Velocities : \n" << m_angular_velocity_integrator->getStack() << std::endl;
+
+    std::cout << "Linear Velocities : \n" << m_linear_velocity_integrator->getStack() << std::endl;
 }
 
 
