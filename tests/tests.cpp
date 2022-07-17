@@ -125,25 +125,30 @@ int main(int argc, char *argv[])
     Eigen::MatrixXd init_position;
     Eigen::MatrixXd init_eta;
     Eigen::MatrixXd init_angular_velocity;
+    Eigen::MatrixXd init_linear_velocity;
 
     LoadEigenMatrixFromFile(init_quaternion, "Q0.csv", "../../tests/data/");
     LoadEigenMatrixFromFile(init_position, "r0.csv", "../../tests/data/");
     LoadEigenMatrixFromFile(init_eta, "eta0.csv", "../../tests/data/");
 
     init_angular_velocity = init_eta.block<3,1>(0, 0);
+    init_linear_velocity = init_eta.block<3,1>(3, 0);
 
     cosserat_rod.forwardKinematics(init_quaternion,
                                    init_position,
-                                   init_angular_velocity);
+                                   init_angular_velocity,
+                                   init_linear_velocity);
 
 
     Eigen::MatrixXd quaternion_stack_from_ode45;
     Eigen::MatrixXd position_stack_from_ode45;
     Eigen::MatrixXd angular_velocity_stack_from_ode45;
+    Eigen::MatrixXd linear_velocity_stack_from_ode45;
 
     LoadEigenMatrixFromFile(quaternion_stack_from_ode45, "quaternion_stack.csv", "../../tests/data/");
     LoadEigenMatrixFromFile(position_stack_from_ode45, "position_stack.csv", "../../tests/data/");
     LoadEigenMatrixFromFile(angular_velocity_stack_from_ode45, "angular_velocity_stack.csv", "../../tests/data/");
+    LoadEigenMatrixFromFile(linear_velocity_stack_from_ode45, "linear_velocity_stack.csv", "../../tests/data/");
 
 
     const unsigned int number_of_Chebyshev_points = position_stack_from_ode45.rows();
@@ -151,14 +156,17 @@ int main(int argc, char *argv[])
     const Eigen::MatrixXd quaternions_relative_error = quaternion_stack_from_ode45 - cosserat_rod.m_quaternion_integrator->getStack();
     const Eigen::MatrixXd positions_relative_error = position_stack_from_ode45 - cosserat_rod.m_position_integrator->getStack();
     const Eigen::MatrixXd angular_velocity_relative_error = angular_velocity_stack_from_ode45 - cosserat_rod.m_angular_velocity_integrator->getStack();
+    const Eigen::MatrixXd linear_velocity_relative_error = linear_velocity_stack_from_ode45 - cosserat_rod.m_linear_velocity_integrator->getStack();
 
     writeToFile("quaternions_relative_error", quaternions_relative_error, "../../tests/data/");
     writeToFile("positions_relative_error", positions_relative_error, "../../tests/data/");
     writeToFile("angular_velocity_relative_error", angular_velocity_relative_error, "../../tests/data/");
+    writeToFile("linear_velocity_relative_error", linear_velocity_relative_error, "../../tests/data/");
 
     std::cout << "Relative errors in quaternions : \n" << quaternions_relative_error << "\n\n" << std::endl;
     std::cout << "Relative errors in positions : \n" << positions_relative_error << "\n\n" << std::endl;
     std::cout << "Relative errors in angular velocities : \n" << angular_velocity_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in linear velocities : \n" << linear_velocity_relative_error << "\n\n" << std::endl;
 
     return 0;
 }
