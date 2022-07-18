@@ -169,7 +169,132 @@ struct LinearVelocityIntegrator : public OSNI::ODEAb {
 
 
 
+struct AngularAccelerationIntegrator : public OSNI::ODEAb {
 
+    AngularAccelerationIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_K_stack,
+                                  const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator) : OSNI::ODEAb(3),
+                                                                                                                         m_K_stack(t_K_stack),
+                                                                                                                         m_dot_K_stack(t_dot_K_stack),
+                                                                                                                         m_ddot_K_stack(t_ddot_K_stack),
+                                                                                                                         m_angular_velocity_integrator(t_angular_velocity_integrator){}
+
+    AngularAccelerationIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_K_stack,
+                                  const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                                  const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEAb(3, t_number_of_Chebyshev_points),
+                                                                                     m_K_stack(t_K_stack),
+                                                                                     m_dot_K_stack(t_dot_K_stack),
+                                                                                     m_ddot_K_stack(t_ddot_K_stack),
+                                                                                     m_angular_velocity_integrator(t_angular_velocity_integrator){}
+
+
+
+    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final
+    {
+        return -skew( m_K_stack->at(t_point) );
+    }
+
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
+    {
+        return m_ddot_K_stack->at(t_point) - skew( m_dot_K_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point);
+    }
+
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_K_stack;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity_integrator;
+
+
+};
+
+
+
+
+
+
+
+struct LinearAccelerationIntegrator : public OSNI::ODEAb {
+
+    LinearAccelerationIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_Lambda_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_Lambda_stack,
+                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator) : OSNI::ODEAb(3),
+                                                                                                                            m_K_stack(t_K_stack),
+                                                                                                                            m_dot_K_stack(t_dot_K_stack),
+                                                                                                                            m_Lambda_stack(t_Lambda_stack),
+                                                                                                                            m_dot_Lambda_stack(t_dot_Lambda_stack),
+                                                                                                                            m_ddot_Lambda_stack(t_ddot_Lambda_stack),
+                                                                                                                            m_angular_velocity_integrator(t_angular_velocity_integrator),
+                                                                                                                            m_linear_velocity_integrator(t_linear_velocity_integrator),
+                                                                                                                            m_angular_acceleration_integrator(t_angular_acceleration_integrator)
+    {}
+
+    LinearAccelerationIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_Lambda_stack,
+                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_Lambda_stack,
+                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
+                                 const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEAb(3, t_number_of_Chebyshev_points),
+                                                                                    m_K_stack(t_K_stack),
+                                                                                    m_dot_K_stack(t_dot_K_stack),
+                                                                                    m_Lambda_stack(t_Lambda_stack),
+                                                                                    m_dot_Lambda_stack(t_dot_Lambda_stack),
+                                                                                    m_ddot_Lambda_stack(t_ddot_Lambda_stack),
+                                                                                    m_angular_velocity_integrator(t_angular_velocity_integrator),
+                                                                                    m_linear_velocity_integrator(t_linear_velocity_integrator),
+                                                                                    m_angular_acceleration_integrator(t_angular_acceleration_integrator)
+    {}
+
+
+
+    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final
+    {
+        return -skew( m_K_stack->at(t_point) );
+    }
+
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
+    {
+        return m_ddot_Lambda_stack->at(t_point) - skew( m_Lambda_stack->at(t_point) ) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
+                                                - skew( m_dot_Lambda_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point)
+                                                - skew( m_dot_K_stack->at(t_point) ) * m_linear_velocity_integrator->getStateAtPoint(t_point);
+    }
+
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Lambda_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity_integrator;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity_integrator;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_acceleration_integrator;
+
+
+
+};
 
 
 

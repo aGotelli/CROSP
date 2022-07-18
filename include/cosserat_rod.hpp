@@ -33,7 +33,9 @@ public:
     void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion=Eigen::Vector4d(1, 0, 0, 0),
                            const Eigen::Vector3d &t_initial_position=Eigen::Vector3d::Zero(),
                            const Eigen::Vector3d &t_initial_angular_velocity=Eigen::Vector3d::Zero(),
-                           const Eigen::Vector3d &t_initial_linear_velocity=Eigen::Vector3d::Zero());
+                           const Eigen::Vector3d &t_initial_linear_velocity=Eigen::Vector3d::Zero(),
+                           const Eigen::Vector3d &t_initial_angular_acceleration=Eigen::Vector3d::Zero(),
+                           const Eigen::Vector3d &t_initial_linear_acceleration=Eigen::Vector3d::Zero());
 
 
 
@@ -77,6 +79,10 @@ private:
     std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity_integrator;
 
     std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity_integrator;
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration_integrator;
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration_integrator;
 
 };
 

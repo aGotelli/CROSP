@@ -31,7 +31,10 @@ CosseratRod::CosseratRod() :
     m_quaternion_integrator(std::make_shared<QuaternionIntegrator>(m_K_stack)),
     m_position_integrator(std::make_shared<PositionIntegrator>(m_quaternion_integrator, m_Lambda_stack)),
     m_angular_velocity_integrator(std::make_shared<AngularVelocityIntegrator>(m_K_stack, m_dot_K_stack)),
-    m_linear_velocity_integrator(std::make_shared<LinearVelocityIntegrator>(m_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_angular_velocity_integrator))
+    m_linear_velocity_integrator(std::make_shared<LinearVelocityIntegrator>(m_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_angular_velocity_integrator)),
+    m_angular_acceleration_integrator(std::make_shared<AngularAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_ddot_K_stack, m_angular_velocity_integrator)),
+    m_linear_acceleration_integrator(std::make_shared<LinearAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_ddot_Lambda_stack, m_angular_velocity_integrator,
+                                                                                     m_linear_velocity_integrator, m_angular_acceleration_integrator))
 {}
 
 void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
@@ -59,7 +62,9 @@ void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
 void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                                     const Eigen::Vector3d &t_initial_position,
                                     const Eigen::Vector3d &t_initial_angular_velocity,
-                                    const Eigen::Vector3d &t_initial_linear_velocity)
+                                    const Eigen::Vector3d &t_initial_linear_velocity,
+                                    const Eigen::Vector3d &t_initial_angular_acceleration,
+                                    const Eigen::Vector3d &t_initial_linear_acceleration)
 {
     m_quaternion_integrator->integrate(t_initial_quaternion);
 
@@ -69,6 +74,10 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 
     m_linear_velocity_integrator->integrate(t_initial_linear_velocity);
 
+    m_angular_acceleration_integrator->integrate(t_initial_angular_acceleration);
+
+    m_linear_acceleration_integrator->integrate(t_initial_linear_acceleration);
+
     std::cout << "Quaternions : \n" << m_quaternion_integrator->getStack() << std::endl;
 
     std::cout << "Positiions : \n" << m_position_integrator->getStack() << std::endl;
@@ -76,6 +85,11 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
     std::cout << "Angular Velocities : \n" << m_angular_velocity_integrator->getStack() << std::endl;
 
     std::cout << "Linear Velocities : \n" << m_linear_velocity_integrator->getStack() << std::endl;
+
+    std::cout << "Angular Accelerations : \n" << m_angular_acceleration_integrator->getStack() << std::endl;
+
+    std::cout << "Linear Accelerations : \n" << m_linear_acceleration_integrator->getStack() << std::endl;
+
 }
 
 
