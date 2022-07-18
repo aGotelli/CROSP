@@ -78,18 +78,6 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 
     m_linear_acceleration_integrator->integrate(t_initial_linear_acceleration);
 
-    std::cout << "Quaternions : \n" << m_quaternion_integrator->getStack() << std::endl;
-
-    std::cout << "Positiions : \n" << m_position_integrator->getStack() << std::endl;
-
-    std::cout << "Angular Velocities : \n" << m_angular_velocity_integrator->getStack() << std::endl;
-
-    std::cout << "Linear Velocities : \n" << m_linear_velocity_integrator->getStack() << std::endl;
-
-    std::cout << "Angular Accelerations : \n" << m_angular_acceleration_integrator->getStack() << std::endl;
-
-    std::cout << "Linear Accelerations : \n" << m_linear_acceleration_integrator->getStack() << std::endl;
-
 }
 
 
