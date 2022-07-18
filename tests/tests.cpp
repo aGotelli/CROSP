@@ -98,9 +98,9 @@ void LoadEigenMatrixFromFile(Eigen::MatrixXd &t_matrix,
 }
 
 
-int main(int argc, char *argv[])
-{
 
+void testRelativeComputations()
+{
     CROSP::CosseratRod cosserat_rod;
 
     constexpr unsigned int ne = 3;
@@ -186,6 +186,119 @@ int main(int argc, char *argv[])
     std::cout << "Relative errors in linear velocities : \n" << linear_velocity_relative_error << "\n\n" << std::endl;
     std::cout << "Relative errors in angular accelerations : \n" << angular_acceleration_relative_error << "\n\n" << std::endl;
     std::cout << "Relative errors in linear accelerations : \n" << linear_acceleration_relative_error << "\n\n" << std::endl;
+
+}
+
+
+void testRelativePrecision(const unsigned int t_number_of_Chebyshev_points)
+{
+
+
+    CROSP::CosseratRod cosserat_rod(t_number_of_Chebyshev_points);
+
+    constexpr unsigned int ne = 3;
+    constexpr unsigned int na = 3;
+    Eigen::VectorXd qe, dot_qe, ddot_qe;
+
+    Eigen::MatrixXd generalised_coordinates;
+
+    LoadEigenMatrixFromFile(generalised_coordinates, "qe-dot_qe-ddotqe_"+std::to_string(t_number_of_Chebyshev_points)+".csv", "../../tests/data/");
+
+    qe = generalised_coordinates(Eigen::all, 0);
+    dot_qe = generalised_coordinates(Eigen::all, 1);
+    ddot_qe = generalised_coordinates(Eigen::all, 2);
+
+
+    cosserat_rod.updateParameterisation(qe, dot_qe, ddot_qe);
+
+    Eigen::MatrixXd init_quaternion;
+    Eigen::MatrixXd init_position;
+    Eigen::MatrixXd init_eta;
+    Eigen::MatrixXd init_angular_velocity;
+    Eigen::MatrixXd init_linear_velocity;
+    Eigen::MatrixXd init_dot_eta;
+    Eigen::MatrixXd init_angular_acceleration;
+    Eigen::MatrixXd init_linear_acceleration;
+
+    LoadEigenMatrixFromFile(init_quaternion, "Q0_"+std::to_string(t_number_of_Chebyshev_points)+".csv", "../../tests/data/");
+    LoadEigenMatrixFromFile(init_position, "r0_"+std::to_string(t_number_of_Chebyshev_points)+".csv", "../../tests/data/");
+    LoadEigenMatrixFromFile(init_eta, "eta0_"+std::to_string(t_number_of_Chebyshev_points)+".csv", "../../tests/data/");
+    LoadEigenMatrixFromFile(init_dot_eta, "dot_eta0_"+std::to_string(t_number_of_Chebyshev_points)+".csv", "../../tests/data/");
+
+
+    init_angular_velocity = init_eta.block<3,1>(0, 0);
+    init_linear_velocity = init_eta.block<3,1>(3, 0);
+
+    init_angular_acceleration = init_dot_eta.block<3,1>(0, 0);
+    init_linear_acceleration = init_dot_eta.block<3,1>(3, 0);
+
+    cosserat_rod.forwardKinematics(init_quaternion,
+                                   init_position,
+                                   init_angular_velocity,
+                                   init_linear_velocity,
+                                   init_angular_acceleration,
+                                   init_linear_acceleration);
+
+
+
+
+    Eigen::MatrixXd final_state_from_ode45;
+
+
+    LoadEigenMatrixFromFile(final_state_from_ode45, "final_state_"+std::to_string(t_number_of_Chebyshev_points)+".csv", "../../tests/data/");
+
+
+    Eigen::MatrixXd final_state = final_state_from_ode45;
+
+
+    final_state.block<4,1>(0, 0) = cosserat_rod.m_quaternion_integrator->getStateAtPoint(0);
+    final_state.block<3,1>(4, 0) = cosserat_rod.m_position_integrator->getStateAtPoint(0);
+    final_state.block<3,1>(7, 0) = cosserat_rod.m_angular_velocity_integrator->getStateAtPoint(0);
+    final_state.block<3,1>(10, 0) = cosserat_rod.m_linear_velocity_integrator->getStateAtPoint(0);
+    final_state.block<3,1>(13, 0) = cosserat_rod.m_angular_acceleration_integrator->getStateAtPoint(0);
+    final_state.block<3,1>(16, 0) = cosserat_rod.m_linear_acceleration_integrator->getStateAtPoint(0);
+
+
+//    std::cout << "final_state :\n" << final_state << std::endl;
+
+    const Eigen::MatrixXd final_state_relative_error = final_state_from_ode45 - final_state;
+
+    writeToFile("final_state_relative_error_"+std::to_string(t_number_of_Chebyshev_points), final_state_relative_error, "../../tests/data/");
+
+    std::cout << "For : " << t_number_of_Chebyshev_points << ", the errors are : \n" << final_state_relative_error << "\n\n" << std::endl;
+}
+
+
+void processData(const std::vector<unsigned int> &t_tested_points)
+{
+
+    Eigen::MatrixXd precision_benchmack(t_tested_points.size(), 2);
+
+    for(unsigned int i=0; i<t_tested_points.size(); i++){
+        Eigen::MatrixXd final_state_relative_error;
+        LoadEigenMatrixFromFile(final_state_relative_error, "final_state_relative_error_"+std::to_string(t_tested_points[i])+".csv", "../../tests/data/");
+
+        precision_benchmack(i, 0) = t_tested_points[i];
+        precision_benchmack(i, 1) = final_state_relative_error.norm();
+    }
+
+    writeToFile("precision_benchmack", precision_benchmack, "../../tests/data/");
+}
+
+
+int main(int argc, char *argv[])
+{
+
+//    testRelativeComputations();
+
+    std::vector<unsigned int> points_to_test {
+        10, 15, 20, 25, 30, 35
+    };
+
+    for(const auto points : points_to_test)
+        testRelativePrecision( points );
+
+    processData( points_to_test );
 
     return 0;
 }
