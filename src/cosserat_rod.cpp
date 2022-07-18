@@ -34,7 +34,31 @@ CosseratRod::CosseratRod() :
     m_linear_velocity_integrator(std::make_shared<LinearVelocityIntegrator>(m_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_angular_velocity_integrator)),
     m_angular_acceleration_integrator(std::make_shared<AngularAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_ddot_K_stack, m_angular_velocity_integrator)),
     m_linear_acceleration_integrator(std::make_shared<LinearAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_ddot_Lambda_stack, m_angular_velocity_integrator,
-                                                                                     m_linear_velocity_integrator, m_angular_acceleration_integrator))
+                                                                                     m_linear_velocity_integrator, m_angular_acceleration_integrator)),
+    m_internal_forces_integrator(std::make_shared<InternalForcesIntegrator>(m_material_properties.m_M.block<3,3>(3, 3), m_K_stack, m_angular_velocity_integrator,
+                                                                            m_linear_velocity_integrator, m_linear_acceleration_integrator, m_quaternion_integrator,
+                                                                            m_position_integrator))
+{}
+
+CosseratRod::CosseratRod(const unsigned int t_number_of_chebyshev_points) : m_number_of_chebyshev_points(t_number_of_chebyshev_points),
+                                                                            m_Chebyshev_points( ComputeChebyshevPoints(m_number_of_chebyshev_points) ),
+                                                                            m_polynomial_base([](const unsigned int t_point, const double& t_x) {
+                                                                                                    return boost::math::legendre_p(t_point, t_x);
+                                                                                                }),
+                                                                            m_K_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
+                                                                            m_Lambda_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
+                                                                            m_dot_K_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
+                                                                            m_dot_Lambda_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
+                                                                            m_ddot_K_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
+                                                                            m_ddot_Lambda_stack( std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) ),
+                                                                            //  The integrators
+                                                                            m_quaternion_integrator(std::make_shared<QuaternionIntegrator>(m_K_stack, m_number_of_chebyshev_points)),
+                                                                            m_position_integrator(std::make_shared<PositionIntegrator>(m_quaternion_integrator, m_Lambda_stack, m_number_of_chebyshev_points)),
+                                                                            m_angular_velocity_integrator(std::make_shared<AngularVelocityIntegrator>(m_K_stack, m_dot_K_stack, m_number_of_chebyshev_points)),
+                                                                            m_linear_velocity_integrator(std::make_shared<LinearVelocityIntegrator>(m_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_angular_velocity_integrator, m_number_of_chebyshev_points)),
+                                                                            m_angular_acceleration_integrator(std::make_shared<AngularAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_ddot_K_stack, m_angular_velocity_integrator, m_number_of_chebyshev_points)),
+                                                                            m_linear_acceleration_integrator(std::make_shared<LinearAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_ddot_Lambda_stack, m_angular_velocity_integrator,
+                                                                                                                                                             m_linear_velocity_integrator, m_angular_acceleration_integrator, m_number_of_chebyshev_points))
 {}
 
 void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
@@ -78,6 +102,13 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 
     m_linear_acceleration_integrator->integrate(t_initial_linear_acceleration);
 
+}
+
+
+void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
+                                   const Eigen::Vector3d &t_couple_at_tip)
+{
+    //m_internal_forces_integrator->integrate(t_force_at_tip);
 }
 
 

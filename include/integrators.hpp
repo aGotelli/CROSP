@@ -299,6 +299,65 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
 
 
 
+struct InternalForcesIntegrator : public OSNI::ODEAb {
+    InternalForcesIntegrator(const Eigen::Matrix3d t_M_linear,
+                             std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator) : OSNI::ODEAb(3),
+                                                                                                      m_M_linear(t_M_linear),
+                                                                                                      m_K_stack(t_K_stack),
+                                                                                                      m_angular_velocity_integrator(t_angular_velocity_integrator),
+                                                                                                      m_linear_velocity_integrator(t_linear_velocity_integrator),
+                                                                                                      m_linear_acceleration_integrator(t_linear_acceleration_integrator),
+                                                                                                      m_quaternion_integrator(t_quaternion_integrator),
+                                                                                                      m_position_integrator(t_position_integrator)
+    {}
+
+
+
+    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final
+    {
+        return -skew( m_K_stack->at(t_point) ).transpose();
+    }
+
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
+    {
+        return m_M_linear*m_linear_acceleration_integrator->getStateAtPoint(t_point)
+                - skew( m_angular_velocity_integrator->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity_integrator->getStateAtPoint(t_point)
+                + computeDistributedForce(m_quaternion_integrator->getStateAtPoint(t_point), m_position_integrator->getStateAtPoint(t_point));
+    }
+
+
+    virtual Eigen::VectorXd computeDistributedForce(const Eigen::Vector4d &t_quaternion, const Eigen::Vector3d &t_position)
+    {
+        return Eigen::Vector3d::Zero();
+    }
+
+
+    const Eigen::Matrix3d m_M_linear;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity_integrator;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity_integrator;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_acceleration_integrator;
+
+    std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion_integrator;
+
+    std::shared_ptr<const OSNI::ODESolverInterface> m_position_integrator;
+
+
+};
+
+
+
+
 }   //  namespace CROSP
 
 
