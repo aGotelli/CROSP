@@ -15,6 +15,9 @@ find_package(math_tools REQUIRED)
 find_package(OSNI REQUIRED)
 
 
+find_package(benchmark REQUIRED)
+
+
 include_directories(include)
 
 
@@ -28,3 +31,8 @@ target_link_libraries(${PROJECT_NAME} math_tools Eigen3::Eigen OSNI)
 add_executable(tests tests/tests.cpp)
 target_link_libraries(tests ${PROJECT_NAME} math_tools)
 target_compile_definitions(tests PRIVATE DEVELOPER)
+
+
+add_executable(benchmark tests/benchmark.cpp)
+target_link_libraries(benchmark ${PROJECT_NAME} benchmark::benchmark)
+
