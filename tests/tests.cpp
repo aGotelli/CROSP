@@ -285,6 +285,32 @@ void processData(const std::vector<unsigned int> &t_tested_points)
     writeToFile("precision_benchmack", precision_benchmack, "../../tests/data/");
 }
 
+#include <iomanip>
+void processDataAdavanced(const std::vector<unsigned int> &t_tested_points)
+{
+
+    Eigen::MatrixXd precision_benchmack_advanced(t_tested_points.size(), 7);
+//    std::ofstream myfile;
+//    myfile.open ("precision_benchmack_advanced.csv");
+//    myfile << "points, quaternions_norm, positions_norm, angular_velocities_norm, linear_velocites_norm, angular_acceleration_norm, linear_acceleration_norm, time, standard_deviation \n";
+
+//    myfile << std::fixed << std::setprecision(16) << std::endl;
+    for(unsigned int i=0; i<t_tested_points.size(); i++){
+        Eigen::MatrixXd final_state_relative_error;
+        LoadEigenMatrixFromFile(final_state_relative_error, "final_state_relative_error_"+std::to_string(t_tested_points[i])+".csv", "../../tests/data/");
+
+        precision_benchmack_advanced.row(i) <<  t_tested_points[i],
+                                                final_state_relative_error.block<4,1>(0, 0).norm(),
+                                                final_state_relative_error.block<3,1>(4, 0).norm(),
+                                                final_state_relative_error.block<3,1>(7, 0).norm(),
+                                                final_state_relative_error.block<3,1>(10, 0).norm(),
+                                                final_state_relative_error.block<3,1>(13, 0).norm(),
+                                                final_state_relative_error.block<3,1>(16, 0).norm();
+    }
+
+    writeToFile("precision_benchmack_advanced", precision_benchmack_advanced, "../../tests/data/");
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -292,13 +318,18 @@ int main(int argc, char *argv[])
 //    testRelativeComputations();
 
     std::vector<unsigned int> points_to_test {
-        10, 15, 20, 25, 30, 35
+        10,
+        15,
+        20,
+        25,
+        30,
+        35
     };
 
     for(const auto points : points_to_test)
         testRelativePrecision( points );
 
-    processData( points_to_test );
+    processDataAdavanced( points_to_test );
 
     return 0;
 }
