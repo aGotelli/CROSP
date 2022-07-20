@@ -187,6 +187,32 @@ void testRelativeComputations()
     std::cout << "Relative errors in angular accelerations : \n" << angular_acceleration_relative_error << "\n\n" << std::endl;
     std::cout << "Relative errors in linear accelerations : \n" << linear_acceleration_relative_error << "\n\n" << std::endl;
 
+
+
+    Eigen::MatrixXd init_F1;
+    Eigen::MatrixXd init_force;
+    Eigen::MatrixXd init_couple;
+
+    LoadEigenMatrixFromFile(init_F1, "F1.csv", "../../tests/data/");
+    init_force = init_F1.block<3,1>(0, 0);
+    init_couple = init_F1.block<3,1>(3, 0);
+
+    cosserat_rod.backwardDynamics(init_force, init_couple);
+
+    Eigen::MatrixXd force_stack_from_ode45;
+//    Eigen::MatrixXd couple_stack_from_ode45;
+
+    LoadEigenMatrixFromFile(force_stack_from_ode45, "force_stack.csv", "../../tests/data/");
+//    LoadEigenMatrixFromFile(force_stack_from_ode45, "couple_stack.csv", "../../tests/data/");
+
+    const Eigen::MatrixXd force_relative_error = force_stack_from_ode45 - cosserat_rod.m_internal_forces_integrator->getStack();
+//    const Eigen::MatrixXd couple_relative_error = force_stack_from_ode45 - cosserat_rod.m_internal_couples_integrator->getStack();
+
+    writeToFile("force_relative_error", force_relative_error, "../../tests/data/");
+//    writeToFile("couple_relative_error", couple_relative_error, "../../tests/data/");
+
+    std::cout << "Relative errors in forces : \n" << force_relative_error << "\n\n" << std::endl;
+//    std::cout << "Relative errors in couples : \n" << couple_relative_error << "\n\n" << std::endl;
 }
 
 
@@ -315,21 +341,21 @@ void processDataAdavanced(const std::vector<unsigned int> &t_tested_points)
 int main(int argc, char *argv[])
 {
 
-//    testRelativeComputations();
+    testRelativeComputations();
 
-    std::vector<unsigned int> points_to_test {
-        10,
-        15,
-        20,
-        25,
-        30,
-        35
-    };
+//    std::vector<unsigned int> points_to_test {
+//        10,
+//        15,
+//        20,
+//        25,
+//        30,
+//        35
+//    };
 
-    for(const auto points : points_to_test)
-        testRelativePrecision( points );
+//    for(const auto points : points_to_test)
+//        testRelativePrecision( points );
 
-    processDataAdavanced( points_to_test );
+//    processDataAdavanced( points_to_test );
 
     return 0;
 }
