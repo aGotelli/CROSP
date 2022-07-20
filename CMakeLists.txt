@@ -25,7 +25,7 @@ include_directories(include)
 add_library(${PROJECT_NAME} include/integrators.hpp
                             include/cosserat_rod.hpp
                             src/cosserat_rod.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE math_tools Eigen3::Eigen OSNI)
+target_link_libraries(${PROJECT_NAME} PUBLIC math_tools Eigen3::Eigen OSNI)
 
 
 add_executable(tests tests/tests.cpp)
@@ -34,5 +34,5 @@ target_compile_definitions(tests PRIVATE DEVELOPER)
 
 
 add_executable(benchmark tests/benchmark.cpp)
-target_link_libraries(benchmark PRIVATE ${PROJECT_NAME} benchmark::benchmark)
+target_link_libraries(benchmark PRIVATE ${PROJECT_NAME} benchmark::benchmark Eigen3::Eigen)
 
