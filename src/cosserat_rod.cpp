@@ -108,7 +108,7 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
                                    const Eigen::Vector3d &t_couple_at_tip)
 {
-    //m_internal_forces_integrator->integrate(t_force_at_tip);
+    m_internal_forces_integrator->integrate(t_force_at_tip);
 }
 
 
