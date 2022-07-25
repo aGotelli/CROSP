@@ -241,6 +241,8 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
                                                                                                                             m_angular_acceleration_integrator(t_angular_acceleration_integrator)
     {}
 
+
+
     LinearAccelerationIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
@@ -270,6 +272,10 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
+        const auto b_local = m_ddot_Lambda_stack->at(t_point) - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_dot_Lambda_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_linear_velocity_integrator->getStateAtPoint(t_point);
+        std::cout << "At point " << t_point << " b : " << b_local << std::endl;
         return m_ddot_Lambda_stack->at(t_point) - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
                                                 - ::LieAlgebra::skew( m_dot_Lambda_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point)
                                                 - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_linear_velocity_integrator->getStateAtPoint(t_point);
@@ -316,33 +322,37 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
                                                                                                       m_position_integrator(t_position_integrator)
     {}
 
+    InternalForcesIntegrator(const Eigen::Matrix3d t_M_linear,
+                             std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
+                             const unsigned int t_number_of_Chebyshev_points) :                       OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD, t_number_of_Chebyshev_points),
+                                                                                                      m_M_linear(t_M_linear),
+                                                                                                      m_K_stack(t_K_stack),
+                                                                                                      m_angular_velocity_integrator(t_angular_velocity_integrator),
+                                                                                                      m_linear_velocity_integrator(t_linear_velocity_integrator),
+                                                                                                      m_linear_acceleration_integrator(t_linear_acceleration_integrator),
+                                                                                                      m_quaternion_integrator(t_quaternion_integrator),
+                                                                                                      m_position_integrator(t_position_integrator)
+    {}
+
 
 
     virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final
     {
-        Eigen::Matrix3d A_local = ::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose();
-        std::cout << "At point : " << t_point << " A local : \n";
-        std::cout << A_local << std::endl;
-
-        return A_local;
+        std::cout << "The point : " << t_point << " K : " << m_K_stack->at(t_point).transpose() << std::endl;
+        return ::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose();
     }
 
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
-        Eigen::Vector3d b_local = m_M_linear*m_linear_acceleration_integrator->getStateAtPoint(t_point)
-                                    - ::LieAlgebra::skew( m_angular_velocity_integrator->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity_integrator->getStateAtPoint(t_point)
-                                    + computeDistributedForce(m_quaternion_integrator->getStateAtPoint(t_point), m_position_integrator->getStateAtPoint(t_point));
-        std::cout << "At point : " << t_point << "\n";
-//        std::cout << "  - m_M_linear : \n" << m_M_linear << "\n";
-        std::cout << "  - positions : " << m_position_integrator->getStateAtPoint(t_point).transpose() << "\n";
-        std::cout << "  - linear acceleration : " << m_linear_acceleration_integrator->getStateAtPoint(t_point).transpose() << "\n";
-        std::cout << "  - Angular velovity : " << m_angular_velocity_integrator->getStateAtPoint(t_point).transpose() << "\n";
-        std::cout << "  - Linear velovity : " << m_linear_velocity_integrator->getStateAtPoint(t_point).transpose() << "\n";
-        std::cout << "  - Distributed Forces : " << computeDistributedForce(m_quaternion_integrator->getStateAtPoint(t_point), m_position_integrator->getStateAtPoint(t_point)).transpose() << "\n";
-        std::cout << "b local : " << b_local.transpose() << std::endl << std::endl << std::endl;
-
-        return b_local;
+        return m_M_linear*m_linear_acceleration_integrator->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_angular_velocity_integrator->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity_integrator->getStateAtPoint(t_point)
+                + computeDistributedForce(m_quaternion_integrator->getStateAtPoint(t_point), m_position_integrator->getStateAtPoint(t_point));
     }
 
 
@@ -381,6 +391,30 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
                              const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
+                              const unsigned int t_number_of_Chebyshev_points) :                              OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD, t_number_of_Chebyshev_points),
+                                                                                                              m_M_angular(t_M_angular),
+                                                                                                              m_M_linear(t_M_linear),
+                                                                                                              m_K_stack(t_K_stack),
+                                                                                                              m_Lambda_stack(t_Lambda_stack),
+                                                                                                              m_angular_velocity_integrator(t_angular_velocity_integrator),
+                                                                                                              m_linear_velocity_integrator(t_linear_velocity_integrator),
+                                                                                                              m_angular_acceleration_integrator(t_angular_acceleration_integrator),
+                                                                                                              m_quaternion_integrator(t_quaternion_integrator),
+                                                                                                              m_position_integrator(t_position_integrator),
+                                                                                                              m_internal_forces_integrator(t_internal_forces_integrator)
+    {}
+
+
+    InternalCouplesIntegrator(const Eigen::Matrix3d t_M_angular,
+                             const Eigen::Matrix3d t_M_linear,
+                             std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                             std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator) :  OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD),
                                                                                                               m_M_angular(t_M_angular),
                                                                                                               m_M_linear(t_M_linear),
@@ -404,11 +438,47 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
+
+//        std::cout << "At point : " << t_point << "\n";
+//        std::cout << "  - m_M_linear : \n" << m_M_linear << "\n";
+//        std::cout << "  - m_M_angular : \n" << m_M_angular << "\n";
+//        std::cout << "  - Lambda : " << m_Lambda_stack->at(t_point).transpose() << "\n";
+//        std::cout << "  - forces : " << m_internal_forces_integrator->getStateAtPoint(t_point).transpose() << "\n";
+//        std::cout << "  - positions : " << m_position_integrator->getStateAtPoint(t_point).transpose() << "\n";
+//        std::cout << "  - Angular velocity : " << m_angular_velocity_integrator->getStateAtPoint(t_point).transpose() << "\n";
+//        std::cout << "  - Linear velocity : " << m_linear_velocity_integrator->getStateAtPoint(t_point).transpose() << "\n";
+//        std::cout << "  - Angular acceleration : " << m_angular_acceleration_integrator->getStateAtPoint(t_point).transpose() << "\n";
+////        std::cout << "  - Distributed Forces : " << computeDistributedCouple(m_quaternion_integrator->getStateAtPoint(t_point), m_position_integrator->getStateAtPoint(t_point)).transpose() << "\n";
+
+
+//        const Eigen::Vector3d couple_from_force = ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ).transpose()*m_internal_forces_integrator->getStateAtPoint(t_point);
+//        const Eigen::Vector3d couple_from_acceleration = m_M_angular*m_angular_acceleration_integrator->getStateAtPoint(t_point);
+//        const Eigen::Vector3d couple_from_angular_velocities = ::LieAlgebra::skew(m_angular_velocity_integrator->getStateAtPoint(t_point)).transpose() * m_M_angular * m_angular_velocity_integrator->getStateAtPoint(t_point);
+//        const Eigen::Vector3d couple_from_linear_velocities = ::LieAlgebra::skew( m_linear_velocity_integrator->getStateAtPoint(t_point) ).transpose()* m_M_linear * m_linear_velocity_integrator->getStateAtPoint(t_point);
+//        const Eigen::Vector3d distributed_couple = computeDistributedCouple(m_quaternion_integrator->getStateAtPoint(t_point), m_position_integrator->getStateAtPoint(t_point));
+
+//        std::cout << "  - Couple from forces : " << couple_from_force.transpose() << "\n";
+//        std::cout << "  - Couple from acceleration : " << couple_from_acceleration.transpose() << "\n";
+//        std::cout << "  - Couple from angular velocities : " << couple_from_angular_velocities.transpose() << "\n";
+//        std::cout << "  - Couple from linear velocities : " << couple_from_linear_velocities.transpose() << "\n";
+//        std::cout << "  - Distributed couple : " << distributed_couple.transpose() << "\n";
+
+
+//        const auto b_local = couple_from_force
+//                            + couple_from_acceleration
+//                            - couple_from_angular_velocities
+//                            - couple_from_linear_velocities
+//                            + distributed_couple;
+
         return ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ).transpose()*m_internal_forces_integrator->getStateAtPoint(t_point)
                 + m_M_angular*m_angular_acceleration_integrator->getStateAtPoint(t_point)
                 - ::LieAlgebra::skew(m_angular_velocity_integrator->getStateAtPoint(t_point)).transpose() * m_M_angular * m_angular_velocity_integrator->getStateAtPoint(t_point)
                 - ::LieAlgebra::skew( m_linear_velocity_integrator->getStateAtPoint(t_point) ).transpose()* m_M_linear * m_linear_velocity_integrator->getStateAtPoint(t_point)
                 + computeDistributedCouple(m_quaternion_integrator->getStateAtPoint(t_point), m_position_integrator->getStateAtPoint(t_point));
+
+//        std::cout << "  - b local : " << b_local.transpose() << "\n\n\n" << std::endl;
+
+//        return b_local;
 
     }
 
