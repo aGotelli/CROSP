@@ -17,7 +17,7 @@
 namespace CROSP {
 
 CosseratRod::CosseratRod() :
-    m_Chebyshev_points( ComputeChebyshevPoints(m_number_of_chebyshev_points) ),
+    m_Chebyshev_points( ::Chebyshev::ComputeChebyshevPoints(m_number_of_chebyshev_points) ),
     m_polynomial_base([](const unsigned int t_point, const double& t_x) {
                             return boost::math::legendre_p(t_point, t_x);
                         }),
@@ -34,14 +34,11 @@ CosseratRod::CosseratRod() :
     m_linear_velocity_integrator(std::make_shared<LinearVelocityIntegrator>(m_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_angular_velocity_integrator)),
     m_angular_acceleration_integrator(std::make_shared<AngularAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_ddot_K_stack, m_angular_velocity_integrator)),
     m_linear_acceleration_integrator(std::make_shared<LinearAccelerationIntegrator>(m_K_stack, m_dot_K_stack, m_Lambda_stack, m_dot_Lambda_stack, m_ddot_Lambda_stack, m_angular_velocity_integrator,
-                                                                                     m_linear_velocity_integrator, m_angular_acceleration_integrator)),
-    m_internal_forces_integrator(std::make_shared<InternalForcesIntegrator>(m_material_properties.m_M.block<3,3>(3, 3), m_K_stack, m_angular_velocity_integrator,
-                                                                            m_linear_velocity_integrator, m_linear_acceleration_integrator, m_quaternion_integrator,
-                                                                            m_position_integrator))
+                                                                                     m_linear_velocity_integrator, m_angular_acceleration_integrator))
 {}
 
 CosseratRod::CosseratRod(const unsigned int t_number_of_chebyshev_points) : m_number_of_chebyshev_points(t_number_of_chebyshev_points),
-                                                                            m_Chebyshev_points( ComputeChebyshevPoints(m_number_of_chebyshev_points) ),
+                                                                            m_Chebyshev_points( ::Chebyshev::ComputeChebyshevPoints(m_number_of_chebyshev_points) ),
                                                                             m_polynomial_base([](const unsigned int t_point, const double& t_x) {
                                                                                                     return boost::math::legendre_p(t_point, t_x);
                                                                                                 }),
@@ -102,13 +99,41 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 
     m_linear_acceleration_integrator->integrate(t_initial_linear_acceleration);
 
+//    std::cout << "Quaternions : \n" << m_quaternion_integrator->getStack() << "\n\n\n" << std::endl;
+//    std::cout << "Positions : \n" << m_position_integrator->getStack() << "\n\n\n" << std::endl;
+//    std::cout << "Linear velocities : \n" << m_angular_velocity_integrator->getStack() << "\n\n\n" << std::endl;
+//    std::cout << "Angular velocities : \n" << m_linear_velocity_integrator->getStack() << "\n\n\n" << std::endl;
+//    std::cout << "Linear accelerations : \n" << m_angular_acceleration_integrator->getStack() << "\n\n\n" << std::endl;
+//    std::cout << "Angular accelerations : \n" << m_linear_acceleration_integrator->getStack() << "\n\n\n" << std::endl;
+
 }
 
 
 void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
                                    const Eigen::Vector3d &t_couple_at_tip)
 {
-    m_internal_forces_integrator->integrate(t_force_at_tip);
+    const auto quaternion_at_tip = m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2);
+
+    std::cout << "Quaternion at tip :" << quaternion_at_tip << std::endl;
+
+
+    const Eigen::Matrix3d rod_tip_orientation = Eigen::Quaterniond(m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(0),
+                                                                    m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(1),
+                                                                    m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(2),
+                                                                    m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(3)).toRotationMatrix();
+    //  Map force and couple into local coordinates
+    Eigen::Vector3d force_at_tip_local_coord = rod_tip_orientation.transpose()*t_force_at_tip;
+
+    std::cout << "Force at tip : " << t_force_at_tip.transpose() << "\n Local force : " << force_at_tip_local_coord.transpose() << std::endl;
+
+    Eigen::Vector3d couple_at_tip_local_coord = rod_tip_orientation.transpose()*t_couple_at_tip;
+
+
+    m_internal_forces_integrator->integrate(force_at_tip_local_coord);
+    m_internal_couples_integrator->integrate(couple_at_tip_local_coord);
+
+    std::cout << "Internal forces : \n" << m_internal_forces_integrator->getStack() << "\n\n\n" << std::endl;
+    std::cout << "Internal couples : \n" << m_internal_couples_integrator->getStack() << "\n\n\n" << std::endl;
 }
 
 

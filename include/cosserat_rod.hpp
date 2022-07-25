@@ -47,11 +47,11 @@ struct MaterialProperties {
             return H;}() };
 
 
-    const  Eigen::Matrix<double, 6, 6>  m_M{ [this](){
+    const  Eigen::Matrix<double, 6, 6>  m_M{ Eigen::Matrix<double, 6, 6>::Identity()/*[this](){
             Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
 
             M.diagonal() << m_rho*m_Jx, m_rho*m_Jy, m_rho*m_Jz, m_rho*m_A, m_rho*m_A, m_rho*m_A;
-            return M;}() };
+            return M;}()*/ };
 
 };
 
@@ -89,7 +89,7 @@ private:
     const unsigned int m_na { 3 };
 
 
-    const unsigned int m_number_of_chebyshev_points { 16 };
+    const unsigned int m_number_of_chebyshev_points { 17 };
 
     const std::vector<double> m_Chebyshev_points;
 
@@ -129,7 +129,23 @@ private:
     std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration_integrator;
 
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces_integrator;
+    std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces_integrator { std::make_shared<InternalForcesIntegrator>(m_material_properties.m_M.block<3,3>(3, 3),
+                                                                                                                        m_K_stack, m_angular_velocity_integrator,
+                                                                                                                        m_linear_velocity_integrator,
+                                                                                                                        m_linear_acceleration_integrator,
+                                                                                                                        m_quaternion_integrator,
+                                                                                                                        m_position_integrator)};
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples_integrator { std::make_shared<InternalCouplesIntegrator>(m_material_properties.m_M.block<3,3>(0, 0),
+                                                                                                                          m_material_properties.m_M.block<3,3>(3, 3),
+                                                                                                                          m_K_stack,
+                                                                                                                          m_Lambda_stack,
+                                                                                                                          m_angular_velocity_integrator,
+                                                                                                                          m_linear_velocity_integrator,
+                                                                                                                          m_angular_acceleration_integrator,
+                                                                                                                          m_quaternion_integrator,
+                                                                                                                          m_position_integrator,
+                                                                                                                          m_internal_forces_integrator)};
 
 };
 
