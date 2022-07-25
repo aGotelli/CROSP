@@ -16,6 +16,9 @@
 
 #include <Eigen/Dense>
 
+
+#include <boost/math/special_functions/legendre.hpp>
+
 #include "integrators.hpp"
 
 namespace CROSP {
@@ -59,7 +62,7 @@ struct MaterialProperties {
 class CosseratRod
 {
 public:
-    CosseratRod();
+    CosseratRod()=default;
 
     CosseratRod(const unsigned int t_number_of_chebyshev_points);
 
@@ -91,9 +94,9 @@ private:
 
     const unsigned int m_number_of_chebyshev_points { 17 };
 
-    const std::vector<double> m_Chebyshev_points;
+    const std::vector<double> m_Chebyshev_points { ::Chebyshev::ComputeChebyshevPoints(m_number_of_chebyshev_points) };
 
-    const std::function<double(const unsigned int, const double&)> m_polynomial_base;
+    const std::function<double(const unsigned int, const double&)> m_polynomial_base {[](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);}};
 
     Eigen::MatrixXd getPhi(const double& t_X,
                             const double& t_begin=0,
@@ -105,28 +108,49 @@ private:
 
 
 
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack;
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack;
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
 
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack;
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack;
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack{ std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
 
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack;
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack;
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
 
 
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_quaternion_integrator;
+    std::shared_ptr<OSNI::ODESolverInterface> m_quaternion_integrator { std::make_shared<QuaternionIntegrator>(m_K_stack,
+                                                                                                               m_number_of_chebyshev_points ) };
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_position_integrator;
+    std::shared_ptr<OSNI::ODESolverInterface> m_position_integrator { std::make_shared<PositionIntegrator>(m_quaternion_integrator,
+                                                                                                           m_Lambda_stack,
+                                                                                                           m_number_of_chebyshev_points ) };
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity_integrator;
+    std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity_integrator { std::make_shared<AngularVelocityIntegrator>(m_K_stack,
+                                                                                                                          m_dot_K_stack,
+                                                                                                                          m_number_of_chebyshev_points ) };
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity_integrator;
+    std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity_integrator { std::make_shared<LinearVelocityIntegrator>(m_K_stack,
+                                                                                                                        m_Lambda_stack,
+                                                                                                                        m_dot_Lambda_stack,
+                                                                                                                        m_angular_velocity_integrator,
+                                                                                                                        m_number_of_chebyshev_points ) };
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration_integrator;
+    std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration_integrator { std::make_shared<AngularAccelerationIntegrator>(m_K_stack,
+                                                                                                                                  m_dot_K_stack,
+                                                                                                                                  m_ddot_K_stack,
+                                                                                                                                  m_angular_velocity_integrator,
+                                                                                                                                  m_number_of_chebyshev_points ) };
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration_integrator;
+    std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration_integrator { std::make_shared<LinearAccelerationIntegrator>(m_K_stack,
+                                                                                                                                m_dot_K_stack,
+                                                                                                                                m_Lambda_stack,
+                                                                                                                                m_dot_Lambda_stack,
+                                                                                                                                m_ddot_Lambda_stack,
+                                                                                                                                m_angular_velocity_integrator,
+                                                                                                                                m_linear_velocity_integrator,
+                                                                                                                                m_angular_acceleration_integrator,
+                                                                                                                                m_number_of_chebyshev_points ) };
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces_integrator { std::make_shared<InternalForcesIntegrator>(m_material_properties.m_M.block<3,3>(3, 3),
@@ -134,7 +158,8 @@ private:
                                                                                                                         m_linear_velocity_integrator,
                                                                                                                         m_linear_acceleration_integrator,
                                                                                                                         m_quaternion_integrator,
-                                                                                                                        m_position_integrator)};
+                                                                                                                        m_position_integrator,
+                                                                                                                        m_number_of_chebyshev_points )};
 
     std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples_integrator { std::make_shared<InternalCouplesIntegrator>(m_material_properties.m_M.block<3,3>(0, 0),
                                                                                                                           m_material_properties.m_M.block<3,3>(3, 3),
@@ -145,7 +170,8 @@ private:
                                                                                                                           m_angular_acceleration_integrator,
                                                                                                                           m_quaternion_integrator,
                                                                                                                           m_position_integrator,
-                                                                                                                          m_internal_forces_integrator)};
+                                                                                                                          m_internal_forces_integrator,
+                                                                                                                          m_number_of_chebyshev_points )};
 
 };
 
