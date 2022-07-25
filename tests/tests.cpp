@@ -101,7 +101,14 @@ void LoadEigenMatrixFromFile(Eigen::MatrixXd &t_matrix,
 
 void testRelativeComputations()
 {
-    CROSP::CosseratRod cosserat_rod;
+    const unsigned int number_of_chebyshev_points = 17;
+
+    const auto chebyshev_points = ::Chebyshev::ComputeChebyshevPoints(number_of_chebyshev_points);
+
+    for(unsigned int point=0; point<chebyshev_points.size(); point++)
+        std::cout << "Point : " << point << " is at " << chebyshev_points[point] << std::endl;
+
+    CROSP::CosseratRod cosserat_rod(number_of_chebyshev_points);
 
     constexpr unsigned int ne = 3;
     constexpr unsigned int na = 3;
@@ -120,6 +127,7 @@ void testRelativeComputations()
     std::cout << "ddot_qe : \n" << ddot_qe << "\n\n\n";
 
     cosserat_rod.updateParameterisation(qe, dot_qe, ddot_qe);
+    std::cout << "\n\n\n";
 
     Eigen::MatrixXd init_quaternion;
     Eigen::MatrixXd init_position;
@@ -173,19 +181,19 @@ void testRelativeComputations()
     const Eigen::MatrixXd angular_acceleration_relative_error = angular_acceleration_stack_from_ode45 - cosserat_rod.m_angular_acceleration_integrator->getStack();
     const Eigen::MatrixXd linear_acceleration_relative_error = linear_acceleration_stack_from_ode45 - cosserat_rod.m_linear_acceleration_integrator->getStack();
 
-    writeToFile("quaternions_relative_error", quaternions_relative_error, "../../tests/data/");
-    writeToFile("positions_relative_error", positions_relative_error, "../../tests/data/");
-    writeToFile("angular_velocity_relative_error", angular_velocity_relative_error, "../../tests/data/");
-    writeToFile("linear_velocity_relative_error", linear_velocity_relative_error, "../../tests/data/");
-    writeToFile("angular_acceleration_relative_error", angular_acceleration_relative_error, "../../tests/data/");
-    writeToFile("linear_acceleration_relative_error", linear_acceleration_relative_error, "../../tests/data/");
+//    writeToFile("quaternions_relative_error", quaternions_relative_error, "../../tests/data/");
+//    writeToFile("positions_relative_error", positions_relative_error, "../../tests/data/");
+//    writeToFile("angular_velocity_relative_error", angular_velocity_relative_error, "../../tests/data/");
+//    writeToFile("linear_velocity_relative_error", linear_velocity_relative_error, "../../tests/data/");
+//    writeToFile("angular_acceleration_relative_error", angular_acceleration_relative_error, "../../tests/data/");
+//    writeToFile("linear_acceleration_relative_error", linear_acceleration_relative_error, "../../tests/data/");
 
-    std::cout << "Relative errors in quaternions : \n" << quaternions_relative_error << "\n\n" << std::endl;
-    std::cout << "Relative errors in positions : \n" << positions_relative_error << "\n\n" << std::endl;
-    std::cout << "Relative errors in angular velocities : \n" << angular_velocity_relative_error << "\n\n" << std::endl;
-    std::cout << "Relative errors in linear velocities : \n" << linear_velocity_relative_error << "\n\n" << std::endl;
-    std::cout << "Relative errors in angular accelerations : \n" << angular_acceleration_relative_error << "\n\n" << std::endl;
-    std::cout << "Relative errors in linear accelerations : \n" << linear_acceleration_relative_error << "\n\n" << std::endl;
+//    std::cout << "Relative errors in quaternions : \n" << quaternions_relative_error << "\n\n" << std::endl;
+//    std::cout << "Relative errors in positions : \n" << positions_relative_error << "\n\n" << std::endl;
+//    std::cout << "Relative errors in angular velocities : \n" << angular_velocity_relative_error << "\n\n" << std::endl;
+//    std::cout << "Relative errors in linear velocities : \n" << linear_velocity_relative_error << "\n\n" << std::endl;
+//    std::cout << "Relative errors in angular accelerations : \n" << angular_acceleration_relative_error << "\n\n" << std::endl;
+//    std::cout << "Relative errors in linear accelerations : \n" << linear_acceleration_relative_error << "\n\n" << std::endl;
 
 
 
@@ -194,26 +202,44 @@ void testRelativeComputations()
     Eigen::MatrixXd init_couple;
 
     LoadEigenMatrixFromFile(init_F1, "F1.csv", "../../tests/data/");
-    init_force = init_F1.block<3,1>(0, 0);
-    init_couple = init_F1.block<3,1>(3, 0);
+    init_couple = init_F1.block<3,1>(0, 0);
+    init_force = init_F1.block<3,1>(3, 0);
 
     cosserat_rod.backwardDynamics(init_force, init_couple);
 
     Eigen::MatrixXd force_stack_from_ode45;
-//    Eigen::MatrixXd couple_stack_from_ode45;
+    Eigen::MatrixXd couple_stack_from_ode45;
 
     LoadEigenMatrixFromFile(force_stack_from_ode45, "force_stack.csv", "../../tests/data/");
-//    LoadEigenMatrixFromFile(force_stack_from_ode45, "couple_stack.csv", "../../tests/data/");
+    LoadEigenMatrixFromFile(couple_stack_from_ode45, "couple_stack.csv", "../../tests/data/");
+
+
+    Eigen::MatrixXd forces(number_of_Chebyshev_points*3, 2);
+    forces << force_stack_from_ode45, cosserat_rod.m_internal_forces_integrator->getStack();
+    std::cout << "Forces stakcs : \n" << forces << std::endl << std::endl << std::endl;
 
     const Eigen::MatrixXd force_relative_error = force_stack_from_ode45 - cosserat_rod.m_internal_forces_integrator->getStack();
-//    const Eigen::MatrixXd couple_relative_error = force_stack_from_ode45 - cosserat_rod.m_internal_couples_integrator->getStack();
+    const Eigen::MatrixXd couple_relative_error = couple_stack_from_ode45 - cosserat_rod.m_internal_couples_integrator->getStack();
 
-    writeToFile("force_relative_error", force_relative_error, "../../tests/data/");
+
+
+//    for(unsigned int point = 1; point<=number_of_Chebyshev_points; point++)
+//        std::cout << "At point : " << point << " that is " << cosserat_rod.m_position_integrator->getStateAtPoint(point)(0) << " the couples : " << cosserat_rod.m_internal_couples_integrator->getStateAtPoint(point).transpose() << std::endl;
+
+
+//    writeToFile("force_relative_error", force_relative_error, "../../tests/data/");
 //    writeToFile("couple_relative_error", couple_relative_error, "../../tests/data/");
 
     std::cout << "Relative errors in forces : \n" << force_relative_error << "\n\n" << std::endl;
-//    std::cout << "Relative errors in couples : \n" << couple_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in couples : \n" << couple_relative_error << "\n\n" << std::endl;
+
+    Eigen::MatrixXd couples(number_of_Chebyshev_points*3, 2);
+    couples << couple_stack_from_ode45, cosserat_rod.m_internal_couples_integrator->getStack();
+    std::cout << "Couples stakcs : \n" << couples << std::endl << std::endl << std::endl;
 }
+
+
+
 
 
 void testRelativePrecision(const unsigned int t_number_of_Chebyshev_points)
@@ -340,6 +366,7 @@ void processDataAdavanced(const std::vector<unsigned int> &t_tested_points)
 
 int main(int argc, char *argv[])
 {
+
 
     testRelativeComputations();
 
