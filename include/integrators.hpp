@@ -18,7 +18,7 @@
 
 #include "OSNI/include/OSNI.hpp"
 
-#include "math_tools/include/lie_algebra_utilities.hpp"
+#include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
 
 namespace CROSP {
