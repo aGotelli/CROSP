@@ -78,19 +78,19 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
                                    const Eigen::Vector3d &t_couple_at_tip)
 {
-    const auto quaternion_at_tip = m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2);
+    const auto quaternion_at_tip = m_quaternion_integrator->getStateAtPoint(0);
 
-//    std::cout << "Quaternion at tip :" << quaternion_at_tip.transpose() << std::endl;
+    std::cout << "Quaternion at tip :" << quaternion_at_tip.transpose() << std::endl;
 
 
-    const Eigen::Matrix3d rod_tip_orientation = Eigen::Quaterniond(m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(0),
-                                                                    m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(1),
-                                                                    m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(2),
-                                                                    m_quaternion_integrator->getStateAtPoint(m_number_of_chebyshev_points-2)(3)).toRotationMatrix();
+    const Eigen::Matrix3d rod_tip_orientation = Eigen::Quaterniond(m_quaternion_integrator->getStateAtPoint(0)(0),
+                                                                    m_quaternion_integrator->getStateAtPoint(0)(1),
+                                                                    m_quaternion_integrator->getStateAtPoint(0)(2),
+                                                                    m_quaternion_integrator->getStateAtPoint(0)(3)).toRotationMatrix();
     //  Map force and couple into local coordinates
     Eigen::Vector3d force_at_tip_local_coord = rod_tip_orientation.transpose()*t_force_at_tip;
 
-//    std::cout << "Force at tip : " << t_force_at_tip.transpose() << "\n" << "Local force : " << force_at_tip_local_coord.transpose() << std::endl;
+    std::cout << "Force at tip : " << t_force_at_tip.transpose() << "\n" << "Local force : " << force_at_tip_local_coord.transpose() << std::endl;
 
     Eigen::Vector3d couple_at_tip_local_coord = rod_tip_orientation.transpose()*t_couple_at_tip;
 
