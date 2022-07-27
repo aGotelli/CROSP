@@ -78,9 +78,6 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
                                    const Eigen::Vector3d &t_couple_at_tip)
 {
-    const auto quaternion_at_tip = m_quaternion_integrator->getStateAtPoint(0);
-
-    std::cout << "Quaternion at tip :" << quaternion_at_tip.transpose() << std::endl;
 
 
     const Eigen::Matrix3d rod_tip_orientation = Eigen::Quaterniond(m_quaternion_integrator->getStateAtPoint(0)(0),
@@ -90,17 +87,11 @@ void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
     //  Map force and couple into local coordinates
     Eigen::Vector3d force_at_tip_local_coord = rod_tip_orientation.transpose()*t_force_at_tip;
 
-    std::cout << "Force at tip : " << t_force_at_tip.transpose() << "\n" << "Local force : " << force_at_tip_local_coord.transpose() << std::endl;
 
     Eigen::Vector3d couple_at_tip_local_coord = rod_tip_orientation.transpose()*t_couple_at_tip;
 
-    std::cout << "Integrate forces \n\n";
     m_internal_forces_integrator->integrate(force_at_tip_local_coord);
-    std::cout << "Integrate couples \n\n";
     m_internal_couples_integrator->integrate(couple_at_tip_local_coord);
-
-    for(unsigned int i=1; i<5; i++)
-        std::cout << "At point " << i << " force " << m_internal_forces_integrator->getStateAtPoint(i).transpose() << "\n\n";
 
     std::cout << "Internal forces : \n" << m_internal_forces_integrator->getStack() << "\n\n\n" << std::endl;
     std::cout << "Internal couples : \n" << m_internal_couples_integrator->getStack() << "\n\n\n" << std::endl;
