@@ -23,6 +23,8 @@ include_directories(include)
 
 
 add_library(${PROJECT_NAME} include/integrators.hpp
+                            include/strain_parameterisation.hpp
+                            #src/strain_parameterisation.cpp
                             include/cosserat_rod.hpp
                             src/cosserat_rod.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC math_tools Eigen3::Eigen OSNI)
@@ -31,6 +33,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC math_tools Eigen3::Eigen OSNI)
 add_executable(tests tests/tests.cpp)
 target_link_libraries(tests ${PROJECT_NAME} math_tools)
 target_compile_definitions(tests PRIVATE DEVELOPER)
+
+
+add_executable(test_strain_parameterisation tests/test_strain_parameterisation.cpp)
+target_link_libraries(test_strain_parameterisation ${PROJECT_NAME} math_tools)
+target_compile_definitions(test_strain_parameterisation PRIVATE DEVELOPER)
 
 
 add_executable(benchmark tests/benchmark.cpp)
