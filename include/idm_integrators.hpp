@@ -90,8 +90,8 @@ struct PositionIntegrator : public OSNI::ODEb {
 
 struct AngularVelocityIntegrator : public OSNI::ODEAb {
 
-    AngularVelocityIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
-                              const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+    AngularVelocityIntegrator(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
                               const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD, t_number_of_Chebyshev_points),
                                                                                  m_K_stack(t_K_stack),
                                                                                  m_dot_K_stack(t_dot_K_stack)
@@ -120,10 +120,10 @@ struct AngularVelocityIntegrator : public OSNI::ODEAb {
 
 struct LinearVelocityIntegrator : public OSNI::ODEAb {
 
-    LinearVelocityIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
-                             const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
-                             const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_Lambda_stack,
-                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+    LinearVelocityIntegrator(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                             std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
+                             std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_Lambda_stack,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                              const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD, t_number_of_Chebyshev_points),
                                                                                 m_K_stack(t_K_stack),
                                                                                 m_Lambda_stack(t_Lambda_stack),
@@ -164,10 +164,10 @@ struct LinearVelocityIntegrator : public OSNI::ODEAb {
 
 struct AngularAccelerationIntegrator : public OSNI::ODEAb {
 
-    AngularAccelerationIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
-                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
-                                  const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_K_stack,
-                                  const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+    AngularAccelerationIntegrator(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                                  std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                                  std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_K_stack,
+                                  std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                   const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD, t_number_of_Chebyshev_points),
                                                                                      m_K_stack(t_K_stack),
                                                                                      m_dot_K_stack(t_dot_K_stack),
@@ -208,14 +208,14 @@ struct AngularAccelerationIntegrator : public OSNI::ODEAb {
 
 struct LinearAccelerationIntegrator : public OSNI::ODEAb {
 
-    LinearAccelerationIntegrator(const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
-                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
-                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
-                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_Lambda_stack,
-                                 const std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_Lambda_stack,
-                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
-                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
-                                 const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
+    LinearAccelerationIntegrator(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                                 std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                                 std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
+                                 std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_Lambda_stack,
+                                 std::shared_ptr<const std::vector<Eigen::Vector3d>> t_ddot_Lambda_stack,
+                                 std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                                 std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                                 std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
                                  const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD, t_number_of_Chebyshev_points),
                                                                                     m_K_stack(t_K_stack),
                                                                                     m_dot_K_stack(t_dot_K_stack),
@@ -270,9 +270,9 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     InternalForcesIntegrator(const Eigen::Matrix3d t_M_linear,
                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
-                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
-                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
-                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
                              const unsigned int t_number_of_Chebyshev_points) :                       OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD, t_number_of_Chebyshev_points),
@@ -333,9 +333,9 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
                              const Eigen::Matrix3d t_M_linear,
                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
-                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
-                             const std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
-                             const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
@@ -405,13 +405,13 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
 struct IDMIntegrators {
 
-    IDMIntegrators(const std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
+    IDMIntegrators(std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
                    const Eigen::Matrix3d &t_M_angular, const Eigen::Matrix3d &t_M_linear) : m_strain_parameterisation(t_strain_parameterisation),
                                                                                             m_M_angular(t_M_angular),
                                                                                             m_M_linear(t_M_angular)
     {}
 
-    IDMIntegrators(const std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
+    IDMIntegrators(std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
                    const Eigen::Matrix3d &t_M_angular, const Eigen::Matrix3d &t_M_linear,
                    const unsigned int t_number_of_Chebyshev_points) :   m_strain_parameterisation(t_strain_parameterisation),
                                                                         m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
