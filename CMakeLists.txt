@@ -23,6 +23,7 @@ include_directories(include)
 
 
 add_library(${PROJECT_NAME} include/integrators.hpp
+                            include/strain_parameterisation.hpp
                             include/cosserat_rod.hpp
                             src/cosserat_rod.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC math_tools Eigen3::Eigen OSNI)
