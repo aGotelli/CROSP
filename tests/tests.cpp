@@ -174,12 +174,12 @@ void testRelativeComputations()
 
     const unsigned int number_of_Chebyshev_points = position_stack_from_ode45.rows();
 
-    const Eigen::MatrixXd quaternions_relative_error = quaternion_stack_from_ode45 - cosserat_rod.m_quaternion_integrator->getStack();
-    const Eigen::MatrixXd positions_relative_error = position_stack_from_ode45 - cosserat_rod.m_position_integrator->getStack();
-    const Eigen::MatrixXd angular_velocity_relative_error = angular_velocity_stack_from_ode45 - cosserat_rod.m_angular_velocity_integrator->getStack();
-    const Eigen::MatrixXd linear_velocity_relative_error = linear_velocity_stack_from_ode45 - cosserat_rod.m_linear_velocity_integrator->getStack();
-    const Eigen::MatrixXd angular_acceleration_relative_error = angular_acceleration_stack_from_ode45 - cosserat_rod.m_angular_acceleration_integrator->getStack();
-    const Eigen::MatrixXd linear_acceleration_relative_error = linear_acceleration_stack_from_ode45 - cosserat_rod.m_linear_acceleration_integrator->getStack();
+    const Eigen::MatrixXd quaternions_relative_error = quaternion_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_quaternion->getStack();
+    const Eigen::MatrixXd positions_relative_error = position_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_position->getStack();
+    const Eigen::MatrixXd angular_velocity_relative_error = angular_velocity_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_angular_velocity->getStack();
+    const Eigen::MatrixXd linear_velocity_relative_error = linear_velocity_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_linear_velocity->getStack();
+    const Eigen::MatrixXd angular_acceleration_relative_error = angular_acceleration_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_angular_acceleration->getStack();
+    const Eigen::MatrixXd linear_acceleration_relative_error = linear_acceleration_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_linear_acceleration->getStack();
 
 //    writeToFile("quaternions_relative_error", quaternions_relative_error, "../../tests/data/");
 //    writeToFile("positions_relative_error", positions_relative_error, "../../tests/data/");
@@ -188,12 +188,12 @@ void testRelativeComputations()
 //    writeToFile("angular_acceleration_relative_error", angular_acceleration_relative_error, "../../tests/data/");
 //    writeToFile("linear_acceleration_relative_error", linear_acceleration_relative_error, "../../tests/data/");
 
-//    std::cout << "Relative errors in quaternions : \n" << quaternions_relative_error << "\n\n" << std::endl;
-//    std::cout << "Relative errors in positions : \n" << positions_relative_error << "\n\n" << std::endl;
-//    std::cout << "Relative errors in angular velocities : \n" << angular_velocity_relative_error << "\n\n" << std::endl;
-//    std::cout << "Relative errors in linear velocities : \n" << linear_velocity_relative_error << "\n\n" << std::endl;
-//    std::cout << "Relative errors in angular accelerations : \n" << angular_acceleration_relative_error << "\n\n" << std::endl;
-//    std::cout << "Relative errors in linear accelerations : \n" << linear_acceleration_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in quaternions : \n" << quaternions_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in positions : \n" << positions_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in angular velocities : \n" << angular_velocity_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in linear velocities : \n" << linear_velocity_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in angular accelerations : \n" << angular_acceleration_relative_error << "\n\n" << std::endl;
+    std::cout << "Relative errors in linear accelerations : \n" << linear_acceleration_relative_error << "\n\n" << std::endl;
 
 
 
@@ -215,16 +215,16 @@ void testRelativeComputations()
 
 
     Eigen::MatrixXd forces(number_of_Chebyshev_points*3, 2);
-    forces << force_stack_from_ode45, cosserat_rod.m_internal_forces_integrator->getStack();
+    forces << force_stack_from_ode45, cosserat_rod.m_idm_integrators->m_internal_forces->getStack();
     std::cout << "Forces stakcs : \n" << forces << std::endl << std::endl << std::endl;
 
-    const Eigen::MatrixXd force_relative_error = force_stack_from_ode45 - cosserat_rod.m_internal_forces_integrator->getStack();
-    const Eigen::MatrixXd couple_relative_error = couple_stack_from_ode45 - cosserat_rod.m_internal_couples_integrator->getStack();
+    const Eigen::MatrixXd force_relative_error = force_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_internal_forces->getStack();
+    const Eigen::MatrixXd couple_relative_error = couple_stack_from_ode45 - cosserat_rod.m_idm_integrators->m_internal_couples->getStack();
 
 
 
 //    for(unsigned int point = 1; point<=number_of_Chebyshev_points; point++)
-//        std::cout << "At point : " << point << " that is " << cosserat_rod.m_position_integrator->getStateAtPoint(point)(0) << " the couples : " << cosserat_rod.m_internal_couples_integrator->getStateAtPoint(point).transpose() << std::endl;
+//        std::cout << "At point : " << point << " that is " << cosserat_rod.m_position->getStateAtPoint(point)(0) << " the couples : " << cosserat_rod.m_internal_couples->getStateAtPoint(point).transpose() << std::endl;
 
 
 //    writeToFile("force_relative_error", force_relative_error, "../../tests/data/");
@@ -234,7 +234,7 @@ void testRelativeComputations()
     std::cout << "Relative errors in couples : \n" << couple_relative_error << "\n\n" << std::endl;
 
     Eigen::MatrixXd couples(number_of_Chebyshev_points*3, 2);
-    couples << couple_stack_from_ode45, cosserat_rod.m_internal_couples_integrator->getStack();
+    couples << couple_stack_from_ode45, cosserat_rod.m_idm_integrators->m_internal_couples->getStack();
     std::cout << "Couples stakcs : \n" << couples << std::endl << std::endl << std::endl;
 }
 
@@ -303,12 +303,12 @@ void testRelativePrecision(const unsigned int t_number_of_Chebyshev_points)
     Eigen::MatrixXd final_state = final_state_from_ode45;
 
 
-    final_state.block<4,1>(0, 0) = cosserat_rod.m_quaternion_integrator->getStateAtPoint(0);
-    final_state.block<3,1>(4, 0) = cosserat_rod.m_position_integrator->getStateAtPoint(0);
-    final_state.block<3,1>(7, 0) = cosserat_rod.m_angular_velocity_integrator->getStateAtPoint(0);
-    final_state.block<3,1>(10, 0) = cosserat_rod.m_linear_velocity_integrator->getStateAtPoint(0);
-    final_state.block<3,1>(13, 0) = cosserat_rod.m_angular_acceleration_integrator->getStateAtPoint(0);
-    final_state.block<3,1>(16, 0) = cosserat_rod.m_linear_acceleration_integrator->getStateAtPoint(0);
+    final_state.block<4,1>(0, 0) = cosserat_rod.m_idm_integrators->m_quaternion->getStateAtPoint(0);
+    final_state.block<3,1>(4, 0) = cosserat_rod.m_idm_integrators->m_position->getStateAtPoint(0);
+    final_state.block<3,1>(7, 0) = cosserat_rod.m_idm_integrators->m_angular_velocity->getStateAtPoint(0);
+    final_state.block<3,1>(10, 0) = cosserat_rod.m_idm_integrators->m_linear_velocity->getStateAtPoint(0);
+    final_state.block<3,1>(13, 0) = cosserat_rod.m_idm_integrators->m_angular_acceleration->getStateAtPoint(0);
+    final_state.block<3,1>(16, 0) = cosserat_rod.m_idm_integrators->m_linear_acceleration->getStateAtPoint(0);
 
 
 //    std::cout << "final_state :\n" << final_state << std::endl;
