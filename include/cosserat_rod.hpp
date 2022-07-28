@@ -104,21 +104,9 @@ private:
 
     const std::function<double(const unsigned int, const double&)> m_polynomial_base { [](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);} };
 
-//    const std::vector<Eigen::MatrixXd> m_Phi_stack { generatePhiStack(m_ne, m_na, m_Chebyshev_points, m_polynomial_base) };
-
-
-    Eigen::MatrixXd getPhi(const double& t_X,
-                           const double& t_begin=0,
-                           const double& t_end=1) const;
-
-//    std::vector<Eigen::MatrixXd> generatePhiStack(const std::vector<double> &t_Chebyshev_points,
-//                                                  const std::function<double(const unsigned int, const double&)> t_polynomial_base)const;
-
-
-
     MaterialProperties m_material_properties;
 
-//    StrainParameterisation m_strain_parameterisation { StrainParameterisation(m_Phi_stack) };
+    StrainParameterisation m_strain_parameterisation { StrainParameterisation(generatePhiStack(m_ne, m_na, m_Chebyshev_points, m_polynomial_base)) };
 
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_chebyshev_points) };
