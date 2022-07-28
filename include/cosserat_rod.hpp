@@ -21,7 +21,7 @@
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-#include "integrators.hpp"
+#include "idm_integrators.hpp"
 #include "strain_parameterisation.hpp"
 
 namespace CROSP {

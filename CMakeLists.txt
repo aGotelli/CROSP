@@ -22,7 +22,7 @@ include_directories(include)
 
 
 
-add_library(${PROJECT_NAME} include/integrators.hpp
+add_library(${PROJECT_NAME} include/idm_integrators.hpp
                             include/strain_parameterisation.hpp
                             #src/strain_parameterisation.cpp
                             include/cosserat_rod.hpp

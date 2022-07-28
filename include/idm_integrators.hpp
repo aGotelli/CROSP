@@ -1,5 +1,5 @@
 /**
- * \file integrators.hpp
+ * \file idm_integrators.hpp
  * \author Andrea Gotelli (Andrea.Gotelli@ls2n.fr)
  * \brief This files contains the integrators for the Cosserat rod IDM
  * \date 13-07-2022
@@ -11,8 +11,8 @@
 
 
 
-#ifndef INTEGRATORS_HPP
-#define INTEGRATORS_HPP
+#ifndef IDM_INTEGRATORS_HPP
+#define IDM_INTEGRATORS_HPP
 
 #include <memory>
 
@@ -488,4 +488,4 @@ struct IDMIntegrators {
 
 
 
-#endif // INTEGRATORS_HPP
+#endif // IDM_INTEGRATORS_HPP
