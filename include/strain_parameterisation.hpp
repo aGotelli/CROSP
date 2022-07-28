@@ -1,3 +1,15 @@
+/**
+ * \file strain_parameterisation.hpp
+ * \author Andrea Gotelli (Andrea.Gotelli@ls2n.fr)
+ * \brief This files contains the functions and class for the strain parameterisation
+ * \date 28-07-2022
+ *
+ * \copyright Copyright (c) 2022 Andrea Gotelli
+ *
+ *
+ */
+
+
 #ifndef STRAIN_PARAMETERISATION_HPP
 #define STRAIN_PARAMETERISATION_HPP
 
@@ -6,11 +18,16 @@
 #include <vector>
 
 #include <eigen3/unsupported/Eigen/KroneckerProduct>
+#include <boost/math/special_functions/legendre.hpp>
+
+namespace CROSP {
+
+
 
 static Eigen::MatrixXd getPhi(const unsigned int t_ne,
                               const unsigned int t_na,
                               const double& t_X,
-                              const std::function<double(const unsigned int, const double&)> t_polynomial_base,
+                              const std::function<double(const unsigned int, const double&)> t_polynomial_base=[](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);},
                               const double& t_begin=0,
                               const double& t_end=1)
 {
@@ -33,9 +50,9 @@ static Eigen::MatrixXd getPhi(const unsigned int t_ne,
 static std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
                                                      const unsigned int t_na,
                                                      const std::vector<double> &t_Chebyshev_points,
-                                                     const std::function<double(const unsigned int, const double&)> t_polynomial_base)
+                                                     const std::function<double(const unsigned int, const double&)> t_polynomial_base=[](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);})
 {
-    std::vector<Eigen::MatrixXd> Phi_stack;
+    std::vector<Eigen::MatrixXd> Phi_stack( t_Chebyshev_points.size() );
 
     std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
         const auto Phi = getPhi(t_ne, t_na, t_Chebyshev_points[index], t_polynomial_base);
@@ -59,14 +76,13 @@ struct StrainParameterisation {
 
     void update(const Eigen::VectorXd &t_qe,
                 const Eigen::VectorXd &t_dot_qe,
-                const Eigen::VectorXd &t_ddot_qe,
-                const std::vector<Eigen::MatrixXd> &t_Phi_stack)
+                const Eigen::VectorXd &t_ddot_qe)
     {
         for(unsigned int i=0; i<m_stacks_dimension; i++){
 
-            m_K_stack->at(i) = t_Phi_stack[i]*t_qe;
-            m_dot_K_stack->at(i) = t_Phi_stack[i]*t_dot_qe;
-            m_ddot_K_stack->at(i) = t_Phi_stack[i]*t_ddot_qe;
+            m_K_stack->at(i) = m_Phi_stack[i]*t_qe;
+            m_dot_K_stack->at(i) = m_Phi_stack[i]*t_dot_qe;
+            m_ddot_K_stack->at(i) = m_Phi_stack[i]*t_ddot_qe;
 
         }
 
@@ -93,7 +109,7 @@ struct StrainParameterisation {
 
 
 
-
+}   //  namespace CROSP
 
 
 
