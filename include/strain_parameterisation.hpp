@@ -78,8 +78,20 @@ struct StrainParameterisation {
     StrainParameterisation(const unsigned int t_number_of_Chebyshev_points) : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
     {}
 
+    StrainParameterisation(unsigned int t_ne, unsigned int t_na,
+                           const unsigned int t_number_of_Chebyshev_points) :   m_na(t_na), m_ne(t_ne),
+                                                                                m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    {}
+
     StrainParameterisation(const unsigned int t_number_of_Chebyshev_points,
                            const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+                                                                                                                m_polynomial_base(t_polynomial_base)
+    {}
+
+    StrainParameterisation(unsigned int t_ne, unsigned int t_na,
+                           unsigned int t_number_of_Chebyshev_points,
+                           const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_na(t_na), m_ne(t_ne),
+                                                                                                                m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
                                                                                                                 m_polynomial_base(t_polynomial_base)
     {}
 
@@ -123,6 +135,74 @@ struct StrainParameterisation {
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
 };
+
+
+struct StrainParameterisationPerturbation {
+
+    StrainParameterisationPerturbation()=default;
+
+    StrainParameterisationPerturbation(const unsigned int t_number_of_Chebyshev_points) : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    {}
+
+    StrainParameterisationPerturbation(unsigned int t_ne, unsigned int t_na,
+                                       const unsigned int t_number_of_Chebyshev_points) :   m_na(t_na), m_ne(t_ne),
+                                                                                            m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    {}
+
+    StrainParameterisationPerturbation(const unsigned int t_number_of_Chebyshev_points,
+                                       const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+                                                                                                                           m_polynomial_base(t_polynomial_base)
+    {}
+
+    StrainParameterisationPerturbation(unsigned int t_ne, unsigned int t_na,
+                                       unsigned int t_number_of_Chebyshev_points,
+                                       const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_na(t_na), m_ne(t_ne),
+                                                                                                                            m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+                                                                                                                            m_polynomial_base(t_polynomial_base)
+    {}
+
+
+    void update(const Eigen::VectorXd &t_Delta_qe,
+                const Eigen::VectorXd &t_Delta_dot_qe,
+                const Eigen::VectorXd &t_Delta_ddot_qe)
+    {
+        for(unsigned int i=0; i<m_stacks_dimension; i++){
+
+            m_Delta_K_stack->at(i) = m_Phi_stack[i]*t_Delta_qe;
+            m_Delta_dot_K_stack->at(i) = m_Phi_stack[i]*t_Delta_dot_qe;
+            m_Delta_ddot_K_stack->at(i) = m_Phi_stack[i]*t_Delta_ddot_qe;
+
+        }
+
+        for(unsigned int i=0; i<m_stacks_dimension; i++){
+            m_Delta_Lambda_stack->at(i) = Eigen::Vector3d::Zero();
+            m_Delta_dot_Lambda_stack->at(i) = Eigen::Vector3d::Zero();
+            m_Delta_ddot_Lambda_stack->at(i) = Eigen::Vector3d::Zero();
+        }
+    }
+
+    const unsigned int m_ne { 3 };
+    const unsigned int m_na { 3 };
+
+    const unsigned int m_number_of_Chebyshev_points { 17 };
+
+    const std::function<double(const unsigned int, const double&)> m_polynomial_base { [](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);} };
+
+    const std::vector<Eigen::MatrixXd> m_Phi_stack { generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points), m_polynomial_base) };
+
+    const unsigned int m_stacks_dimension { static_cast<unsigned int>( m_Phi_stack.size() ) };
+
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
+
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_dot_Lambda_stack{ std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
+
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
+};
+
+
 
 
 
