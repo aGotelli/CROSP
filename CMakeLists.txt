@@ -40,6 +40,10 @@ add_executable(test_strain_parameterisation tests/test_strain_parameterisation.c
 target_link_libraries(test_strain_parameterisation ${PROJECT_NAME} math_tools)
 target_compile_definitions(test_strain_parameterisation PRIVATE DEVELOPER)
 
+add_executable(test_tidm tests/test_tidm.cpp)
+target_link_libraries(test_tidm ${PROJECT_NAME} math_tools)
+target_compile_definitions(test_tidm PRIVATE DEVELOPER)
+
 
 add_executable(benchmark tests/benchmark.cpp)
 target_link_libraries(benchmark PRIVATE ${PROJECT_NAME} benchmark::benchmark Eigen3::Eigen)
