@@ -20,6 +20,8 @@
 #include <eigen3/unsupported/Eigen/KroneckerProduct>
 #include <boost/math/special_functions/legendre.hpp>
 
+#include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
+
 namespace CROSP {
 
 
@@ -71,7 +73,15 @@ static std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
 
 struct StrainParameterisation {
 
-    StrainParameterisation(const std::vector<Eigen::MatrixXd> &t_Phi_stack) : m_Phi_stack(t_Phi_stack) {}
+    StrainParameterisation()=default;
+
+    StrainParameterisation(const unsigned int t_number_of_Chebyshev_points) : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    {}
+
+    StrainParameterisation(const unsigned int t_number_of_Chebyshev_points,
+                           const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+                                                                                                                m_polynomial_base(t_polynomial_base)
+    {}
 
 
     void update(const Eigen::VectorXd &t_qe,
@@ -93,7 +103,14 @@ struct StrainParameterisation {
         }
     }
 
-    const std::vector<Eigen::MatrixXd> m_Phi_stack;
+    const unsigned int m_ne { 3 };
+    const unsigned int m_na { 3 };
+
+    const unsigned int m_number_of_Chebyshev_points { 17 };
+
+    const std::function<double(const unsigned int, const double&)> m_polynomial_base { [](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);} };
+
+    const std::vector<Eigen::MatrixXd> m_Phi_stack { generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points), m_polynomial_base) };
 
     const unsigned int m_stacks_dimension { static_cast<unsigned int>( m_Phi_stack.size() ) };
 
