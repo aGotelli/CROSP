@@ -19,6 +19,8 @@
 
 #include <boost/math/special_functions/legendre.hpp>
 
+#include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
+
 #include "integrators.hpp"
 
 namespace CROSP {
@@ -76,6 +78,9 @@ public:
                            const Eigen::Vector3d &t_initial_linear_velocity=Eigen::Vector3d::Zero(),
                            const Eigen::Vector3d &t_initial_angular_acceleration=Eigen::Vector3d::Zero(),
                            const Eigen::Vector3d &t_initial_linear_acceleration=Eigen::Vector3d::Zero());
+
+    ::LieAlgebra::Kinematics getKinematicsAtTip()const;
+
 
 
     void backwardDynamics(const Eigen::Vector3d &t_force_at_tip,

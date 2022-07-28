@@ -75,20 +75,34 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 }
 
 
+::LieAlgebra::Kinematics CosseratRod::getKinematicsAtTip()const
+{
+    ::LieAlgebra::Kinematics rod_tip_kinematics;
+
+    rod_tip_kinematics.m_pose = ::LieAlgebra::SE3Pose( m_quaternion_integrator->getStateAtPoint(0),
+                                                       m_position_integrator->getStateAtPoint(0) );
+
+
+    rod_tip_kinematics.m_twist = ::LieAlgebra::Screw( m_angular_velocity_integrator->getStateAtPoint(0),
+                                                      m_linear_velocity_integrator->getStateAtPoint(0) );
+
+    rod_tip_kinematics.m_accelerations = ::LieAlgebra::Screw( m_angular_acceleration_integrator->getStateAtPoint(0),
+                                                              m_linear_acceleration_integrator->getStateAtPoint(0) );
+    return rod_tip_kinematics;
+}
+
+
 void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
                                    const Eigen::Vector3d &t_couple_at_tip)
 {
 
+    const auto [tip_pose, _, __] = getKinematicsAtTip();
 
-    const Eigen::Matrix3d rod_tip_orientation = Eigen::Quaterniond(m_quaternion_integrator->getStateAtPoint(0)(0),
-                                                                    m_quaternion_integrator->getStateAtPoint(0)(1),
-                                                                    m_quaternion_integrator->getStateAtPoint(0)(2),
-                                                                    m_quaternion_integrator->getStateAtPoint(0)(3)).toRotationMatrix();
     //  Map force and couple into local coordinates
-    Eigen::Vector3d force_at_tip_local_coord = rod_tip_orientation.transpose()*t_force_at_tip;
+    Eigen::Vector3d force_at_tip_local_coord = tip_pose.getRotationMatrix().transpose()*t_force_at_tip;
 
 
-    Eigen::Vector3d couple_at_tip_local_coord = rod_tip_orientation.transpose()*t_couple_at_tip;
+    Eigen::Vector3d couple_at_tip_local_coord = tip_pose.getRotationMatrix().transpose()*t_couple_at_tip;
 
     m_internal_forces_integrator->integrate(force_at_tip_local_coord);
     m_internal_couples_integrator->integrate(couple_at_tip_local_coord);
