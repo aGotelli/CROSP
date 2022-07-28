@@ -338,7 +338,8 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
                              const std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
-                             std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator) :  OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD),
+                             std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
+                              const unsigned int t_number_of_Chebyshev_points) :                              OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD, t_number_of_Chebyshev_points),
                                                                                                               m_M_angular(t_M_angular),
                                                                                                               m_M_linear(t_M_linear),
                                                                                                               m_K_stack(t_K_stack),
@@ -350,6 +351,7 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
                                                                                                               m_position_integrator(t_position_integrator),
                                                                                                               m_internal_forces_integrator(t_internal_forces_integrator)
     {}
+
 
 
 
@@ -426,56 +428,56 @@ struct IDMIntegrators {
     std::shared_ptr<OSNI::ODESolverInterface> m_quaternion_integrator { std::make_shared<QuaternionIntegrator>(m_strain_parameterisation->m_K_stack,
                                                                                                                m_number_of_Chebyshev_points ) };
 
-//    std::shared_ptr<OSNI::ODESolverInterface> m_position_integrator { std::make_shared<PositionIntegrator>(m_quaternion_integrator,
-//                                                                                                           m_strain_parameterisation->m_Lambda_stack,
-//                                                                                                           m_number_of_Chebyshev_points ) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_position_integrator { std::make_shared<PositionIntegrator>(m_quaternion_integrator,
+                                                                                                           m_strain_parameterisation->m_Lambda_stack,
+                                                                                                           m_number_of_Chebyshev_points ) };
 
-//    std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity_integrator { std::make_shared<AngularVelocityIntegrator>(m_strain_parameterisation->m_K_stack,
-//                                                                                                                          m_strain_parameterisation->m_dot_K_stack,
-//                                                                                                                          m_number_of_Chebyshev_points ) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity_integrator { std::make_shared<AngularVelocityIntegrator>(m_strain_parameterisation->m_K_stack,
+                                                                                                                          m_strain_parameterisation->m_dot_K_stack,
+                                                                                                                          m_number_of_Chebyshev_points ) };
 
-//    std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity_integrator { std::make_shared<LinearVelocityIntegrator>(m_strain_parameterisation->m_K_stack,
-//                                                                                                                        m_strain_parameterisation->m_Lambda_stack,
-//                                                                                                                        m_strain_parameterisation->m_dot_Lambda_stack,
-//                                                                                                                        m_angular_velocity_integrator,
-//                                                                                                                        m_number_of_Chebyshev_points ) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity_integrator { std::make_shared<LinearVelocityIntegrator>(m_strain_parameterisation->m_K_stack,
+                                                                                                                        m_strain_parameterisation->m_Lambda_stack,
+                                                                                                                        m_strain_parameterisation->m_dot_Lambda_stack,
+                                                                                                                        m_angular_velocity_integrator,
+                                                                                                                        m_number_of_Chebyshev_points ) };
 
-//    std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration_integrator { std::make_shared<AngularAccelerationIntegrator>(m_strain_parameterisation->m_K_stack,
-//                                                                                                                                  m_strain_parameterisation->m_dot_K_stack,
-//                                                                                                                                  m_strain_parameterisation->m_ddot_K_stack,
-//                                                                                                                                  m_angular_velocity_integrator,
-//                                                                                                                                  m_number_of_Chebyshev_points ) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration_integrator { std::make_shared<AngularAccelerationIntegrator>(m_strain_parameterisation->m_K_stack,
+                                                                                                                                  m_strain_parameterisation->m_dot_K_stack,
+                                                                                                                                  m_strain_parameterisation->m_ddot_K_stack,
+                                                                                                                                  m_angular_velocity_integrator,
+                                                                                                                                  m_number_of_Chebyshev_points ) };
 
-//    std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration_integrator { std::make_shared<LinearAccelerationIntegrator>(m_strain_parameterisation->m_K_stack,
-//                                                                                                                                m_strain_parameterisation->m_dot_K_stack,
-//                                                                                                                                m_strain_parameterisation->m_Lambda_stack,
-//                                                                                                                                m_strain_parameterisation->m_dot_Lambda_stack,
-//                                                                                                                                m_strain_parameterisation->m_ddot_Lambda_stack,
-//                                                                                                                                m_angular_velocity_integrator,
-//                                                                                                                                m_linear_velocity_integrator,
-//                                                                                                                                m_angular_acceleration_integrator,
-//                                                                                                                                m_number_of_Chebyshev_points ) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration_integrator { std::make_shared<LinearAccelerationIntegrator>(m_strain_parameterisation->m_K_stack,
+                                                                                                                                m_strain_parameterisation->m_dot_K_stack,
+                                                                                                                                m_strain_parameterisation->m_Lambda_stack,
+                                                                                                                                m_strain_parameterisation->m_dot_Lambda_stack,
+                                                                                                                                m_strain_parameterisation->m_ddot_Lambda_stack,
+                                                                                                                                m_angular_velocity_integrator,
+                                                                                                                                m_linear_velocity_integrator,
+                                                                                                                                m_angular_acceleration_integrator,
+                                                                                                                                m_number_of_Chebyshev_points ) };
 
 
-//    std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces_integrator { std::make_shared<InternalForcesIntegrator>(m_M_linear,
-//                                                                                                                        m_strain_parameterisation->m_K_stack, m_angular_velocity_integrator,
-//                                                                                                                        m_linear_velocity_integrator,
-//                                                                                                                        m_linear_acceleration_integrator,
-//                                                                                                                        m_quaternion_integrator,
-//                                                                                                                        m_position_integrator,
-//                                                                                                                        m_number_of_Chebyshev_points )};
+    std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces_integrator { std::make_shared<InternalForcesIntegrator>(m_M_linear,
+                                                                                                                        m_strain_parameterisation->m_K_stack, m_angular_velocity_integrator,
+                                                                                                                        m_linear_velocity_integrator,
+                                                                                                                        m_linear_acceleration_integrator,
+                                                                                                                        m_quaternion_integrator,
+                                                                                                                        m_position_integrator,
+                                                                                                                        m_number_of_Chebyshev_points )};
 
-//    std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples_integrator { std::make_shared<InternalCouplesIntegrator>(m_M_angular,
-//                                                                                                                          m_M_linear,
-//                                                                                                                          m_strain_parameterisation->m_K_stack,
-//                                                                                                                          m_strain_parameterisation->m_Lambda_stack,
-//                                                                                                                          m_angular_velocity_integrator,
-//                                                                                                                          m_linear_velocity_integrator,
-//                                                                                                                          m_angular_acceleration_integrator,
-//                                                                                                                          m_quaternion_integrator,
-//                                                                                                                          m_position_integrator,
-//                                                                                                                          m_internal_forces_integrator,
-//                                                                                                                          m_number_of_Chebyshev_points )};
+    std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples_integrator { std::make_shared<InternalCouplesIntegrator>(m_M_angular,
+                                                                                                                          m_M_linear,
+                                                                                                                          m_strain_parameterisation->m_K_stack,
+                                                                                                                          m_strain_parameterisation->m_Lambda_stack,
+                                                                                                                          m_angular_velocity_integrator,
+                                                                                                                          m_linear_velocity_integrator,
+                                                                                                                          m_angular_acceleration_integrator,
+                                                                                                                          m_quaternion_integrator,
+                                                                                                                          m_position_integrator,
+                                                                                                                          m_internal_forces_integrator,
+                                                                                                                          m_number_of_Chebyshev_points )};
 
 };
 
