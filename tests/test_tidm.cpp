@@ -116,30 +116,13 @@ int main(int argc, char *argv[])
 
 
         tidm_integrators->m_Delta_angular_acceleration->integrate(Eigen::Vector3d::Zero());
-//        tidm_integrators->m_Delta_linear_acceleration->integrate(Eigen::Vector3d::Zero());
+        tidm_integrators->m_Delta_linear_acceleration->integrate(Eigen::Vector3d::Zero());
         std::cout << "  - angular acceleration : \n" << tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix() << "\n";
-//        std::cout << "  - linear acceleration : \n" << tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix() << "\n";
+        std::cout << "  - linear acceleration : \n" << tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix() << "\n";
 
 
-//        Eigen::Matrix<double, 6, number_of_Chebyshev_points> local_Delta_zeta;
-//        for(unsigned int point=0; point<number_of_Chebyshev_points; point++){
-
-
-
-
-//            local_Delta_zeta.block<3,1>(0, point) = tidm_integrators->m_delta_rotation->getStateAtPoint(point);
-//            local_Delta_zeta.block<3,1>(3, point) = tidm_integrators->m_delta_position->getStateAtPoint(point);
-
-//            std::cout << "At delta : " << point << " Delta zeta \n" << ( Eigen::VectorXd(6) << tidm_integrators->m_delta_rotation->getStateAtPoint(point), tidm_integrators->m_delta_position->getStateAtPoint(point) ).finished() << "\n\n";
-
-//            //auto row = i*6;
-//            //Delta_zeta.block<6, number_of_Chebyshev_points>(row + 0, point) = local_Delta_zeta;
-//        }
-//        std::cout << "At delta : " << i << " Delta zeta \n" << local_Delta_zeta.reverse() << "\n\n";
 
     }
-
-    //std::cout << "All the Delta zeta : \n\n" << Delta_zeta << std::endl;
 
 
 
