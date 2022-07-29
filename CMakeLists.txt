@@ -41,7 +41,7 @@ target_link_libraries(test_strain_parameterisation ${PROJECT_NAME} math_tools)
 target_compile_definitions(test_strain_parameterisation PRIVATE DEVELOPER)
 
 add_executable(test_tidm tests/test_tidm.cpp)
-target_link_libraries(test_tidm ${PROJECT_NAME} math_tools)
+target_link_libraries(test_tidm PRIVATE ${PROJECT_NAME} math_tools benchmark::benchmark)
 target_compile_definitions(test_tidm PRIVATE DEVELOPER)
 
 

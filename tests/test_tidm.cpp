@@ -4,6 +4,7 @@
 #include "tidm_integrators.hpp"
 
 
+#include <benchmark/benchmark.h>
 
 using namespace CROSP;
 
@@ -13,7 +14,7 @@ using namespace CROSP;
 int main(int argc, char *argv[])
 {
 
-    const unsigned int number_of_Chebyshev_points = 11;
+    const unsigned int number_of_Chebyshev_points = 21;
 
     const unsigned int ne = 3;
 
@@ -88,6 +89,9 @@ int main(int argc, char *argv[])
     const unsigned int a = 400;
     const unsigned int b = 160000;
 
+
+
+
     Eigen::Matrix<double, ne*6, number_of_Chebyshev_points> Delta_zeta;
     for(unsigned int i=0; i<ne; i++){
         Delta_qe.setZero();
@@ -123,6 +127,39 @@ int main(int argc, char *argv[])
 
 
     }
+
+    ::benchmark::RegisterBenchmark("Compose Jacobian", [&](::benchmark::State &t_state){
+
+        while(t_state.KeepRunning()){
+            Eigen::Matrix<double, ne*6, number_of_Chebyshev_points> Delta_zeta;
+            for(unsigned int i=0; i<ne; i++){
+                Delta_qe.setZero();
+                Delta_qe(i) = 1;
+
+                Delta_dot_qe = a*Delta_qe;
+                Delta_ddot_qe = b*Delta_qe;
+
+                strain_parameterisation_perturbation->update(Delta_qe, Delta_dot_qe, Delta_ddot_qe);
+
+                tidm_integrators->m_Delta_rotation->integrate( Eigen::Vector3d::Zero() );
+                tidm_integrators->m_Delta_position->integrate( Eigen::Vector3d::Zero() );
+
+
+                tidm_integrators->m_Delta_angular_velocity->integrate(Eigen::Vector3d::Zero());
+                tidm_integrators->m_Delta_linear_velocity->integrate(Eigen::Vector3d::Zero());
+
+
+                tidm_integrators->m_Delta_angular_acceleration->integrate(Eigen::Vector3d::Zero());
+                tidm_integrators->m_Delta_linear_acceleration->integrate(Eigen::Vector3d::Zero());
+
+            }
+
+        }
+    });
+
+    ::benchmark::Initialize(&argc, argv);
+
+    ::benchmark::RunSpecifiedBenchmarks();
 
 
 
