@@ -16,7 +16,7 @@
 
 #include <memory>
 
-#include "OSNI/include/OSNI.hpp"
+#include "OSNI/OSNI.hpp"
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 #include "strain_parameterisation.hpp"
