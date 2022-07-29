@@ -28,7 +28,7 @@ namespace CROSP {
 struct DeltaRotation : public OSNI::ODEAb {
     DeltaRotation(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
                   std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_K_stack,
-                  const unsigned int t_number_of_Chebyshev_points) :    OSNI::ODEAb(4, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                  const unsigned int t_number_of_Chebyshev_points) :    OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                                                                                     t_number_of_Chebyshev_points),
                                                                         m_K_stack(t_K_stack),
                                                                         m_Delta_K_stack(t_Delta_K_stack)
@@ -55,7 +55,7 @@ struct DeltaPosition : public OSNI::ODEAb {
                   std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
                   std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_Lambda_stack,
                   std::shared_ptr<const DeltaRotation> t_delta_rotation,
-                  const unsigned int t_number_of_Chebyshev_points) :    OSNI::ODEAb(4, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                  const unsigned int t_number_of_Chebyshev_points) :    OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                                                                                     t_number_of_Chebyshev_points),
                                                                         m_K_stack(t_K_stack),
                                                                         m_Lambda_stack(t_Lambda_stack),
@@ -65,13 +65,24 @@ struct DeltaPosition : public OSNI::ODEAb {
 
     virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point)
     {
+//        std::cout << "At point : " << t_point << "\n";
+//        std::cout << "  - A  : \n" << -::LieAlgebra::skew( m_K_stack->at(t_point) ) << "\n";
+//        std::cout << "\n\n\n\n";
         return -::LieAlgebra::skew( m_K_stack->at(t_point) );
     }
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point)
     {
+//        std::cout << "At point : " << t_point << "\n";
+//        std::cout << "  - Lambda : \n" << m_Lambda_stack->at(t_point)<< "\n";
+//        std::cout << "  - Delta Pi : \n" << m_delta_rotation->getStateAtPoint(t_point) << "\n";
+//        std::cout << "  - Delta Lambda : \n" << m_Delta_Lambda_stack->at(t_point)<< "\n";
+//        std::cout << "  - b : \n" << -::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_delta_rotation->getStateAtPoint(t_point)
+//                     + m_Delta_Lambda_stack->at(t_point) << "\n";
+
+//        std::cout << "\n\n\n\n";
         return -::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_delta_rotation->getStateAtPoint(t_point)
-                + m_Lambda_stack->at(t_point);
+                + m_Delta_Lambda_stack->at(t_point);
     }
 
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
