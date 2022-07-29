@@ -80,6 +80,13 @@ public:
                            const Eigen::Vector3d &t_initial_angular_acceleration=Eigen::Vector3d::Zero(),
                            const Eigen::Vector3d &t_initial_linear_acceleration=Eigen::Vector3d::Zero());
 
+    void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation=Eigen::Vector3d::Zero(),
+                                  const Eigen::Vector3d &t_initial_Delta_position=Eigen::Vector3d::Zero(),
+                                  const Eigen::Vector3d &t_initial_Delta_angular_velocity=Eigen::Vector3d::Zero(),
+                                  const Eigen::Vector3d &t_initial_Delta_linear_velocity=Eigen::Vector3d::Zero(),
+                                  const Eigen::Vector3d &t_initial_Delta_angular_acceleration=Eigen::Vector3d::Zero(),
+                                  const Eigen::Vector3d &t_initial_Delta_linear_acceleration=Eigen::Vector3d::Zero());
+
     ::LieAlgebra::Kinematics getKinematicsAtTip()const;
 
 

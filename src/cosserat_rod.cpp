@@ -55,6 +55,15 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
 
 }
 
+void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+                                           const Eigen::Vector3d &t_initial_Delta_position,
+                                           const Eigen::Vector3d &t_initial_Delta_angular_velocity,
+                                           const Eigen::Vector3d &t_initial_Delta_linear_velocity,
+                                           const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
+                                           const Eigen::Vector3d &t_initial_Delta_linear_acceleration)
+{
+
+}
 
 ::LieAlgebra::Kinematics CosseratRod::getKinematicsAtTip()const
 {
