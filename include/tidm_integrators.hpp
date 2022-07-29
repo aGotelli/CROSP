@@ -54,7 +54,7 @@ struct DeltaPosition : public OSNI::ODEAb {
     DeltaPosition(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
                   std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
                   std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_Lambda_stack,
-                  std::shared_ptr<const DeltaRotation> t_delta_rotation,
+                  std::shared_ptr<const OSNI::ODESolverInterface> t_delta_rotation,
                   const unsigned int t_number_of_Chebyshev_points) :    OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                                                                                     t_number_of_Chebyshev_points),
                                                                         m_K_stack(t_K_stack),
@@ -65,22 +65,11 @@ struct DeltaPosition : public OSNI::ODEAb {
 
     virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point)
     {
-//        std::cout << "At point : " << t_point << "\n";
-//        std::cout << "  - A  : \n" << -::LieAlgebra::skew( m_K_stack->at(t_point) ) << "\n";
-//        std::cout << "\n\n\n\n";
         return -::LieAlgebra::skew( m_K_stack->at(t_point) );
     }
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point)
     {
-//        std::cout << "At point : " << t_point << "\n";
-//        std::cout << "  - Lambda : \n" << m_Lambda_stack->at(t_point)<< "\n";
-//        std::cout << "  - Delta Pi : \n" << m_delta_rotation->getStateAtPoint(t_point) << "\n";
-//        std::cout << "  - Delta Lambda : \n" << m_Delta_Lambda_stack->at(t_point)<< "\n";
-//        std::cout << "  - b : \n" << -::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_delta_rotation->getStateAtPoint(t_point)
-//                     + m_Delta_Lambda_stack->at(t_point) << "\n";
-
-//        std::cout << "\n\n\n\n";
         return -::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_delta_rotation->getStateAtPoint(t_point)
                 + m_Delta_Lambda_stack->at(t_point);
     }
@@ -89,8 +78,144 @@ struct DeltaPosition : public OSNI::ODEAb {
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack;
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack;
 
-    const std::shared_ptr<const DeltaRotation> m_delta_rotation;
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_delta_rotation;
 };
+
+
+
+
+struct DeltaAngularVelocity : public OSNI::ODEAb {
+    DeltaAngularVelocity(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                         std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_K_stack,
+                         std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_dot_K_stack,
+                         std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                         const unsigned int t_number_of_Chebyshev_points) :     OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                                                                                            t_number_of_Chebyshev_points),
+                                                                                m_K_stack(t_K_stack),
+                                                                                m_Delta_K_stack(t_Delta_K_stack),
+                                                                                m_Delta_dot_K_stack(t_Delta_dot_K_stack),
+                                                                                m_angular_velocity_integrator(t_angular_velocity_integrator)
+    {}
+
+    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point)
+    {
+        return -::LieAlgebra::skew( m_K_stack->at(t_point) );
+    }
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point)
+    {
+        return -::LieAlgebra::skew( m_Delta_K_stack->at(t_point) )*m_angular_velocity_integrator->getStateAtPoint(t_point)
+         +m_Delta_dot_K_stack->at(t_point);
+    }
+
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity_integrator;
+
+};
+
+
+struct DeltaLinearVelocity : public OSNI::ODEAb {
+    DeltaLinearVelocity(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                        std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_K_stack,
+                        std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
+                        std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_Lambda_stack,
+                        std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_dot_Lambda_stack,
+                        std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                        std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
+                        std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                        const unsigned int t_number_of_Chebyshev_points) :  OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                                                                                        t_number_of_Chebyshev_points),
+                                                                            m_K_stack(t_K_stack),
+                                                                            m_Delta_K_stack(t_Delta_K_stack),
+                                                                            m_Lambda_stack(t_Lambda_stack),
+                                                                            m_Delta_Lambda_stack(t_Delta_Lambda_stack),
+                                                                            m_Delta_dot_Lambda_stack(t_Delta_dot_Lambda_stack),
+                                                                            m_angular_velocity_integrator(t_angular_velocity_integrator),
+                                                                            m_Delta_angular_velocity_integrator(t_Delta_angular_velocity_integrator),
+                                                                            m_linear_velocity_integrator(t_linear_velocity_integrator)
+    {}
+
+    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point)
+    {
+        return -::LieAlgebra::skew( m_K_stack->at(t_point) );
+    }
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point)
+    {
+        return m_Delta_dot_Lambda_stack->at(t_point)
+                - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_Delta_K_stack->at(t_point) ) * m_linear_velocity_integrator->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_Delta_Lambda_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point);
+    }
+
+
+
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack;
+
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Lambda_stack;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity_integrator;
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_angular_velocity_integrator;
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity_integrator;
+
+};
+
+
+struct DeltaAngularAccelerations : public OSNI::ODEAb {
+
+    DeltaAngularAccelerations(std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
+                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_dot_K_stack,
+                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_K_stack,
+                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_dot_K_stack,
+                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Delta_ddot_K_stack,
+                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
+                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
+                              const unsigned int t_number_of_Chebyshev_points) :  OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                                                                                        t_number_of_Chebyshev_points),
+                                                                                  m_K_stack(t_K_stack),
+                                                                                  m_dot_K_stack(t_dot_K_stack),
+                                                                                  m_Delta_K_stack(t_Delta_K_stack),
+                                                                                  m_Delta_dot_K_stack(t_Delta_dot_K_stack),
+                                                                                  m_Delta_ddot_K_stack(t_Delta_ddot_K_stack),
+                                                                                  m_angular_velocity_integrator(t_angular_velocity_integrator),
+                                                                                  m_angular_acceleration_integrator(t_angular_acceleration_integrator),
+                                                                                  m_Delta_angular_velocity_integrator(t_Delta_angular_velocity_integrator)
+    {}
+
+    virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point)
+    {
+        return -::LieAlgebra::skew( m_K_stack->at(t_point) );
+    }
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point)
+    {
+        return m_Delta_ddot_K_stack->at(t_point)
+                - ::LieAlgebra::skew( m_Delta_K_stack->at(t_point) ) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_Delta_dot_K_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point);
+    }
+
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack;
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_ddot_K_stack;
+
+
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity_integrator;
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_acceleration_integrator;
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_angular_velocity_integrator;
+
+};
+
 
 
 struct TIDMIntegrators{
@@ -120,15 +245,41 @@ struct TIDMIntegrators{
     const unsigned int m_number_of_Chebyshev_points { 17 };
 
 
-    std::shared_ptr<DeltaRotation> m_delta_rotation { std::make_shared<DeltaRotation>( m_strain_parameterisation->m_K_stack,
-                                                                                       m_strain_parameterisation_perturbation->m_Delta_K_stack,
-                                                                                       m_number_of_Chebyshev_points) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_rotation { std::make_shared<DeltaRotation>( m_strain_parameterisation->m_K_stack,
+                                                                                                  m_strain_parameterisation_perturbation->m_Delta_K_stack,
+                                                                                                  m_number_of_Chebyshev_points) };
 
-    std::shared_ptr<DeltaPosition> m_delta_position { std::make_shared<DeltaPosition>( m_strain_parameterisation->m_K_stack,
-                                                                                       m_strain_parameterisation->m_Lambda_stack,
-                                                                                       m_strain_parameterisation_perturbation->m_Delta_Lambda_stack,
-                                                                                       m_delta_rotation,
-                                                                                       m_number_of_Chebyshev_points) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_position { std::make_shared<DeltaPosition>( m_strain_parameterisation->m_K_stack,
+                                                                                                  m_strain_parameterisation->m_Lambda_stack,
+                                                                                                  m_strain_parameterisation_perturbation->m_Delta_Lambda_stack,
+                                                                                                  m_Delta_rotation,
+                                                                                                  m_number_of_Chebyshev_points) };
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_velocity { std::make_shared<DeltaAngularVelocity>(m_strain_parameterisation->m_K_stack,
+                                                                                                                m_strain_parameterisation_perturbation->m_Delta_K_stack,
+                                                                                                                m_strain_parameterisation_perturbation->m_Delta_dot_K_stack,
+                                                                                                                m_idm_integrators->m_angular_velocity,
+                                                                                                                m_number_of_Chebyshev_points) };
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_linear_velocity { std::make_shared<DeltaLinearVelocity>(m_strain_parameterisation->m_K_stack,
+                                                                                                              m_strain_parameterisation_perturbation->m_Delta_K_stack,
+                                                                                                              m_strain_parameterisation->m_Lambda_stack,
+                                                                                                              m_strain_parameterisation_perturbation->m_Delta_Lambda_stack,
+                                                                                                              m_strain_parameterisation_perturbation->m_Delta_dot_Lambda_stack,
+                                                                                                              m_idm_integrators->m_angular_velocity,
+                                                                                                              m_Delta_angular_velocity,
+                                                                                                              m_idm_integrators->m_linear_velocity,
+                                                                                                              m_number_of_Chebyshev_points) };
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_acceleration { std::make_shared<DeltaAngularAccelerations>(m_strain_parameterisation->m_K_stack,
+                                                                                                                         m_strain_parameterisation->m_dot_K_stack,
+                                                                                                                         m_strain_parameterisation_perturbation->m_Delta_K_stack,
+                                                                                                                         m_strain_parameterisation_perturbation->m_Delta_dot_K_stack,
+                                                                                                                         m_strain_parameterisation_perturbation->m_Delta_ddot_K_stack,
+                                                                                                                         m_idm_integrators->m_angular_velocity,
+                                                                                                                         m_idm_integrators->m_angular_acceleration,
+                                                                                                                         m_Delta_angular_velocity,
+                                                                                                                         m_number_of_Chebyshev_points) };
 
 };
 

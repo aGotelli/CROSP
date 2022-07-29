@@ -98,12 +98,27 @@ int main(int argc, char *argv[])
 
         strain_parameterisation_perturbation->update(Delta_qe, Delta_dot_qe, Delta_ddot_qe);
 
-        tidm_integrators->m_delta_rotation->integrate( Eigen::Vector3d::Zero() );
-        tidm_integrators->m_delta_position->integrate( Eigen::Vector3d::Zero() );
+        tidm_integrators->m_Delta_rotation->integrate( Eigen::Vector3d::Zero() );
+        tidm_integrators->m_Delta_position->integrate( Eigen::Vector3d::Zero() );
 
         std::cout << "Delta : " << (i+1) << "\n\n";
-        std::cout << "  - rotations : \n" << tidm_integrators->m_delta_rotation->getStackAsMatrix() << "\n";
-        std::cout << "  - positions : \n" << tidm_integrators->m_delta_position->getStackAsMatrix() << "\n";
+        std::cout << "  - rotations : \n" << tidm_integrators->m_Delta_rotation->getStackAsMatrix() << "\n";
+        std::cout << "  - positions : \n" << tidm_integrators->m_Delta_position->getStackAsMatrix() << "\n";
+
+        std::cout << "\n\n\n";
+
+        tidm_integrators->m_Delta_angular_velocity->integrate(Eigen::Vector3d::Zero());
+        tidm_integrators->m_Delta_linear_velocity->integrate(Eigen::Vector3d::Zero());
+        std::cout << "  - angular velocity : \n" << tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix() << "\n";
+        std::cout << "  - linear velocity : \n" << tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix() << "\n";
+
+        std::cout << "\n\n\n";
+
+
+        tidm_integrators->m_Delta_angular_acceleration->integrate(Eigen::Vector3d::Zero());
+//        tidm_integrators->m_Delta_linear_acceleration->integrate(Eigen::Vector3d::Zero());
+        std::cout << "  - angular acceleration : \n" << tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix() << "\n";
+//        std::cout << "  - linear acceleration : \n" << tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix() << "\n";
 
 
 //        Eigen::Matrix<double, 6, number_of_Chebyshev_points> local_Delta_zeta;
