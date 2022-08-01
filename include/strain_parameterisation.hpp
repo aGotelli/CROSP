@@ -21,6 +21,8 @@
 #include <eigen3/unsupported/Eigen/KroneckerProduct>
 #include <boost/math/special_functions/legendre.hpp>
 
+#include "material_properties.hpp"
+
 #include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
@@ -84,6 +86,16 @@ struct StrainParameterisation {
                                                                                 m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
     {}
 
+
+    StrainParameterisation(unsigned int t_ne, const std::vector<bool> &t_admitted_deformations,
+                           const unsigned int t_number_of_Chebyshev_points,
+                           const MaterialProperties &t_material_properties) :   m_ne(t_ne), m_admitted_deformations(t_admitted_deformations),
+                                                                                m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+                                                                                m_material_properties(t_material_properties)
+    {}
+
+
+
     StrainParameterisation(const unsigned int t_number_of_Chebyshev_points,
                            const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
                                                                                                                 m_polynomial_base(t_polynomial_base)
@@ -106,20 +118,11 @@ struct StrainParameterisation {
         Eigen::VectorXd dot_xi;
         Eigen::VectorXd ddot_xi;
 
-        Eigen::MatrixXd xi_stack(6, m_number_of_Chebyshev_points);
-
         for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
-
-            std::cout << "Point : " << i << "\n";
-            std::cout << "  - X : " << ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)[i] << "\n";
-            std::cout << "  - Phi : " << m_Phi_stack[i] << "\n";
 
             xi = m_B*m_Phi_stack[i]*t_qe + m_B_bar*m_constrained_strain;
             dot_xi = m_B*m_Phi_stack[i]*t_dot_qe;
             ddot_xi = m_B*m_Phi_stack[i]*t_ddot_qe;
-
-            xi_stack.col(i) = xi;
-            //std::cout << "At point : " << i << " ad_xi : \n" << ::LieAlgebra::ad(xi) << "\n\n";
 
             m_K_stack->at(i) = xi.block<3,1>(0,0);
             m_dot_K_stack->at(i) = dot_xi.block<3,1>(0,0);
@@ -130,8 +133,6 @@ struct StrainParameterisation {
             m_ddot_Lambda_stack->at(i) = ddot_xi.block<3,1>(3,0);
 
         }
-
-        std::cout << "xi : \n" << xi_stack.rowwise().reverse() << "\n\n";
 
     }
 
@@ -200,8 +201,10 @@ struct StrainParameterisation {
 
     const std::vector<Eigen::MatrixXd> m_Phi_stack { generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points), m_polynomial_base) };
 
+    const MaterialProperties m_material_properties;
 
-
+    const Eigen::MatrixXd m_Ma { [&](){return m_B.transpose()*m_material_properties.m_M*m_B;}() };
+    const Eigen::MatrixXd m_Ha { [&](){return m_B.transpose()*m_material_properties.m_H*m_B;}() };
 
 
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
