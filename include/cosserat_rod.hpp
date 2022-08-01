@@ -23,43 +23,12 @@
 
 #include "idm_integrators.hpp"
 #include "strain_parameterisation.hpp"
+#include "material_properties.hpp"
 
 namespace CROSP {
 
 
-struct MaterialProperties {
 
-    const double m_E { 210000000000 };
-    const double m_G {  80000000000 };
-    const double m_rho { 7800 };
-
-
-    const double m_r { 0.001 };
-    const double m_A { M_PI*m_r*m_r };
-    const double m_L { 1.0 };
-
-    const double m_Jx { M_PI*pow(m_r,4)/2 };
-    const double m_Jy { M_PI*pow(m_r,4)/4 };
-    const double m_Jz { M_PI*pow(m_r,4)/4 };
-
-
-
-
-    const Eigen::Matrix<double, 6, 6> m_H { [this](){
-            Eigen::Matrix<double, 6, 6> H;
-            H.setZero();
-            H.diagonal() << m_G*m_Jx, m_E*m_Jy, m_E*m_Jz, m_E*m_A, m_G*m_A, m_G*m_A;
-
-            return H;}() };
-
-
-    const  Eigen::Matrix<double, 6, 6>  m_M{ Eigen::Matrix<double, 6, 6>::Identity()/*[this](){
-            Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
-
-            M.diagonal() << m_rho*m_Jx, m_rho*m_Jy, m_rho*m_Jz, m_rho*m_A, m_rho*m_A, m_rho*m_A;
-            return M;}()*/ };
-
-};
 
 
 class CosseratRod
