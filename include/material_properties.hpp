@@ -30,7 +30,7 @@ struct MaterialProperties {
     const double m_rho { 7800 };
 
 
-    const double m_r { 0.001 };
+    const double m_r { 0.01 };
     const double m_A { M_PI*m_r*m_r };
     const double m_L { 1.0 };
 

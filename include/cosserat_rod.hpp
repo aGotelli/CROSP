@@ -69,11 +69,11 @@ public:
 private:
 #endif
 
-    MaterialProperties m_material_properties;
+    std::shared_ptr<MaterialProperties> m_material_properties { std::make_shared<MaterialProperties>() };
 
     std::shared_ptr<StrainParameterisation> m_strain_parameterisation { std::make_shared<StrainParameterisation>() };
 
-    std::shared_ptr<IDMIntegrators> m_idm_integrators { std::make_shared<IDMIntegrators>(m_strain_parameterisation, m_material_properties.m_M.block<3,3>(0,0), m_material_properties.m_M.block<3,3>(3,3))};
+    std::shared_ptr<IDMIntegrators> m_idm_integrators { std::make_shared<IDMIntegrators>(m_strain_parameterisation, m_material_properties )};
 
 };
 

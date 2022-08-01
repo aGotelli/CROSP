@@ -295,6 +295,11 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
+        b_stack(Eigen::all, t_point) = m_M_linear*m_linear_acceleration->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
+                - computeDistributedForce(t_point);
+
+
         return m_M_linear*m_linear_acceleration->getStateAtPoint(t_point)
                 - ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
                 - computeDistributedForce(t_point);
@@ -313,7 +318,7 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
                                                q(2),
                                                q(3)).toRotationMatrix();
 
-        Eigen::Vector3d N_bar = -R.transpose()*7800*3.1416e-06*Eigen::Vector3d(0, 0, 9.81);
+        Eigen::Vector3d N_bar = -R.transpose()*7800*M_PI*0.01*0.01*Eigen::Vector3d(0, 0, 9.81);
 
 
         return N_bar;
@@ -334,14 +339,15 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     std::shared_ptr<const OSNI::ODESolverInterface> m_position;
 
+    Eigen::MatrixXd b_stack { Eigen::MatrixXd::Zero(3, m_K_stack->size()) };
+
 
 };
 
 
 struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
-    InternalCouplesIntegrator(const Eigen::Matrix3d t_M_angular,
-                             const Eigen::Matrix3d t_M_linear,
+    InternalCouplesIntegrator(const Eigen::Matrix3d t_M_angular, const Eigen::Matrix3d t_M_linear,
                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_K_stack,
                              std::shared_ptr<const std::vector<Eigen::Vector3d>> t_Lambda_stack,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
@@ -350,9 +356,10 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
                              std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
-                              const unsigned int t_number_of_Chebyshev_points) :                              OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD, t_number_of_Chebyshev_points),
-                                                                                                              m_M_angular(t_M_angular),
-                                                                                                              m_M_linear(t_M_linear),
+                              const unsigned int t_number_of_Chebyshev_points) :                              OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
+                                                                                                                          t_number_of_Chebyshev_points),
+                                                                                                              m_M_angular( t_M_angular ),
+                                                                                                              m_M_linear( t_M_linear ),
                                                                                                               m_K_stack(t_K_stack),
                                                                                                               m_Lambda_stack(t_Lambda_stack),
                                                                                                               m_angular_velocity(t_angular_velocity_integrator),
@@ -374,6 +381,23 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
+
+        Eigen::Vector3d b = ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point)
+                + m_M_angular*m_angular_acceleration->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * m_M_angular * m_angular_velocity->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_linear_velocity->getStateAtPoint(t_point) ).transpose()* m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
+                + computeDistributedCouple(m_quaternion->getStateAtPoint(t_point), m_position->getStateAtPoint(t_point));
+
+        std::cout << "At point : " << t_point << "\n";
+        std::cout << "  - hat(Lambda) : \n" << ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ).transpose() << "\n";
+        std::cout << "  - N : \n" << m_internal_forces->getStateAtPoint(t_point) << "\n";
+        std::cout << "  - hat(lambda) * N : \n" << ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point) << "\n";
+//        std::cout << "  - M * dot(eta) : \n" << m_M_angular*m_angular_acceleration->getStateAtPoint(t_point) << "\n";
+//        std::cout << "  - hat(Omega) * M * Omega : \n" << ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * m_M_angular * m_angular_velocity->getStateAtPoint(t_point) << "\n";
+//        std::cout << "  - hat(V) * M * V : \n" << ::LieAlgebra::skew( m_linear_velocity->getStateAtPoint(t_point) ).transpose()* m_M_linear * m_linear_velocity->getStateAtPoint(t_point) << "\n";
+//        std::cout << "  - C_bar : \n" << computeDistributedCouple(m_quaternion->getStateAtPoint(t_point), m_position->getStateAtPoint(t_point)) << "\n";
+        std::cout << b << "\n";
+
         return ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point)
                 + m_M_angular*m_angular_acceleration->getStateAtPoint(t_point)
                 - ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * m_M_angular * m_angular_velocity->getStateAtPoint(t_point)
@@ -410,6 +434,9 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
     std::shared_ptr<const OSNI::ODESolverInterface> m_internal_forces;
 
 
+    Eigen::MatrixXd b_stack { Eigen::MatrixXd::Zero(3, m_K_stack->size()) };
+
+
 };
 
 
@@ -417,17 +444,17 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 struct IDMIntegrators {
 
     IDMIntegrators(std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
-                   const Eigen::Matrix3d &t_M_angular, const Eigen::Matrix3d &t_M_linear) : m_strain_parameterisation(t_strain_parameterisation),
-                                                                                            m_M_angular(t_M_angular),
-                                                                                            m_M_linear(t_M_angular)
+                   std::shared_ptr<const MaterialProperties> t_material_properties) :   m_strain_parameterisation(t_strain_parameterisation),
+                                                                                        m_M_angular( t_material_properties->m_M.block<3, 3>(0, 0) ),
+                                                                                        m_M_linear( t_material_properties->m_M.block<3, 3>(3, 3) )
     {}
 
     IDMIntegrators(std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
-                   const Eigen::Matrix3d &t_M_angular, const Eigen::Matrix3d &t_M_linear,
+                   std::shared_ptr<const MaterialProperties> t_material_properties,
                    const unsigned int t_number_of_Chebyshev_points) :   m_strain_parameterisation(t_strain_parameterisation),
                                                                         m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-                                                                        m_M_angular(t_M_angular),
-                                                                        m_M_linear(t_M_angular)
+                                                                        m_M_angular( t_material_properties->m_M.block<3, 3>(0, 0) ),
+                                                                        m_M_linear( t_material_properties->m_M.block<3, 3>(3, 3) )
     {}
 
     const std::shared_ptr<const StrainParameterisation> m_strain_parameterisation;
@@ -470,7 +497,7 @@ struct IDMIntegrators {
                                                                                                                                 m_number_of_Chebyshev_points ) };
 
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces { std::make_shared<InternalForcesIntegrator>(m_M_linear,
+    std::shared_ptr<InternalForcesIntegrator> m_internal_forces { std::make_shared<InternalForcesIntegrator>(m_M_linear,
                                                                                                                         m_strain_parameterisation->m_K_stack, m_angular_velocity,
                                                                                                                         m_linear_velocity,
                                                                                                                         m_linear_acceleration,
@@ -478,7 +505,7 @@ struct IDMIntegrators {
                                                                                                                         m_position,
                                                                                                                         m_number_of_Chebyshev_points )};
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples { std::make_shared<InternalCouplesIntegrator>(m_M_angular,
+    std::shared_ptr<InternalCouplesIntegrator> m_internal_couples { std::make_shared<InternalCouplesIntegrator>(m_M_angular,
                                                                                                                m_M_linear,
                                                                                                                m_strain_parameterisation->m_K_stack,
                                                                                                                m_strain_parameterisation->m_Lambda_stack,

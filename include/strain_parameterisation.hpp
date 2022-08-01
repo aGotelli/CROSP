@@ -87,15 +87,6 @@ struct StrainParameterisation {
     {}
 
 
-    StrainParameterisation(unsigned int t_ne, const std::vector<bool> &t_admitted_deformations,
-                           const unsigned int t_number_of_Chebyshev_points,
-                           const MaterialProperties &t_material_properties) :   m_ne(t_ne), m_admitted_deformations(t_admitted_deformations),
-                                                                                m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-                                                                                m_material_properties(t_material_properties)
-    {}
-
-
-
     StrainParameterisation(const unsigned int t_number_of_Chebyshev_points,
                            const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
                                                                                                                 m_polynomial_base(t_polynomial_base)
@@ -201,10 +192,6 @@ struct StrainParameterisation {
 
     const std::vector<Eigen::MatrixXd> m_Phi_stack { generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points), m_polynomial_base) };
 
-    const MaterialProperties m_material_properties;
-
-    const Eigen::MatrixXd m_Ma { [&](){return m_B.transpose()*m_material_properties.m_M*m_B;}() };
-    const Eigen::MatrixXd m_Ha { [&](){return m_B.transpose()*m_material_properties.m_H*m_B;}() };
 
 
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
