@@ -289,23 +289,60 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final
     {
-        std::cout << "The point : " << t_point << " K : " << m_K_stack->at(t_point).transpose() << std::endl;
+        std::cout << "At point : " << t_point << "\n";
+        std::cout << "  - A :\n" << ::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose() << "\n";
+        std::cout << " \n\n" ;
         return ::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose();
     }
 
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
-        return m_M_linear*m_linear_acceleration->getStateAtPoint(t_point)
-                - ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
-                + computeDistributedForce(m_quaternion->getStateAtPoint(t_point), m_position->getStateAtPoint(t_point));
+        std::cout << "At point : " << t_point << "\n" << " corresponding at X = " << ::Chebyshev::ComputeChebyshevPoints(11)[t_point] << "\n";
+//        std::cout << "  - Ml :\n" << m_M_linear << "\n";
+        std::cout << "  - linear acceleration :\n" << m_linear_acceleration->getStateAtPoint(t_point).transpose() << "\n";
+        std::cout << "  - angular velocity :\n" << m_angular_velocity->getStateAtPoint(t_point).transpose() << "\n";
+        std::cout << "  - linear velocity :\n" << m_linear_velocity->getStateAtPoint(t_point).transpose() << "\n";
+
+
+        Eigen::Vector3d distributed_forces = computeDistributedForce(t_point);
+        Eigen::Vector3d M_dot_eta = m_M_linear*m_linear_acceleration->getStateAtPoint(t_point);
+        Eigen::Vector3d ad_eta_M_eta = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point);
+
+        std::cout << "  - N_bar : " << distributed_forces.transpose() << "\n";
+        std::cout << "  - M_dot_eta : " << distributed_forces.transpose() << "\n";
+        std::cout << "  - ad_eta_M_eta : " << distributed_forces.transpose() << "\n";
+
+        Eigen::Vector3d b = M_dot_eta
+                            - ad_eta_M_eta
+                            - distributed_forces;
+        std::cout << "  - b :\n" << b << "\n";
+        std::cout << " \n\n" ;
+
+        return b;
+
+//        return m_M_linear*m_linear_acceleration->getStateAtPoint(t_point)
+//                - ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
+//                + computeDistributedForce(m_quaternion->getStateAtPoint(t_point), m_position->getStateAtPoint(t_point));
     }
 
 
-    virtual Eigen::VectorXd computeDistributedForce(const Eigen::Vector4d &t_quaternion, const Eigen::Vector3d &t_position)
+    virtual Eigen::VectorXd computeDistributedForce(const unsigned int t_point)
     {
-        Eigen::Vector3d distributed_force(0, 0, 0);
-        return distributed_force;
+        if(t_point == 0 or t_point == 10)
+            return Eigen::Vector3d::Zero();
+
+        Eigen::Vector4d q(m_quaternion->getStateAtPoint(t_point));
+
+        Eigen::Matrix3d R = Eigen::Quaterniond(q(0),
+                                               q(1),
+                                               q(2),
+                                               q(3)).toRotationMatrix();
+
+        Eigen::Vector3d N_bar = -R.transpose()*7800*3.1416e-06*Eigen::Vector3d(0, 0, 9.81);
+
+
+        return N_bar;
     }
 
 
@@ -373,8 +410,8 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::VectorXd computeDistributedCouple(const Eigen::Vector4d &t_quaternion, const Eigen::Vector3d &t_position)
     {
-        Eigen::Vector3d distributed_force(0, 0, 0);
-        return distributed_force;
+        Eigen::Vector3d distributed_couples(0, 0, 0);
+        return distributed_couples;
     }
 
 
@@ -468,16 +505,16 @@ struct IDMIntegrators {
                                                                                                                         m_number_of_Chebyshev_points )};
 
     std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples { std::make_shared<InternalCouplesIntegrator>(m_M_angular,
-                                                                                                                          m_M_linear,
-                                                                                                                          m_strain_parameterisation->m_K_stack,
-                                                                                                                          m_strain_parameterisation->m_Lambda_stack,
-                                                                                                                          m_angular_velocity,
-                                                                                                                          m_linear_velocity,
-                                                                                                                          m_angular_acceleration,
-                                                                                                                          m_quaternion,
-                                                                                                                          m_position,
-                                                                                                                          m_internal_forces,
-                                                                                                                          m_number_of_Chebyshev_points )};
+                                                                                                               m_M_linear,
+                                                                                                               m_strain_parameterisation->m_K_stack,
+                                                                                                               m_strain_parameterisation->m_Lambda_stack,
+                                                                                                               m_angular_velocity,
+                                                                                                               m_linear_velocity,
+                                                                                                               m_angular_acceleration,
+                                                                                                               m_quaternion,
+                                                                                                               m_position,
+                                                                                                               m_internal_forces,
+                                                                                                               m_number_of_Chebyshev_points )};
 
 };
 

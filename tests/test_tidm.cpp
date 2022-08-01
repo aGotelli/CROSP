@@ -14,7 +14,7 @@ using namespace CROSP;
 int main(int argc, char *argv[])
 {
 
-    const unsigned int number_of_Chebyshev_points = 21;
+    const unsigned int number_of_Chebyshev_points = 11;
 
     const unsigned int ne = 3;
 
@@ -31,14 +31,17 @@ int main(int argc, char *argv[])
 
 
 
+    std::shared_ptr<MaterialProperties> material_properties = std::make_shared<MaterialProperties>();
+
+
     std::shared_ptr<StrainParameterisation> strain_parameterisation = std::make_shared<StrainParameterisation>(ne, admitted_deformations, number_of_Chebyshev_points);
 
     std::shared_ptr<StrainParameterisationPerturbation> strain_parameterisation_perturbation = std::make_shared<StrainParameterisationPerturbation>(ne, admitted_deformations,
                                                                                                                                                     number_of_Chebyshev_points);
 
     Eigen::Matrix3d M_angular, M_linear;
-    M_angular.setIdentity();
-    M_linear.setIdentity();
+    M_angular = material_properties->m_M.block<3, 3>(0, 0);
+    M_linear = material_properties->m_M.block<3, 3>(3, 3);
 
     std::shared_ptr<IDMIntegrators> idm_integrators = std::make_shared<IDMIntegrators>(strain_parameterisation,
                                                                                        M_angular, M_linear,
@@ -47,6 +50,7 @@ int main(int argc, char *argv[])
     std::shared_ptr<TIDMIntegrators> tidm_integrators = std::make_shared<TIDMIntegrators>(strain_parameterisation,
                                                                                           strain_parameterisation_perturbation,
                                                                                           idm_integrators,
+                                                                                          material_properties,
                                                                                           number_of_Chebyshev_points);
 
     Eigen::VectorXd qe = Eigen::VectorXd::Zero(ne*na);
@@ -73,12 +77,19 @@ int main(int argc, char *argv[])
 
     idm_integrators->m_linear_acceleration->integrate( Eigen::Vector3d::Zero() );
 
+    idm_integrators->m_internal_forces->integrate( Eigen::Vector3d::Zero() );
+
+    idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
+
 //    std::cout << "Quaternions : \n" << idm_integrators->m_quaternion->getStackAsMatrix() << "\n\n\n" << std::endl;
 //    std::cout << "Positions : \n" << idm_integrators->m_position->getStackAsMatrix() << "\n\n\n" << std::endl;
 //    std::cout << "Angular velocities : \n" << idm_integrators->m_angular_velocity->getStackAsMatrix() << "\n\n\n" << std::endl;
 //    std::cout << "Linear velocities : \n" << idm_integrators->m_linear_velocity->getStackAsMatrix() << "\n\n\n" << std::endl;
 //    std::cout << "Angular accelerations : \n" << idm_integrators->m_angular_acceleration->getStackAsMatrix() << "\n\n\n" << std::endl;
 //    std::cout << "Linear accelerations : \n" << idm_integrators->m_linear_acceleration->getStackAsMatrix() << "\n\n\n" << std::endl;
+
+    std::cout << "Internal couples : \n" << idm_integrators->m_internal_couples->getStackAsMatrix() << "\n\n\n" << std::endl;
+    std::cout << "Internal forces : \n" << idm_integrators->m_internal_forces->getStackAsMatrix() << "\n\n\n" << std::endl;
 
 
     Eigen::VectorXd Delta_qe = Eigen::VectorXd::Zero(ne*na);
@@ -125,6 +136,11 @@ int main(int argc, char *argv[])
         std::cout << "  - linear acceleration : \n" << tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix() << "\n";
 
 
+        std::cout << "\n\n\n\n\n\n";
+        tidm_integrators->m_Delta_internal_forces->integrate(Eigen::Vector3d::Zero());
+        std::cout << "  - internal forces : \n" << tidm_integrators->m_Delta_internal_forces->getStackAsMatrix() << "\n";
+
+
 
     }
 
@@ -159,7 +175,7 @@ int main(int argc, char *argv[])
 
     ::benchmark::Initialize(&argc, argv);
 
-    ::benchmark::RunSpecifiedBenchmarks();
+    //::benchmark::RunSpecifiedBenchmarks();
 
 
 
