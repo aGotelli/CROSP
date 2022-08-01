@@ -16,7 +16,7 @@
 #include <memory>
 #include <vector>
 
-#include "OSNI/include/OSNI.hpp"
+#include "OSNI/OSNI.hpp"
 
 #include "strain_parameterisation.hpp"
 #include "idm_integrators.hpp"
