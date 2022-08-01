@@ -289,41 +289,15 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final
     {
-        std::cout << "At point : " << t_point << "\n";
-        std::cout << "  - A :\n" << ::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose() << "\n";
-        std::cout << " \n\n" ;
         return ::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose();
     }
 
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
-        std::cout << "At point : " << t_point << "\n" << " corresponding at X = " << ::Chebyshev::ComputeChebyshevPoints(11)[t_point] << "\n";
-//        std::cout << "  - Ml :\n" << m_M_linear << "\n";
-        std::cout << "  - linear acceleration :\n" << m_linear_acceleration->getStateAtPoint(t_point).transpose() << "\n";
-        std::cout << "  - angular velocity :\n" << m_angular_velocity->getStateAtPoint(t_point).transpose() << "\n";
-        std::cout << "  - linear velocity :\n" << m_linear_velocity->getStateAtPoint(t_point).transpose() << "\n";
-
-
-        Eigen::Vector3d distributed_forces = computeDistributedForce(t_point);
-        Eigen::Vector3d M_dot_eta = m_M_linear*m_linear_acceleration->getStateAtPoint(t_point);
-        Eigen::Vector3d ad_eta_M_eta = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point);
-
-        std::cout << "  - N_bar : " << distributed_forces.transpose() << "\n";
-        std::cout << "  - M_dot_eta : " << distributed_forces.transpose() << "\n";
-        std::cout << "  - ad_eta_M_eta : " << distributed_forces.transpose() << "\n";
-
-        Eigen::Vector3d b = M_dot_eta
-                            - ad_eta_M_eta
-                            - distributed_forces;
-        std::cout << "  - b :\n" << b << "\n";
-        std::cout << " \n\n" ;
-
-        return b;
-
-//        return m_M_linear*m_linear_acceleration->getStateAtPoint(t_point)
-//                - ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
-//                + computeDistributedForce(m_quaternion->getStateAtPoint(t_point), m_position->getStateAtPoint(t_point));
+        return m_M_linear*m_linear_acceleration->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
+                - computeDistributedForce(t_point);
     }
 
 
