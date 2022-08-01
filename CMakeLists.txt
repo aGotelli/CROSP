@@ -22,7 +22,8 @@ include_directories(include)
 
 
 
-add_library(${PROJECT_NAME} include/idm_integrators.hpp
+add_library(${PROJECT_NAME} include/material_properties.hpp
+                            include/idm_integrators.hpp
                             include/tidm_integrators.hpp
                             include/strain_parameterisation.hpp
                             #src/strain_parameterisation.cpp
