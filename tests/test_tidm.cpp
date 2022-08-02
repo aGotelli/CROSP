@@ -53,7 +53,7 @@ void writeToFile(std::string t_name,
 int main(int argc, char *argv[])
 {
 
-    const unsigned int number_of_Chebyshev_points = 21;
+    const unsigned int number_of_Chebyshev_points = 15;
 
     const unsigned int ne = 3;
 

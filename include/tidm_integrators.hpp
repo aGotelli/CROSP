@@ -302,6 +302,7 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
                                   std::shared_ptr<const MaterialProperties> t_material_properties,
                                   const unsigned int t_number_of_Chebyshev_points) :    OSNI::ODEAb(3, ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                                                                                                     t_number_of_Chebyshev_points),
+                                                                                        m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
                                                                                         m_K_stack(t_strain_parameterisation->m_K_stack),
                                                                                         m_Delta_K_stack(t_strain_parameterisation_perturbation->m_Delta_K_stack),
                                                                                         m_quaternion_integrator(t_idm_integrators->m_quaternion),
@@ -319,17 +320,17 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point)
     {
-        std::cout << "At point : " << t_point << "\n";
-        std::cout << "  - A :\n" << -::LieAlgebra::skew( m_K_stack->at(t_point) ) << "\n";
-        std::cout << " \n\n" ;
+//        std::cout << "At point : " << t_point << "\n";
+//        std::cout << "  - A :\n" << -::LieAlgebra::skew( m_K_stack->at(t_point) ) << "\n";
+//        std::cout << " \n\n" ;
 
-        return -::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose();
+        return ::LieAlgebra::skew( m_K_stack->at(t_point) ).transpose();
     }
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point)
     {
 
-        std::cout << "At point : " << t_point << "\n";
+//        std::cout << "At point : " << t_point << "\n";
 //        std::cout << "  - Omega : \n" << m_angular_velocity_integrator->getStateAtPoint(t_point) << "\n";
 //        std::cout << "  - V : \n" << m_linear_velocity_integrator->getStateAtPoint(t_point) << "\n";
 //        std::cout << "  - Delta Omega : \n" << m_Delta_angular_velocity_integrator->getStateAtPoint(t_point) << "\n";
@@ -354,11 +355,12 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
 
 
-        Eigen::Vector3d b = m_Ml*m_Delta_linear_acceleration_integrator->getStateAtPoint(t_point)
-                - ::LieAlgebra::skew( m_Delta_angular_velocity_integrator->getStateAtPoint(t_point) ).transpose() * m_Ml * m_linear_velocity_integrator->getStateAtPoint(t_point)
-                - ::LieAlgebra::skew( m_angular_velocity_integrator->getStateAtPoint(t_point) ).transpose() * m_Ml * m_Delta_linear_velocity_integrator->getStateAtPoint(t_point)
-                - computeLocalExternalForces(t_point)
-                +::LieAlgebra::skew( m_Delta_K_stack->at(t_point) ).transpose()*m_internal_forces_integrator->getStateAtPoint(t_point)
+        Eigen::Vector3d b = Eigen::Vector3d::Zero()
+//                + m_Ml*m_Delta_linear_acceleration_integrator->getStateAtPoint(t_point)
+//                - ::LieAlgebra::skew( m_Delta_angular_velocity_integrator->getStateAtPoint(t_point) ).transpose() * m_Ml * m_linear_velocity_integrator->getStateAtPoint(t_point)
+//                - ::LieAlgebra::skew( m_angular_velocity_integrator->getStateAtPoint(t_point) ).transpose() * m_Ml * m_Delta_linear_velocity_integrator->getStateAtPoint(t_point)
+//                - computeLocalExternalForces(t_point) +
+                  + ::LieAlgebra::skew( m_Delta_K_stack->at(t_point) ).transpose()*m_internal_forces_integrator->getStateAtPoint(t_point)
                 ;
 
 
@@ -368,8 +370,8 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
         b_stack(Eigen::all, t_point) = b;
 
-        std::cout << b_stack << std::endl;
-                std::cout << "\n\n\n";
+//        std::cout << b_stack << std::endl;
+//                std::cout << "\n\n\n";
 
 
         return b;
@@ -379,7 +381,7 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::Vector3d computeLocalExternalForces(unsigned int t_point) const
     {
-        //if(t_point == 0 or t_point == 10)
+        if(t_point == 0 or t_point == m_number_of_Chebyshev_points-1)
             return Eigen::Vector3d::Zero();
 
         Eigen::Vector4d q(m_quaternion_integrator->getStateAtPoint(t_point));
@@ -395,12 +397,16 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
                                         *R.transpose()*m_material_properties->m_rho*m_material_properties->m_A*Eigen::Vector3d(0, 0, 9.81);
 
 
-        //return Delta_N_bar;
+        return Delta_N_bar;
     }
 
+//    void printPointInfo(unsigned int t_point, unsigned int t_number_of_Chebyshev_points)
+//    {
+//        std::cout << "At point : " << t_point << ", corresponding to X = " << ::Chebyshev::ComputeChebyshevPoints(t_number_of_Chebyshev_points)[t_point] << "\n";
+//        std::cout
+//    }
 
-
-
+    const unsigned int m_number_of_Chebyshev_points;
 
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack;
