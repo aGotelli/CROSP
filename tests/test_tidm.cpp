@@ -53,7 +53,7 @@ void writeToFile(std::string t_name,
 int main(int argc, char *argv[])
 {
 
-    const unsigned int number_of_Chebyshev_points = 31;
+    const unsigned int number_of_Chebyshev_points = 21;
 
     const unsigned int ne = 3;
 
@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
 
 
     std::shared_ptr<MaterialProperties> material_properties = std::make_shared<MaterialProperties>();
+
 
 
     std::shared_ptr<StrainParameterisation> strain_parameterisation = std::make_shared<StrainParameterisation>(ne, admitted_deformations, number_of_Chebyshev_points);
