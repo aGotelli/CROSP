@@ -93,13 +93,13 @@ int main(int argc, char *argv[])
 
     Eigen::VectorXd qe = Eigen::VectorXd::Zero(ne*na);
     qe << -0.2,
-           0.0,
-           0.0;
+           0.2,
+          -0.2;
 
     Eigen::VectorXd dot_qe = Eigen::VectorXd::Zero(ne*na);
-    //dot_qe = 0.4 * qe;
+    dot_qe = 0.4 * qe;
     Eigen::VectorXd ddot_qe = Eigen::VectorXd::Zero(ne*na);
-    //ddot_qe = -0.15*qe;
+    ddot_qe = -0.15*qe;
 
     strain_parameterisation->update(qe, dot_qe, ddot_qe);
 
@@ -170,36 +170,50 @@ int main(int argc, char *argv[])
         tidm_integrators->m_Delta_rotation->integrate( Eigen::Vector3d::Zero() );
         tidm_integrators->m_Delta_position->integrate( Eigen::Vector3d::Zero() );
 
+
+
         std::cout << "Delta : " << (i+1) << "\n\n";
-//        std::cout << "  - rotations : \n" << tidm_integrators->m_Delta_rotation->getStackAsMatrix() << "\n";
-//        std::cout << "  - positions : \n" << tidm_integrators->m_Delta_position->getStackAsMatrix() << "\n";
+//        std::cout << "  - Delta rotations : \n" << tidm_integrators->m_Delta_rotation->getStackAsMatrix() << "\n";
+//        std::cout << "  - Delta positions : \n" << tidm_integrators->m_Delta_position->getStackAsMatrix() << "\n";
+        writeToFile("Delta_P"+std::to_string(i+1), tidm_integrators->m_Delta_rotation->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+        writeToFile("Delta_Y"+std::to_string(i+1), tidm_integrators->m_Delta_position->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+
 
 //        std::cout << "\n\n\n";
 
         tidm_integrators->m_Delta_angular_velocity->integrate(Eigen::Vector3d::Zero());
         tidm_integrators->m_Delta_linear_velocity->integrate(Eigen::Vector3d::Zero());
-//        std::cout << "  - angular velocity : \n" << tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix() << "\n";
-//        std::cout << "  - linear velocity : \n" << tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix() << "\n";
+//        std::cout << "  - Delta angular velocity : \n" << tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix() << "\n";
+//        std::cout << "  - Delta linear velocity : \n" << tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix() << "\n";
+        writeToFile("Delta_Omega"+std::to_string(i+1), tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+        writeToFile("Delta_V"+std::to_string(i+1), tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
 //        std::cout << "\n\n\n";
 
 
         tidm_integrators->m_Delta_angular_acceleration->integrate(Eigen::Vector3d::Zero());
         tidm_integrators->m_Delta_linear_acceleration->integrate(Eigen::Vector3d::Zero());
-//        std::cout << "  - angular acceleration : \n" << tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix() << "\n";
-//        std::cout << "  - linear acceleration : \n" << tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix() << "\n";
+        writeToFile("Delta_dot_Omega"+std::to_string(i+1), tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+        writeToFile("Delta_dot_V"+std::to_string(i+1), tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+
+//        std::cout << "  - Delta angular acceleration : \n" << tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix() << "\n";
+//        std::cout << "  - Delta linear acceleration : \n" << tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix() << "\n";
 
 
 //        std::cout << "\n\n\n";
 
 
         tidm_integrators->m_Delta_internal_forces->integrate(Eigen::Vector3d::Zero());
-        std::cout << "  - internal forces : \n" << tidm_integrators->m_Delta_internal_forces->getStackAsMatrix() << "\n";
+        tidm_integrators->m_Delta_internal_couples->integrate(Eigen::Vector3d::Zero());
+        std::cout << "  - Delta internal forces : \n" << tidm_integrators->m_Delta_internal_forces->getStackAsMatrix() << "\n";
+        std::cout << "  - Delta internal couples : \n" << tidm_integrators->m_Delta_internal_couples->getStackAsMatrix() << "\n";
 
         writeToFile("Delta_N"+std::to_string(i+1), tidm_integrators->m_Delta_internal_forces->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+        writeToFile("Delta_C"+std::to_string(i+1), tidm_integrators->m_Delta_internal_couples->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
 
-        writeToFile("b_stack_Delta"+std::to_string(i+1), tidm_integrators->m_Delta_internal_forces->b_stack.rowwise().reverse(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+        writeToFile("b_stack_Delta_N"+std::to_string(i+1), tidm_integrators->m_Delta_internal_forces->b_stack.rowwise().reverse(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+        writeToFile("b_stack_Delta_C"+std::to_string(i+1), tidm_integrators->m_Delta_internal_couples->b_stack.rowwise().reverse(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
 
         std::cout << "\n\n\n\n\n\n";

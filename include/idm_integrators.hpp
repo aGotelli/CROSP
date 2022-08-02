@@ -185,7 +185,8 @@ struct AngularAccelerationIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
-        return m_ddot_K_stack->at(t_point) - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_angular_velocity->getStateAtPoint(t_point);
+        return m_ddot_K_stack->at(t_point)
+                - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_angular_velocity->getStateAtPoint(t_point);
     }
 
 
@@ -237,9 +238,10 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
     {
-        return m_ddot_Lambda_stack->at(t_point) - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_angular_acceleration->getStateAtPoint(t_point)
-                                                - ::LieAlgebra::skew( m_dot_Lambda_stack->at(t_point) ) * m_angular_velocity->getStateAtPoint(t_point)
-                                                - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_linear_velocity->getStateAtPoint(t_point);
+        return m_ddot_Lambda_stack->at(t_point)
+                - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_angular_acceleration->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_dot_Lambda_stack->at(t_point) ) * m_angular_velocity->getStateAtPoint(t_point)
+                - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_linear_velocity->getStateAtPoint(t_point);
     }
 
 
@@ -301,8 +303,8 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
         Eigen::Vector3d inertial_velocities = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point);
         Eigen::Vector3d distributed_forces = computeDistributedForce(t_point);
 
-        Eigen::Vector3d b = /*inertial_acceleration
-                            - inertial_velocities*/
+        Eigen::Vector3d b = inertial_acceleration
+                            - inertial_velocities
                             - distributed_forces
                             ;
 
