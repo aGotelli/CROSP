@@ -1,9 +1,7 @@
-include_directories(include)
-
 
 
 add_library(StrainParameterisation SHARED
-        include/strain_parameterisation/strain_parameterisation.hpp
+        include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
         strain_parameterisation/strain_parameterisation.cpp
 )
 target_link_libraries(StrainParameterisation
@@ -12,7 +10,7 @@ target_link_libraries(StrainParameterisation
 )
 
 add_library(MaterialProperties SHARED
-    include/material_properties/material_properties.hpp
+    include/${PROJECT_NAME}/material_properties/material_properties.hpp
     material_properties/material_properties.cpp
 )
 target_link_libraries(MaterialProperties
@@ -21,7 +19,7 @@ target_link_libraries(MaterialProperties
 )
 
 add_library(IDMIntegrators SHARED
-    include/idm_integrators/idm_integrators.hpp
+    include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
     idm_integrators/idm_integrators.cpp
 )
 target_link_libraries(IDMIntegrators
@@ -34,7 +32,7 @@ target_link_libraries(IDMIntegrators
 )
 
 add_library(TIDMIntegrators SHARED
-    include/tidm_integrators/tidm_integrators.hpp
+    include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
     tidm_integrators/tidm_integrators.cpp
 )
 target_link_libraries(TIDMIntegrators
@@ -49,7 +47,7 @@ target_link_libraries(TIDMIntegrators
 
 
 add_library(${PROJECT_NAME} SHARED
-                            include/${PROJECT_NAME}/cosserat_rod.hpp
+                            include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
