@@ -17,9 +17,7 @@
 #include <Eigen/Dense>
 #include <math.h>
 
-
-namespace CROSP {
-
+namespace CROSP::material_properties {
 
 struct MaterialProperties {
 
@@ -37,6 +35,17 @@ struct MaterialProperties {
     const double m_Jx { M_PI*pow(m_r,4)/2 };
     const double m_Jy { M_PI*pow(m_r,4)/4 };
     const double m_Jz { M_PI*pow(m_r,4)/4 };
+
+
+    double distributedDensity()const;
+
+    Eigen::Matrix3d getMAngular()const;
+
+    Eigen::Matrix3d getMLinear()const;
+
+    Eigen::Matrix3d getHAngular()const;
+
+    Eigen::Matrix3d getHLinear()const;
 
 
 
@@ -63,7 +72,6 @@ struct MaterialProperties {
 
 
 
-
-}
+}   //  namespace CROSP::MaterialProperties
 
 #endif // MATERIAL_PROPERTIES_HPP

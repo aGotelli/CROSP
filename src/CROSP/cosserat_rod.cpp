@@ -9,7 +9,7 @@
  *
  */
 
-#include "cosserat_rod.hpp"
+#include "CROSP/CROSP/cosserat_rod.hpp"
 
 
 #include <boost/math/special_functions/legendre.hpp>
@@ -17,15 +17,17 @@
 namespace CROSP {
 
 
-CosseratRod::CosseratRod(const unsigned int t_number_of_chebyshev_points) : m_strain_parameterisation( std::make_shared<StrainParameterisation>(t_number_of_chebyshev_points) )
+CosseratRod::CosseratRod(const unsigned int t_number_of_chebyshev_points) :
+    m_strain_parameterisation( std::make_shared<strain_parameterisation::StrainParameterisation>(t_number_of_chebyshev_points) ),
+    m_strain_parameterisation_perturbation( std::make_shared<strain_parameterisation::StrainParameterisationDelta>(t_number_of_chebyshev_points) )
 {
     setForwardIntegratorsInitialConditions();
 }
 
 
-CosseratRod::CosseratRod(std::shared_ptr<MaterialProperties> t_material_properties,
-                         std::shared_ptr<StrainParameterisation> t_strain_parameterisation,
-                         std::shared_ptr<StrainParameterisationPerturbation> t_strain_parameterisation_perturbation) :   m_material_properties(t_material_properties),
+CosseratRod::CosseratRod(std::shared_ptr<material_properties::MaterialProperties> t_material_properties,
+                         std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                         std::shared_ptr<strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation) :   m_material_properties(t_material_properties),
                                                                                                             m_strain_parameterisation(t_strain_parameterisation),
                                                                                                             m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation)
 {

@@ -16,19 +16,14 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <vector>
-#include <algorithm>
 
-#include <eigen3/unsupported/Eigen/KroneckerProduct>
 #include <boost/math/special_functions/legendre.hpp>
 
-#include "material_properties.hpp"
-
 #include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
-#include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-namespace CROSP {
 
-namespace StrainParameterisation {
+
+namespace CROSP::strain_parameterisation {
 
 
 typedef std::function<double(const unsigned int, const double&)> BaseFunction;
@@ -61,6 +56,9 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
 struct StrainParameterisation {
 
     StrainParameterisation()=default;
+
+
+    StrainParameterisation(const unsigned int t_number_of_Chebyshev_points);
 
 
     StrainParameterisation(unsigned int t_ne,
@@ -175,6 +173,10 @@ struct StrainParameterisation {
 
 struct StrainParameterisationDelta : public StrainParameterisation {
 
+    StrainParameterisationDelta()=default;
+
+    StrainParameterisationDelta(const unsigned int t_number_of_Chebyshev_points);
+
     StrainParameterisationDelta(unsigned int t_ne,
                                 const std::vector<bool> &t_admitted_deformations,
                                 const unsigned int t_number_of_Chebyshev_points);
@@ -195,9 +197,8 @@ struct StrainParameterisationDelta : public StrainParameterisation {
 
 
 
-}   //  namespace StrainParameterisation
+}   //  namespace CROSP::StrainParameterisation
 
-}   //  namespace CROSP
 
 
 

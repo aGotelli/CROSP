@@ -1,9 +1,9 @@
-#include "strain_parameterisation.hpp"
+#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+
+#include <eigen3/unsupported/Eigen/KroneckerProduct>
 
 
-namespace CROSP {
-
-namespace StrainParameterisation {
+namespace CROSP::strain_parameterisation {
 
 
 Eigen::MatrixXd getPhi(const unsigned int t_ne,
@@ -45,6 +45,10 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
     return Phi_stack;
 }
 
+
+StrainParameterisation::StrainParameterisation(const unsigned int t_number_of_Chebyshev_points) :
+    m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+{}
 
 
 StrainParameterisation::StrainParameterisation(unsigned int t_ne,
@@ -100,7 +104,9 @@ void StrainParameterisation::update(const Eigen::VectorXd &t_qe,
 
 
 
-
+StrainParameterisationDelta::StrainParameterisationDelta(const unsigned int t_number_of_Chebyshev_points) :
+    StrainParameterisation(t_number_of_Chebyshev_points)
+{}
 
 StrainParameterisationDelta::StrainParameterisationDelta(unsigned int t_ne,
                                                          const std::vector<bool> &t_admitted_deformations,
@@ -154,5 +160,4 @@ void StrainParameterisationDelta::update(const Eigen::VectorXd &t_Delta_qe,
 
 
 
-}   //  namespace StrainParameterisation
-}   //  namespace CROSP
+}   //  namespace CROSP::StrainParameterisation
