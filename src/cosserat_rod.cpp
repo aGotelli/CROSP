@@ -34,25 +34,26 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                                     const Eigen::Vector3d &t_initial_angular_acceleration,
                                     const Eigen::Vector3d &t_initial_linear_acceleration)
 {
+    //  Integrate Quaternions
     m_idm_integrators->m_quaternion->integrate(t_initial_quaternion);
 
+    //  Integrate Positions
     m_idm_integrators->m_position->integrate(t_initial_position);
 
+    //  Integrate twist
     m_idm_integrators->m_angular_velocity->integrate(t_initial_angular_velocity);
-
     m_idm_integrators->m_linear_velocity->integrate(t_initial_linear_velocity);
 
+    //  Integrate accelerations
     m_idm_integrators->m_angular_acceleration->integrate(t_initial_angular_acceleration);
-
     m_idm_integrators->m_linear_acceleration->integrate(t_initial_linear_acceleration);
+}
 
-//    std::cout << "Quaternions : \n" << m_idm_integrators->m_quaternion->getStack() << "\n\n\n" << std::endl;
-//    std::cout << "Positions : \n" << m_idm_integrators->m_position->getStack() << "\n\n\n" << std::endl;
-//    std::cout << "Linear velocities : \n" << m_idm_integrators->m_angular_velocity->getStack() << "\n\n\n" << std::endl;
-//    std::cout << "Angular velocities : \n" << m_idm_integrators->m_linear_velocity->getStack() << "\n\n\n" << std::endl;
-//    std::cout << "Linear accelerations : \n" << m_idm_integrators->m_angular_acceleration->getStack() << "\n\n\n" << std::endl;
-//    std::cout << "Angular accelerations : \n" << m_idm_integrators->m_linear_acceleration->getStack() << "\n\n\n" << std::endl;
-
+void CosseratRod::updateParameterisationPerturbation(const Eigen::VectorXd &t_Delta_qe,
+                                        const Eigen::VectorXd &t_Delta_dot_qe,
+                                        const Eigen::VectorXd &t_Delta_ddot_qe)
+{
+    m_strain_parameterisation_perturbation->update(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
 }
 
 void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
@@ -62,7 +63,17 @@ void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delt
                                            const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
                                            const Eigen::Vector3d &t_initial_Delta_linear_acceleration)
 {
+    //  Integrate Delta zeta
+    m_tidm_integrators->m_Delta_rotation->integrate( Eigen::Vector3d::Zero() );
+    m_tidm_integrators->m_Delta_position->integrate( Eigen::Vector3d::Zero() );
 
+    //  Integrate Delta eta
+    m_tidm_integrators->m_Delta_angular_velocity->integrate(Eigen::Vector3d::Zero());
+    m_tidm_integrators->m_Delta_linear_velocity->integrate(Eigen::Vector3d::Zero());
+
+    //  Integrate Delta dot eta
+    m_tidm_integrators->m_Delta_angular_acceleration->integrate(Eigen::Vector3d::Zero());
+    m_tidm_integrators->m_Delta_linear_acceleration->integrate(Eigen::Vector3d::Zero());
 }
 
 ::LieAlgebra::Kinematics CosseratRod::getKinematicsAtTip()const
@@ -97,8 +108,6 @@ void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
     m_idm_integrators->m_internal_forces->integrate(force_at_tip_local_coord);
     m_idm_integrators->m_internal_couples->integrate(couple_at_tip_local_coord);
 
-//    std::cout << "Internal forces : \n" << m_idm_integrators->m_internal_forces->getStack() << "\n\n\n" << std::endl;
-//    std::cout << "Internal couples : \n" << m_idm_integrators->m_internal_couples->getStack() << "\n\n\n" << std::endl;
 }
 
 

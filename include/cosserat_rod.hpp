@@ -16,14 +16,13 @@
 
 #include <Eigen/Dense>
 
-
-#include <boost/math/special_functions/legendre.hpp>
-
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-#include "idm_integrators.hpp"
 #include "strain_parameterisation.hpp"
 #include "material_properties.hpp"
+
+#include "idm_integrators.hpp"
+#include "tidm_integrators.hpp"
 
 namespace CROSP {
 
@@ -36,7 +35,14 @@ class CosseratRod
 public:
     CosseratRod()=default;
 
-    CosseratRod(const unsigned int t_number_of_chebyshev_points);
+    CosseratRod(unsigned int t_number_of_Chebyshev_points);
+
+    CosseratRod(std::shared_ptr<MaterialProperties> t_material_properties,
+                std::shared_ptr<StrainParameterisation> t_strain_parameterisation,
+                std::shared_ptr<StrainParameterisationPerturbation> t_strain_parameterisation_perturbation) :   m_material_properties(t_material_properties),
+                                                                                                                m_strain_parameterisation(t_strain_parameterisation),
+                                                                                                                m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation)
+    {}
 
     void updateParameterisation(const Eigen::VectorXd &t_qe,
                                 const Eigen::VectorXd &t_dot_qe,
@@ -48,6 +54,11 @@ public:
                            const Eigen::Vector3d &t_initial_linear_velocity=Eigen::Vector3d::Zero(),
                            const Eigen::Vector3d &t_initial_angular_acceleration=Eigen::Vector3d::Zero(),
                            const Eigen::Vector3d &t_initial_linear_acceleration=Eigen::Vector3d::Zero());
+
+
+    void updateParameterisationPerturbation(const Eigen::VectorXd &t_Delta_qe,
+                                            const Eigen::VectorXd &t_Delta_dot_qe,
+                                            const Eigen::VectorXd &t_Delta_ddot_qe);
 
     void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation=Eigen::Vector3d::Zero(),
                                   const Eigen::Vector3d &t_initial_Delta_position=Eigen::Vector3d::Zero(),
@@ -73,8 +84,15 @@ private:
 
     std::shared_ptr<StrainParameterisation> m_strain_parameterisation { std::make_shared<StrainParameterisation>() };
 
-    std::shared_ptr<IDMIntegrators> m_idm_integrators { std::make_shared<IDMIntegrators>(m_strain_parameterisation, m_material_properties )};
+    std::shared_ptr<StrainParameterisationPerturbation> m_strain_parameterisation_perturbation { std::make_shared<StrainParameterisationPerturbation>() };
 
+    std::shared_ptr<IDMIntegrators> m_idm_integrators { std::make_shared<IDMIntegrators>(m_strain_parameterisation,
+                                                                                         m_material_properties )};
+
+    std::shared_ptr<TIDMIntegrators> m_tidm_integrators { std::make_shared<TIDMIntegrators>(m_strain_parameterisation,
+                                                                                            m_strain_parameterisation_perturbation,
+                                                                                            m_idm_integrators,
+                                                                                            m_material_properties) };
 };
 
 
