@@ -3,6 +3,7 @@
 #include "cosserat_rod.hpp"
 #include "tidm_integrators.hpp"
 
+#include <utilities/Eigen/eigen_io.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -10,42 +11,6 @@
 
 using namespace CROSP;
 
-/*!
- * \brief writeToFile writes a Eigen matrix into file
- * \param t_name    name of the file
- * \param t_matrix  the Eigen matrix to write into the file
- * \param t_relative_path_from_build the relative path from the build folder to the file location. Default is none so the file is written in the build directory)
- * \param t_format  the specification for writing. (Default in column major allignment, with comma column separator and 8 digits precision)
- */
-void writeToFile(std::string t_name,
-                 const Eigen::MatrixXd &t_matrix,
-                 std::string t_relative_path_from_build="",
-                 const Eigen::IOFormat &t_format=Eigen::IOFormat(16, 0, ","))
-{
-    if(not t_relative_path_from_build.empty()
-            ){
-        //  Ensure relative path ends with a backslash only if a path is given
-        if(not t_relative_path_from_build.ends_with('/'))
-            t_relative_path_from_build.append("/");
-    }
-
-
-    //  Ensure it ends with .csv
-    if(t_name.find(".csv") == std::string::npos)
-        t_name.append(".csv");
-
-    //  The file will be created in the location given by the realtive path and with the given name
-    const auto file_name_and_location = t_relative_path_from_build + t_name;
-
-    //  Create file in given location with given name
-    std::ofstream file(file_name_and_location.c_str());
-
-    //  Put matrix in this file
-    file << t_matrix.format(t_format);
-
-    //  Close the file
-    file.close();
- }
 
 
 
@@ -53,7 +18,7 @@ void writeToFile(std::string t_name,
 int main(int argc, char *argv[])
 {
 
-    const unsigned int number_of_Chebyshev_points = 15;
+    const unsigned int number_of_Chebyshev_points = 21;
 
     const unsigned int ne = 3;
 
@@ -74,9 +39,12 @@ int main(int argc, char *argv[])
 
 
 
-    std::shared_ptr<StrainParameterisation> strain_parameterisation = std::make_shared<StrainParameterisation>(ne, admitted_deformations, number_of_Chebyshev_points);
+    std::shared_ptr<StrainParameterisation> strain_parameterisation = std::make_shared<StrainParameterisation>(ne,
+                                                                                                               admitted_deformations,
+                                                                                                               number_of_Chebyshev_points);
 
-    std::shared_ptr<StrainParameterisationPerturbation> strain_parameterisation_perturbation = std::make_shared<StrainParameterisationPerturbation>(ne, admitted_deformations,
+    std::shared_ptr<StrainParameterisationPerturbation> strain_parameterisation_perturbation = std::make_shared<StrainParameterisationPerturbation>(ne,
+                                                                                                                                                    admitted_deformations,
                                                                                                                                                     number_of_Chebyshev_points);
 
 
@@ -119,6 +87,8 @@ int main(int argc, char *argv[])
 
     idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
 
+    idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(ne) );
+
     std::cout.flush();
 
     writeToFile("Quaternions", idm_integrators->m_quaternion->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
@@ -129,10 +99,8 @@ int main(int argc, char *argv[])
     writeToFile("LinearAccelerations", idm_integrators->m_linear_acceleration->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
     writeToFile("InternalCouples", idm_integrators->m_internal_couples->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
     writeToFile("InternalForces", idm_integrators->m_internal_forces->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+    writeToFile("GeneralisedForces", idm_integrators->m_generalised_forces->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
-
-    writeToFile("b_stack_forces", idm_integrators->m_internal_forces->b_stack.rowwise().reverse(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
-    writeToFile("b_stack_couples", idm_integrators->m_internal_couples->b_stack.rowwise().reverse(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
 
 //    std::cout << "Quaternions : \n" << idm_integrators->m_quaternion->getStackAsMatrix() << "\n\n\n" << std::endl;
@@ -196,8 +164,6 @@ int main(int argc, char *argv[])
         writeToFile("Delta_dot_Omega"+std::to_string(i+1), tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
         writeToFile("Delta_dot_V"+std::to_string(i+1), tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
-//        std::cout << "  - Delta angular acceleration : \n" << tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix() << "\n";
-//        std::cout << "  - Delta linear acceleration : \n" << tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix() << "\n";
 
 
 //        std::cout << "\n\n\n";
@@ -212,9 +178,8 @@ int main(int argc, char *argv[])
         writeToFile("Delta_C"+std::to_string(i+1), tidm_integrators->m_Delta_internal_couples->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
 
-        writeToFile("b_stack_Delta_N"+std::to_string(i+1), tidm_integrators->m_Delta_internal_forces->b_stack.rowwise().reverse(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
-        writeToFile("b_stack_Delta_C"+std::to_string(i+1), tidm_integrators->m_Delta_internal_couples->b_stack.rowwise().reverse(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
-
+        tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(ne));
+        writeToFile("Delta_Q"+std::to_string(i+1), tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
         std::cout << "\n\n\n\n\n\n";
 
@@ -223,7 +188,29 @@ int main(int argc, char *argv[])
     ::benchmark::RegisterBenchmark("Compose Jacobian", [&](::benchmark::State &t_state){
 
         while(t_state.KeepRunning()){
-            Eigen::Matrix<double, ne*6, number_of_Chebyshev_points> Delta_zeta;
+
+            strain_parameterisation->update(qe, dot_qe, ddot_qe);
+
+            idm_integrators->m_quaternion->integrate( Eigen::Vector4d(1, 0, 0, 0) );
+
+            idm_integrators->m_position->integrate( Eigen::Vector3d::Zero() );
+
+            idm_integrators->m_angular_velocity->integrate( Eigen::Vector3d::Zero() );
+
+            idm_integrators->m_linear_velocity->integrate( Eigen::Vector3d::Zero() );
+
+            idm_integrators->m_angular_acceleration->integrate( Eigen::Vector3d::Zero() );
+
+            idm_integrators->m_linear_acceleration->integrate( Eigen::Vector3d::Zero() );
+
+            idm_integrators->m_internal_forces->integrate( Eigen::Vector3d::Zero() );
+
+            idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
+
+
+            idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(ne) );
+
+
             for(unsigned int i=0; i<ne; i++){
                 Delta_qe.setZero();
                 Delta_qe(i) = 1;
@@ -244,10 +231,13 @@ int main(int argc, char *argv[])
                 tidm_integrators->m_Delta_angular_acceleration->integrate(Eigen::Vector3d::Zero());
                 tidm_integrators->m_Delta_linear_acceleration->integrate(Eigen::Vector3d::Zero());
 
+                tidm_integrators->m_Delta_internal_forces->integrate(Eigen::Vector3d::Zero());
+                tidm_integrators->m_Delta_internal_couples->integrate(Eigen::Vector3d::Zero());
+
             }
 
         }
-    });
+    })->Repetitions(50);
 
     ::benchmark::Initialize(&argc, argv);
 

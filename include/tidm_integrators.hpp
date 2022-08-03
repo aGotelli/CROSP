@@ -546,6 +546,39 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 
 
 
+struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
+
+    DeltaGeneralisedForcesIntegrator(std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
+                                     std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_couples_integrator,
+                                     std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator,
+                                     const unsigned int t_number_of_Chebyshev_points) : OSNI::ODEb(t_strain_parameterisation->m_ne,
+                                                                                                   ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
+                                                                                                   t_number_of_Chebyshev_points),
+                                                                                        m_strain_parameterisation(t_strain_parameterisation),
+                                                                                        m_Delta_internal_couples_integrator(t_Delta_internal_couples_integrator),
+                                                                                        m_Delta_internal_forces_integrator(t_Delta_internal_forces_integrator)
+    {}
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final
+    {
+        Eigen::Vector3d Delta_C = m_Delta_internal_couples_integrator->getStateAtPoint(t_point);
+        Eigen::Vector3d Delta_N = m_Delta_internal_forces_integrator->getStateAtPoint(t_point);
+
+        Eigen::Matrix<double, 6, 1> Delta_Lambda;
+        Delta_Lambda << Delta_C,
+                        Delta_N;
+
+        const auto Phi = m_strain_parameterisation->m_Phi_stack.at(t_point);
+        const auto B = m_strain_parameterisation->m_B;
+        return -Phi.transpose()*B.transpose()*Delta_Lambda;
+    }
+
+
+    const std::shared_ptr<const StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_internal_couples_integrator;
+    const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_internal_forces_integrator;
+
+};
 
 
 
@@ -631,18 +664,18 @@ struct TIDMIntegrators{
                                                                                                                         m_number_of_Chebyshev_points) };
 
 
-    std::shared_ptr<DeltaInternalForcesIntegrator> m_Delta_internal_forces { std::make_shared<DeltaInternalForcesIntegrator>(m_strain_parameterisation,
-                                                                                                                             m_strain_parameterisation_perturbation,
-                                                                                                                             m_idm_integrators,
-                                                                                                                             m_Delta_rotation,
-                                                                                                                             m_Delta_angular_velocity,
-                                                                                                                             m_Delta_linear_velocity,
-                                                                                                                             m_Delta_linear_acceleration,
-                                                                                                                             m_material_properties,
-                                                                                                                             m_number_of_Chebyshev_points) };
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_forces { std::make_shared<DeltaInternalForcesIntegrator>(m_strain_parameterisation,
+                                                                                                                        m_strain_parameterisation_perturbation,
+                                                                                                                        m_idm_integrators,
+                                                                                                                        m_Delta_rotation,
+                                                                                                                        m_Delta_angular_velocity,
+                                                                                                                        m_Delta_linear_velocity,
+                                                                                                                        m_Delta_linear_acceleration,
+                                                                                                                        m_material_properties,
+                                                                                                                        m_number_of_Chebyshev_points) };
 
 
-    std::shared_ptr<DeltaInternalCouplesIntegrator> m_Delta_internal_couples { std::make_shared<DeltaInternalCouplesIntegrator>(m_material_properties,
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_couples { std::make_shared<DeltaInternalCouplesIntegrator>(m_material_properties,
                                                                                                                           m_idm_integrators,
                                                                                                                           m_strain_parameterisation,
                                                                                                                           m_strain_parameterisation_perturbation,
@@ -652,6 +685,17 @@ struct TIDMIntegrators{
                                                                                                                           m_Delta_linear_velocity,
                                                                                                                           m_Delta_internal_forces,
                                                                                                                           m_number_of_Chebyshev_points) };
+
+
+    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_generalised_forces { std::make_shared<DeltaGeneralisedForcesIntegrator>(m_strain_parameterisation,
+                                                                                                                              m_Delta_internal_couples,
+                                                                                                                              m_Delta_internal_forces,
+                                                                                                                              m_number_of_Chebyshev_points) };
+
+
+
+
+
 };
 
 }   //  namespace CROSP
