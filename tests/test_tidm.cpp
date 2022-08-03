@@ -15,6 +15,7 @@ using namespace CROSP;
 
 
 
+
 int main(int argc, char *argv[])
 {
 
@@ -35,29 +36,27 @@ int main(int argc, char *argv[])
 
 
 
-    std::shared_ptr<MaterialProperties> material_properties = std::make_shared<MaterialProperties>();
+    std::shared_ptr<::material_properties::MaterialProperties> material_properties = std::make_shared<::material_properties::MaterialProperties>();
 
 
 
-    std::shared_ptr<StrainParameterisation> strain_parameterisation = std::make_shared<StrainParameterisation>(ne,
+    std::shared_ptr<::strain_parameterisation::StrainParameterisation> strain_parameterisation = std::make_shared<::strain_parameterisation::StrainParameterisation>(ne,
                                                                                                                admitted_deformations,
                                                                                                                number_of_Chebyshev_points);
 
-    std::shared_ptr<StrainParameterisationPerturbation> strain_parameterisation_perturbation = std::make_shared<StrainParameterisationPerturbation>(ne,
+    std::shared_ptr<::strain_parameterisation::StrainParameterisationDelta> strain_parameterisation_perturbation = std::make_shared<::strain_parameterisation::StrainParameterisationDelta>(ne,
                                                                                                                                                     admitted_deformations,
                                                                                                                                                     number_of_Chebyshev_points);
 
 
 
-    std::shared_ptr<IDMIntegrators> idm_integrators = std::make_shared<IDMIntegrators>(strain_parameterisation,
-                                                                                       material_properties,
-                                                                                       number_of_Chebyshev_points);
+    std::shared_ptr<::idm_integrators::IDMIntegrators> idm_integrators = std::make_shared<::idm_integrators::IDMIntegrators>(strain_parameterisation,
+                                                                                                                             material_properties);
 
-    std::shared_ptr<TIDMIntegrators> tidm_integrators = std::make_shared<TIDMIntegrators>(strain_parameterisation,
-                                                                                          strain_parameterisation_perturbation,
-                                                                                          idm_integrators,
-                                                                                          material_properties,
-                                                                                          number_of_Chebyshev_points);
+    std::shared_ptr<::tidm_integrators::TIDMIntegrators> tidm_integrators = std::make_shared<::tidm_integrators::TIDMIntegrators>(strain_parameterisation,
+                                                                                                                                  strain_parameterisation_perturbation,
+                                                                                                                                  idm_integrators,
+                                                                                                                                  material_properties);
 
     Eigen::VectorXd qe = Eigen::VectorXd::Zero(ne*na);
     qe << -0.2,
