@@ -33,39 +33,39 @@ namespace CROSP {
 class CosseratRod
 {
 public:
-    CosseratRod()=default;
 
     CosseratRod(unsigned int t_number_of_Chebyshev_points);
 
     CosseratRod(std::shared_ptr<MaterialProperties> t_material_properties,
                 std::shared_ptr<StrainParameterisation> t_strain_parameterisation,
-                std::shared_ptr<StrainParameterisationPerturbation> t_strain_parameterisation_perturbation) :   m_material_properties(t_material_properties),
-                                                                                                                m_strain_parameterisation(t_strain_parameterisation),
-                                                                                                                m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation)
-    {}
+                std::shared_ptr<StrainParameterisationPerturbation> t_strain_parameterisation_perturbation);
 
     void updateParameterisation(const Eigen::VectorXd &t_qe,
                                 const Eigen::VectorXd &t_dot_qe,
                                 const Eigen::VectorXd &t_ddot_qe);
 
-    void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion=Eigen::Vector4d(1, 0, 0, 0),
-                           const Eigen::Vector3d &t_initial_position=Eigen::Vector3d::Zero(),
-                           const Eigen::Vector3d &t_initial_angular_velocity=Eigen::Vector3d::Zero(),
-                           const Eigen::Vector3d &t_initial_linear_velocity=Eigen::Vector3d::Zero(),
-                           const Eigen::Vector3d &t_initial_angular_acceleration=Eigen::Vector3d::Zero(),
-                           const Eigen::Vector3d &t_initial_linear_acceleration=Eigen::Vector3d::Zero());
+    void forwardKinematics();
+
+    void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+                           const Eigen::Vector3d &t_initial_position,
+                           const Eigen::Vector3d &t_initial_angular_velocity,
+                           const Eigen::Vector3d &t_initial_linear_velocity,
+                           const Eigen::Vector3d &t_initial_angular_acceleration,
+                           const Eigen::Vector3d &t_initial_linear_acceleration);
 
 
     void updateParameterisationPerturbation(const Eigen::VectorXd &t_Delta_qe,
                                             const Eigen::VectorXd &t_Delta_dot_qe,
                                             const Eigen::VectorXd &t_Delta_ddot_qe);
 
-    void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation=Eigen::Vector3d::Zero(),
-                                  const Eigen::Vector3d &t_initial_Delta_position=Eigen::Vector3d::Zero(),
-                                  const Eigen::Vector3d &t_initial_Delta_angular_velocity=Eigen::Vector3d::Zero(),
-                                  const Eigen::Vector3d &t_initial_Delta_linear_velocity=Eigen::Vector3d::Zero(),
-                                  const Eigen::Vector3d &t_initial_Delta_angular_acceleration=Eigen::Vector3d::Zero(),
-                                  const Eigen::Vector3d &t_initial_Delta_linear_acceleration=Eigen::Vector3d::Zero());
+    void forwardTangentKinematics();
+
+    void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+                                  const Eigen::Vector3d &t_initial_Delta_position,
+                                  const Eigen::Vector3d &t_initial_Delta_angular_velocity,
+                                  const Eigen::Vector3d &t_initial_Delta_linear_velocity,
+                                  const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
+                                  const Eigen::Vector3d &t_initial_Delta_linear_acceleration);
 
     ::LieAlgebra::Kinematics getKinematicsAtTip()const;
 
@@ -79,6 +79,14 @@ public:
 #ifndef DEVELOPER
 private:
 #endif
+
+    /*!
+     * \brief setForwardIntegratorsInitialConditions sets the initial conditions for the forward integrators.
+     *
+     * This function sets the initial conditions for the forward integrators. For these integrators, we integrate from a fixed
+     * reference configuration so we can set their ivp once and for all.
+     */
+    void setForwardIntegratorsInitialConditions();
 
     std::shared_ptr<MaterialProperties> m_material_properties { std::make_shared<MaterialProperties>() };
 
