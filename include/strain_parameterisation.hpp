@@ -111,9 +111,9 @@ struct StrainParameterisation {
 
         for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
 
-            xi = m_B*m_Phi_stack[i]*t_qe + m_B_bar*m_constrained_strain;
-            dot_xi = m_B*m_Phi_stack[i]*t_dot_qe;
-            ddot_xi = m_B*m_Phi_stack[i]*t_ddot_qe;
+            xi = m_strains_map_stack[i]*t_qe + m_B_bar*m_constrained_strain;
+            dot_xi = m_strains_map_stack[i]*t_dot_qe;
+            ddot_xi = m_strains_map_stack[i]*t_ddot_qe;
 
             m_K_stack->at(i) = xi.block<3,1>(0,0);
             m_dot_K_stack->at(i) = dot_xi.block<3,1>(0,0);
@@ -130,7 +130,7 @@ struct StrainParameterisation {
 
 
 
-    const std::vector<bool> m_admitted_deformations { false, true, true, false, false, true };
+    const std::vector<bool> m_admitted_deformations { true, true, true, false, false, false };
 
     const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
 
@@ -191,6 +191,16 @@ struct StrainParameterisation {
     const std::function<double(const unsigned int, const double&)> m_polynomial_base { [](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);} };
 
     const std::vector<Eigen::MatrixXd> m_Phi_stack { generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points), m_polynomial_base) };
+
+    const std::vector<Eigen::MatrixXd> m_strains_map_stack { [&](){
+            std::vector<Eigen::MatrixXd> strains_map_stack(m_number_of_Chebyshev_points);
+
+            std::generate(strains_map_stack.begin(), strains_map_stack.end(), [&, index=0]()mutable{
+               return m_B*m_Phi_stack[index++];
+            });
+
+            return strains_map_stack;
+                                                             }() };
 
 
 
