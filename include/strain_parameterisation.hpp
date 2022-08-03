@@ -74,13 +74,15 @@ struct StrainParameterisation {
                            const Eigen::VectorXd &t_constrained_strain,
                            const BaseFunction t_polynomial_base=default_base_function);
 
+    ~StrainParameterisation()=default;
+
 
     inline unsigned int getNumberOfChebyshewPoints()const{return m_number_of_Chebyshev_points;}
 
 
-    void update(const Eigen::VectorXd &t_qe,
-                const Eigen::VectorXd &t_dot_qe,
-                const Eigen::VectorXd &t_ddot_qe);
+    virtual void update(const Eigen::VectorXd &t_qe,
+                        const Eigen::VectorXd &t_dot_qe,
+                        const Eigen::VectorXd &t_ddot_qe);
 
 
 
@@ -171,117 +173,25 @@ struct StrainParameterisation {
 };
 
 
-struct StrainParameterisationPerturbation {
+struct StrainParameterisationDelta : public StrainParameterisation {
 
-    StrainParameterisationPerturbation()=default;
-
-    StrainParameterisationPerturbation(const unsigned int t_number_of_Chebyshev_points) : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
-    {}
-
-    StrainParameterisationPerturbation(unsigned int t_ne, const std::vector<bool> &t_admitted_deformations,
-                                       const unsigned int t_number_of_Chebyshev_points) :   m_ne(t_ne), m_admitted_deformations(t_admitted_deformations),
-                                                                                            m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
-    {}
+    StrainParameterisationDelta(unsigned int t_ne,
+                                const std::vector<bool> &t_admitted_deformations,
+                                const unsigned int t_number_of_Chebyshev_points);
 
 
-    StrainParameterisationPerturbation(const unsigned int t_number_of_Chebyshev_points,
-                                       const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-                                                                                                                           m_polynomial_base(t_polynomial_base)
-    {}
+    StrainParameterisationDelta(unsigned int t_ne,
+                                const std::vector<bool> &t_admitted_deformations,
+                                const unsigned int t_number_of_Chebyshev_points,
+                                const Eigen::VectorXd &t_constrained_strain,
+                                const BaseFunction t_polynomial_base=default_base_function);
 
-    StrainParameterisationPerturbation(unsigned int t_ne, unsigned int t_na,
-                                       unsigned int t_number_of_Chebyshev_points,
-                                       const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_na(t_na), m_ne(t_ne),
-                                                                                                                            m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-                                                                                                                            m_polynomial_base(t_polynomial_base)
-    {}
+    virtual void update(const Eigen::VectorXd &t_Delta_qe,
+                        const Eigen::VectorXd &t_Delta_dot_qe,
+                        const Eigen::VectorXd &t_Delta_ddot_qe)override;
 
-
-    void update(const Eigen::VectorXd &t_Delta_qe,
-                const Eigen::VectorXd &t_Delta_dot_qe,
-                const Eigen::VectorXd &t_Delta_ddot_qe)
-    {
-
-        Eigen::VectorXd Delta_xi;
-        Eigen::VectorXd Delta_dot_xi;
-        Eigen::VectorXd Delta_ddot_xi;
-
-        Eigen::MatrixXd Delta_xi_stack(6,m_stacks_dimension);
-
-        for(unsigned int i=0; i<m_stacks_dimension; i++){
-
-            Delta_xi = m_B*m_Phi_stack[i]*t_Delta_qe;
-            Delta_dot_xi = m_B*m_Phi_stack[i]*t_Delta_dot_qe;
-            Delta_ddot_xi = m_B*m_Phi_stack[i]*t_Delta_ddot_qe;
-
-            Delta_xi_stack.col(i) = Delta_xi;
-
-            m_Delta_K_stack->at(i) = Delta_xi.block<3,1>(0,0);
-            m_Delta_dot_K_stack->at(i) = Delta_dot_xi.block<3,1>(0,0);
-            m_Delta_ddot_K_stack->at(i) = Delta_ddot_xi.block<3,1>(0,0);
-
-            m_Delta_Lambda_stack->at(i) = Delta_xi.block<3,1>(3,0);
-            m_Delta_dot_Lambda_stack->at(i) = Delta_dot_xi.block<3,1>(3,0);
-            m_Delta_ddot_Lambda_stack->at(i) = Delta_ddot_xi.block<3,1>(3,0);
-        }
-
-        //std::cout << "Delta xi : \n" << Delta_xi_stack << "\n\n";
-    }
-
-
-
-
-
-    const std::vector<bool> m_admitted_deformations { false, true, true, false, false, true };
-
-    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
-
-    const unsigned int m_ne { 3 };
-
-    const Eigen::MatrixXd m_B { [&](){
-            Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
-
-            std::vector<int> indexes;
-            std::for_each(m_admitted_deformations.begin(),
-                          m_admitted_deformations.end(),
-                          [&indexes, index=0](const bool dof)mutable{   if(dof == true)
-                                                                            indexes.push_back(index);
-                                                                        index++;});
-            const Eigen::MatrixXd map = I(Eigen::all, indexes);
-            return map;
-                              }() };
-
-    const Eigen::MatrixXd m_B_bar { [&](){
-
-            Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
-
-            std::vector<int> indexes;
-            std::for_each(m_admitted_deformations.begin(),
-                          m_admitted_deformations.end(),
-                          [&indexes, index=0](const bool dof)mutable{   if(dof == false)
-                                                                            indexes.push_back(index);
-                                                                        index++;});
-            const Eigen::MatrixXd map = I(Eigen::all, indexes);
-            return map;
-                              }() };
-
-    const unsigned int m_number_of_Chebyshev_points { 17 };
-
-    const std::function<double(const unsigned int, const double&)> m_polynomial_base { [](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);} };
-
-    const std::vector<Eigen::MatrixXd> m_Phi_stack { generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points), m_polynomial_base) };
-
-    const unsigned int m_stacks_dimension { static_cast<unsigned int>( m_Phi_stack.size() ) };
-
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
-
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_dot_Lambda_stack{ std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
-
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Delta_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_stacks_dimension) };
 };
+
 
 
 

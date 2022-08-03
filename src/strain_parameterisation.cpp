@@ -101,5 +101,58 @@ void StrainParameterisation::update(const Eigen::VectorXd &t_qe,
 
 
 
+
+StrainParameterisationDelta::StrainParameterisationDelta(unsigned int t_ne,
+                                                         const std::vector<bool> &t_admitted_deformations,
+                                                         const unsigned int t_number_of_Chebyshev_points) :
+    StrainParameterisation(t_ne,
+                           t_admitted_deformations,
+                           t_number_of_Chebyshev_points)
+{}
+
+
+
+StrainParameterisationDelta::StrainParameterisationDelta(unsigned int t_ne,
+                                const std::vector<bool> &t_admitted_deformations,
+                                const unsigned int t_number_of_Chebyshev_points,
+                                const Eigen::VectorXd &t_constrained_strain,
+                                const BaseFunction t_polynomial_base) :
+    StrainParameterisation(t_ne,
+                           t_admitted_deformations,
+                           t_number_of_Chebyshev_points,
+                           t_constrained_strain,
+                           t_polynomial_base)
+{}
+
+void StrainParameterisationDelta::update(const Eigen::VectorXd &t_Delta_qe,
+                                         const Eigen::VectorXd &t_Delta_dot_qe,
+                                         const Eigen::VectorXd &t_Delta_ddot_qe)
+{
+    Eigen::VectorXd Delta_xi;
+    Eigen::VectorXd Delta_dot_xi;
+    Eigen::VectorXd Delta_ddot_xi;
+
+
+    for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
+
+        Delta_xi = m_B*m_Phi_stack[i]*t_Delta_qe;
+        Delta_dot_xi = m_B*m_Phi_stack[i]*t_Delta_dot_qe;
+        Delta_ddot_xi = m_B*m_Phi_stack[i]*t_Delta_ddot_qe;
+
+
+        m_K_stack->at(i) = Delta_xi.block<3,1>(0,0);
+        m_dot_K_stack->at(i) = Delta_dot_xi.block<3,1>(0,0);
+        m_ddot_K_stack->at(i) = Delta_ddot_xi.block<3,1>(0,0);
+
+        m_Lambda_stack->at(i) = Delta_xi.block<3,1>(3,0);
+        m_dot_Lambda_stack->at(i) = Delta_dot_xi.block<3,1>(3,0);
+        m_ddot_Lambda_stack->at(i) = Delta_ddot_xi.block<3,1>(3,0);
+    }
+}
+
+
+
+
+
 }   //  namespace StrainParameterisation
 }   //  namespace CROSP
