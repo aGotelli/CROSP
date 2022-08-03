@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Eigen3 3.4 NO_MODULE REQUIRED)
 
+find_package(utilities REQUIRED)
+
 find_package(math_tools REQUIRED)
 
 find_package(OSNI REQUIRED)
@@ -42,7 +44,7 @@ target_link_libraries(test_strain_parameterisation ${PROJECT_NAME} math_tools)
 target_compile_definitions(test_strain_parameterisation PRIVATE DEVELOPER)
 
 add_executable(test_tidm tests/test_tidm.cpp)
-target_link_libraries(test_tidm PRIVATE ${PROJECT_NAME} math_tools benchmark::benchmark)
+target_link_libraries(test_tidm PRIVATE ${PROJECT_NAME} math_tools utilities benchmark::benchmark)
 target_compile_definitions(test_tidm PRIVATE DEVELOPER)
 
 
