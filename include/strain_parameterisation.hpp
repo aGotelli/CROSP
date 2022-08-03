@@ -28,46 +28,30 @@
 
 namespace CROSP {
 
+namespace StrainParameterisation {
 
 
-static Eigen::MatrixXd getPhi(const unsigned int t_ne,
+typedef std::function<double(const unsigned int, const double&)> BaseFunction;
+static const BaseFunction default_base_function { [](const unsigned int t_point,
+                                                     const double& t_x)
+                                                        {
+                                                            return boost::math::legendre_p(t_point, t_x);
+                                                        }
+                                                };
+
+
+Eigen::MatrixXd getPhi(const unsigned int t_ne,
                               const unsigned int t_na,
                               const double& t_X,
-                              const std::function<double(const unsigned int, const double&)> t_polynomial_base=[](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);},
+                              const BaseFunction t_polynomial_base=default_base_function,
                               const double& t_begin=0,
-                              const double& t_end=1)
-{
-    //  The coordinate must be transposed into the Chebyshev domain [-1, 1];
-    double x = ( 2 * t_X - ( t_end + t_begin) ) / ( t_end - t_begin );
+                              const double& t_end=1);
 
-    //  Compute the values of the polynomial for every element of the strain field
-    Eigen::VectorXd Phi_i(t_ne, 1);
-    for(unsigned int i=0; i<t_ne; i++)
-        Phi_i[i] = t_polynomial_base(i, x);
+std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
+                                              const unsigned int t_na,
+                                              const std::vector<double> &t_Chebyshev_points,
+                                              const BaseFunction t_polynomial_base=default_base_function);
 
-
-    //  Define the matrix of bases
-    Eigen::MatrixXd Phi = Eigen::KroneckerProduct(Eigen::MatrixXd::Identity(t_na, t_na), Phi_i.transpose());
-
-
-    return Phi;
-}
-
-static std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
-                                                     const unsigned int t_na,
-                                                     const std::vector<double> &t_Chebyshev_points,
-                                                     const std::function<double(const unsigned int, const double&)> t_polynomial_base=[](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);})
-{
-    std::vector<Eigen::MatrixXd> Phi_stack( t_Chebyshev_points.size() );
-
-    std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
-        const auto Phi = getPhi(t_ne, t_na, t_Chebyshev_points[index], t_polynomial_base);
-        index++;
-        return Phi;
-    });
-
-    return Phi_stack;
-}
 
 
 
@@ -78,54 +62,25 @@ struct StrainParameterisation {
 
     StrainParameterisation()=default;
 
-    StrainParameterisation(const unsigned int t_number_of_Chebyshev_points) : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
-    {}
 
-    StrainParameterisation(unsigned int t_ne, const std::vector<bool> &t_admitted_deformations,
-                           const unsigned int t_number_of_Chebyshev_points) :   m_ne(t_ne), m_admitted_deformations(t_admitted_deformations),
-                                                                                m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
-    {}
+    StrainParameterisation(unsigned int t_ne,
+                           const std::vector<bool> &t_admitted_deformations,
+                           const unsigned int t_number_of_Chebyshev_points);
 
 
-    StrainParameterisation(const unsigned int t_number_of_Chebyshev_points,
-                           const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-                                                                                                                m_polynomial_base(t_polynomial_base)
-    {}
+    StrainParameterisation(unsigned int t_ne,
+                           const std::vector<bool> &t_admitted_deformations,
+                           const unsigned int t_number_of_Chebyshev_points,
+                           const Eigen::VectorXd &t_constrained_strain,
+                           const BaseFunction t_polynomial_base=default_base_function);
 
-    StrainParameterisation(unsigned int t_ne, unsigned int t_na,
-                           unsigned int t_number_of_Chebyshev_points,
-                           const std::function<double(const unsigned int, const double&)> t_polynomial_base) :  m_na(t_na), m_ne(t_ne),
-                                                                                                                m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-                                                                                                                m_polynomial_base(t_polynomial_base)
-    {}
+
+    inline unsigned int getNumberOfChebyshewPoints()const{return m_number_of_Chebyshev_points;}
 
 
     void update(const Eigen::VectorXd &t_qe,
                 const Eigen::VectorXd &t_dot_qe,
-                const Eigen::VectorXd &t_ddot_qe)
-    {
-
-        Eigen::VectorXd xi;
-        Eigen::VectorXd dot_xi;
-        Eigen::VectorXd ddot_xi;
-
-        for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
-
-            xi = m_strains_map_stack[i]*t_qe + m_B_bar*m_constrained_strain;
-            dot_xi = m_strains_map_stack[i]*t_dot_qe;
-            ddot_xi = m_strains_map_stack[i]*t_ddot_qe;
-
-            m_K_stack->at(i) = xi.block<3,1>(0,0);
-            m_dot_K_stack->at(i) = dot_xi.block<3,1>(0,0);
-            m_ddot_K_stack->at(i) = ddot_xi.block<3,1>(0,0);
-
-            m_Lambda_stack->at(i) = xi.block<3,1>(3,0);
-            m_dot_Lambda_stack->at(i) = dot_xi.block<3,1>(3,0);
-            m_ddot_Lambda_stack->at(i) = ddot_xi.block<3,1>(3,0);
-
-        }
-
-    }
+                const Eigen::VectorXd &t_ddot_qe);
 
 
 
@@ -147,7 +102,7 @@ struct StrainParameterisation {
                                                                         index++;});
             const Eigen::MatrixXd map = I(Eigen::all, indexes);
             return map;
-                              }() };
+        }() };
 
     const Eigen::MatrixXd m_B_bar { [&](){
 
@@ -161,7 +116,7 @@ struct StrainParameterisation {
                                                                         index++;});
             const Eigen::MatrixXd map = I(Eigen::all, indexes);
             return map;
-                              }() };
+        }() };
 
     const Eigen::VectorXd m_constrained_strain { [&](){
 
@@ -183,7 +138,8 @@ struct StrainParameterisation {
             Eigen::VectorXd xi_c = constrains(indexes);
 
             return xi_c;
-                                                 }() };
+        }() };
+
 
 
     const unsigned int m_number_of_Chebyshev_points { 17 };
@@ -200,7 +156,7 @@ struct StrainParameterisation {
             });
 
             return strains_map_stack;
-                                                             }() };
+        }() };
 
 
 
@@ -329,7 +285,7 @@ struct StrainParameterisationPerturbation {
 
 
 
-
+}   //  namespace StrainParameterisation
 
 }   //  namespace CROSP
 
