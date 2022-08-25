@@ -158,6 +158,24 @@ void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
 }
 
 
+void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_force_at_tip,
+                                          const Eigen::Vector3d &t_Delta_couple_at_tip)
+{
+    const auto [tip_pose, _, __] = getKinematicsAtTip();
+
+    //  Map force and couple into local coordinates
+    Eigen::Vector3d Delta_force_at_tip_local_coord = tip_pose.getRotationMatrix().transpose()*t_Delta_force_at_tip;
+    Eigen::Vector3d Delta_couple_at_tip_local_coord = tip_pose.getRotationMatrix().transpose()*t_Delta_couple_at_tip;
+
+
+    m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip_local_coord);
+    m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip_local_coord);
+
+    m_tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(m_strain_parameterisation->getCoordinatesDimention()));
+}
+
+
+
 void CosseratRod::setForwardIntegratorsInitialConditions()
 {
     //  Integrate Quaternions

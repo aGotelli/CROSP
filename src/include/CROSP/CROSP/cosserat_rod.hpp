@@ -75,6 +75,15 @@ public:
 
 
 
+
+
+
+    void backwardTangentDynamics(const Eigen::Vector3d &t_Delta_force_at_tip,
+                                 const Eigen::Vector3d &t_Delta_couple_at_tip);
+
+
+
+
 #ifndef DEVELOPER
 private:
 #endif
