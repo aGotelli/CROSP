@@ -77,6 +77,8 @@ struct StrainParameterisation {
 
     inline unsigned int getNumberOfChebyshewPoints()const{return m_number_of_Chebyshev_points;}
 
+    inline unsigned int getCoordinatesDimention()const{return m_na*m_ne;}
+
 
     virtual void update(const Eigen::VectorXd &t_qe,
                         const Eigen::VectorXd &t_dot_qe,
