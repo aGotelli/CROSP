@@ -1,7 +1,7 @@
 
 #include "benchmark/benchmark.h"
 
-#include "cosserat_rod.hpp"
+#include "CROSP/cosserat_rod.hpp"
 
 
 

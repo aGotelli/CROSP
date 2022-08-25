@@ -32,6 +32,8 @@ include_directories(include)
 
 add_subdirectory(src)
 
+add_subdirectory(tests)
+
 
 #   Install the library using the default routine
 include(cmake/installation_module.cmake)
