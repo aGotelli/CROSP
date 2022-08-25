@@ -1,4 +1,4 @@
-
+include_directories(include)
 
 add_library(StrainParameterisation SHARED
         include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
