@@ -360,7 +360,6 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
 
 
 
-
 TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                     std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
                     std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
