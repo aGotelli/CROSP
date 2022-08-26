@@ -1,19 +1,21 @@
 include_directories(include)
 
-add_library(StrainParameterisation SHARED
-        include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
-        strain_parameterisation/strain_parameterisation.cpp
-)
-target_link_libraries(StrainParameterisation
-    PRIVATE
-        Eigen3::Eigen
-)
+
 
 add_library(MaterialProperties SHARED
     include/${PROJECT_NAME}/material_properties/material_properties.hpp
     material_properties/material_properties.cpp
 )
 target_link_libraries(MaterialProperties
+    PRIVATE
+        Eigen3::Eigen
+)
+
+add_library(StrainParameterisation SHARED
+        include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
+        strain_parameterisation/strain_parameterisation.cpp
+)
+target_link_libraries(StrainParameterisation
     PRIVATE
         Eigen3::Eigen
 )
@@ -48,7 +50,9 @@ target_link_libraries(TIDMIntegrators
 
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
-                            ${PROJECT_NAME}/cosserat_rod.cpp)
+                            ${PROJECT_NAME}/cosserat_rod.cpp
+                            include/${PROJECT_NAME}/${PROJECT_NAME}/kee_integrator.hpp
+)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         math_tools

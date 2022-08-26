@@ -63,6 +63,10 @@ target_link_libraries(test_cosserat_rod
         math_tools
         utilities
 )
+target_compile_definitions(test_cosserat_rod
+    PRIVATE
+        DEVELOPER
+)
 
 
 
