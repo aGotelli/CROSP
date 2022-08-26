@@ -24,6 +24,11 @@
 #include "CROSP/idm_integrators/idm_integrators.hpp"
 #include "CROSP/tidm_integrators/tidm_integrators.hpp"
 
+#include "kee_integrator.hpp"
+
+#include <boost/numeric/odeint.hpp>
+
+
 namespace CROSP {
 
 typedef Eigen::Matrix<double, 6, 1> Vector6d ;
@@ -72,13 +77,13 @@ public:
 
 
 
-    void backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
-                          const Eigen::Vector3d &t_couple_at_tip);
+    void backwardDynamics(const Eigen::Vector3d &t_couple_at_tip,
+                          const Eigen::Vector3d &t_force_at_tip);
 
 
 
-    void backwardTangentDynamics(const Eigen::Vector3d &t_Delta_force_at_tip,
-                                 const Eigen::Vector3d &t_Delta_couple_at_tip);
+    void backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_at_tip,
+                                 const Eigen::Vector3d &t_Delta_force_at_tip);
 
 
 
@@ -87,6 +92,7 @@ public:
     unsigned int getCoordinatesDimension()const;
 
 
+    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
 
 
 
@@ -105,6 +111,40 @@ private:
     std::shared_ptr<material_properties::MaterialProperties> m_material_properties { std::make_shared<material_properties::MaterialProperties>() };
 
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { std::make_shared<strain_parameterisation::StrainParameterisation>() };
+
+
+
+    const Eigen::MatrixXd m_Kee { [this](){
+
+            const unsigned int ne = m_strain_parameterisation->m_ne;
+            const unsigned int na = m_strain_parameterisation->m_na;
+            const unsigned int n = ne*na;
+
+            const auto B = m_strain_parameterisation->m_B;
+            const auto Ha = B.transpose() * m_material_properties->m_H * B;
+
+            std::cout << "H : \n" << m_material_properties->m_H << "\n\n";
+            std::cout << "Ha : \n" << Ha << "\n\n";
+
+            typedef Eigen::MatrixXd Kee_state_type;
+
+
+            typedef boost::numeric::odeint::runge_kutta_dopri5< Kee_state_type, double,
+                                                                 Kee_state_type, double,
+                                                                 boost::numeric::odeint::vector_space_algebra> Ke_stepper;
+            Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
+
+            boost::numeric::odeint::integrate_const(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_X){
+                const auto Phi = strain_parameterisation::getPhi(ne,
+                                                                 na,
+                                                                 t_X);
+
+                t_dKeeds = Phi.transpose()*Ha*Phi;}, Kee, 0.0, 1.0, 0.0005);
+
+            std::cout << Kee << std::endl;
+
+            return Kee;}() };
+
 
     std::shared_ptr<strain_parameterisation::StrainParameterisationDelta> m_strain_parameterisation_perturbation { std::make_shared<strain_parameterisation::StrainParameterisationDelta>() };
 
