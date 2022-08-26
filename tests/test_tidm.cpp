@@ -15,8 +15,6 @@ using namespace CROSP;
 
 
 
-
-
 int main(int argc, char *argv[])
 {
 
