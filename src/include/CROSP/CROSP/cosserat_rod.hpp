@@ -26,12 +26,14 @@
 
 namespace CROSP {
 
-
+typedef Eigen::Matrix<double, 6, 1> Vector6d ;
 
 
 class CosseratRod
 {
 public:
+
+    CosseratRod()=default;
 
     CosseratRod(unsigned int t_number_of_Chebyshev_points);
 
@@ -75,11 +77,15 @@ public:
 
 
 
-
-
-
     void backwardTangentDynamics(const Eigen::Vector3d &t_Delta_force_at_tip,
                                  const Eigen::Vector3d &t_Delta_couple_at_tip);
+
+
+
+    Vector6d getLambdaAtBase()const;
+
+    unsigned int getCoordinatesDimension()const;
+
 
 
 

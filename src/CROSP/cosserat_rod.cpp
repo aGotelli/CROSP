@@ -175,6 +175,22 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_force_a
 }
 
 
+Vector6d CosseratRod::getLambdaAtBase()const
+{
+    const unsigned int rod_begin_Chebyshev_point = m_strain_parameterisation->getNumberOfChebyshewPoints()-1;
+
+    Vector6d Lambda;
+    Lambda <<   m_idm_integrators->m_internal_couples->getStateAtPoint(rod_begin_Chebyshev_point),
+                m_idm_integrators->m_internal_forces->getStateAtPoint(rod_begin_Chebyshev_point);
+
+    return Lambda;
+}
+
+unsigned int CosseratRod::getCoordinatesDimension()const
+{
+    return m_strain_parameterisation->getCoordinatesDimention();
+}
+
 
 void CosseratRod::setForwardIntegratorsInitialConditions()
 {
