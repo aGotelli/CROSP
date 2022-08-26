@@ -133,17 +133,17 @@ void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delt
                                                        m_idm_integrators->m_position->getStateAtPoint(0) );
 
 
-    rod_tip_kinematics.m_twist = ::LieAlgebra::Screw( m_idm_integrators->m_angular_velocity->getStateAtPoint(0),
-                                                      m_idm_integrators->m_linear_velocity->getStateAtPoint(0) );
+    rod_tip_kinematics.m_twist << m_idm_integrators->m_angular_velocity->getStateAtPoint(0),
+                                    m_idm_integrators->m_linear_velocity->getStateAtPoint(0);
 
-    rod_tip_kinematics.m_accelerations = ::LieAlgebra::Screw( m_idm_integrators->m_angular_acceleration->getStateAtPoint(0),
-                                                              m_idm_integrators->m_linear_acceleration->getStateAtPoint(0) );
+    rod_tip_kinematics.m_accelerations << m_idm_integrators->m_angular_acceleration->getStateAtPoint(0),
+                                            m_idm_integrators->m_linear_acceleration->getStateAtPoint(0);
     return rod_tip_kinematics;
 }
 
 
-void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
-                                   const Eigen::Vector3d &t_couple_at_tip)
+void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_couple_at_tip,
+                                   const Eigen::Vector3d &t_force_at_tip)
 {
 
     const auto [tip_pose, _, __] = getKinematicsAtTip();
@@ -158,8 +158,8 @@ void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_force_at_tip,
 }
 
 
-void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_force_at_tip,
-                                          const Eigen::Vector3d &t_Delta_couple_at_tip)
+void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_at_tip,
+                                          const Eigen::Vector3d &t_Delta_force_at_tip)
 {
     const auto [tip_pose, _, __] = getKinematicsAtTip();
 
@@ -177,11 +177,9 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_force_a
 
 Vector6d CosseratRod::getLambdaAtBase()const
 {
-    const unsigned int rod_begin_Chebyshev_point = m_strain_parameterisation->getNumberOfChebyshewPoints()-1;
-
     Vector6d Lambda;
-    Lambda <<   m_idm_integrators->m_internal_couples->getStateAtPoint(rod_begin_Chebyshev_point),
-                m_idm_integrators->m_internal_forces->getStateAtPoint(rod_begin_Chebyshev_point);
+    Lambda <<   m_idm_integrators->m_internal_couples->getStateAtPoint(::OSNI::ROD_POSITION::BASE),
+                m_idm_integrators->m_internal_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
 
     return Lambda;
 }
@@ -189,6 +187,13 @@ Vector6d CosseratRod::getLambdaAtBase()const
 unsigned int CosseratRod::getCoordinatesDimension()const
 {
     return m_strain_parameterisation->getCoordinatesDimention();
+}
+
+
+Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) const
+{
+    return m_Kee*t_qe
+            - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
 }
 
 
