@@ -14,7 +14,7 @@ namespace CROSP::KeeIntegrator {
 
 
 struct KeeIntegrator : public ::OSNI::ODEb {
-    KeeIntegrator(const unsigned int t_coordinate_dimension,
+    KeeIntegrator(unsigned int t_coordinate_dimension,
                   const std::vector<Eigen::MatrixXd> &t_Phi_stack,
                   const Eigen::MatrixXd &t_Ha) :
         OSNI::ODEb(t_coordinate_dimension,
