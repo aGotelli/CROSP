@@ -46,6 +46,65 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
 }
 
 
+
+StrainParameterisationBase::StrainParameterisationBase(const unsigned int t_number_of_Chebyshev_points) :
+    m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+{}
+
+
+StrainParameterisationBase::StrainParameterisationBase(unsigned int t_ne,
+                                               const std::vector<bool> &t_admitted_deformations,
+                                               const unsigned int t_number_of_Chebyshev_points) :
+    m_ne(t_ne),
+    m_admitted_deformations(t_admitted_deformations),
+    m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+{}
+
+
+StrainParameterisationBase::StrainParameterisationBase(unsigned int t_ne,
+                                               const std::vector<bool> &t_admitted_deformations,
+                                               const unsigned int t_number_of_Chebyshev_points,
+                                               const Eigen::VectorXd &t_constrained_strain,
+                                               const std::function<double(const unsigned int, const double&)> t_polynomial_base) :
+    m_ne(t_ne),
+    m_admitted_deformations(t_admitted_deformations),
+    m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+    m_constrained_strain(t_constrained_strain),
+    m_polynomial_base(t_polynomial_base)
+{}
+
+
+
+
+void StrainParameterisationBase::updateStacks(const Eigen::VectorXd &t_qe,
+            const Eigen::VectorXd &t_dot_qe,
+            const Eigen::VectorXd &t_ddot_qe)
+{
+
+    Eigen::VectorXd xi;
+    Eigen::VectorXd dot_xi;
+    Eigen::VectorXd ddot_xi;
+
+    for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
+
+        xi = m_strains_map_stack[i]*t_qe + m_B_bar*m_constrained_strain;
+        dot_xi = m_strains_map_stack[i]*t_dot_qe;
+        ddot_xi = m_strains_map_stack[i]*t_ddot_qe;
+
+        m_K_stack->at(i) = xi.block<3,1>(0,0);
+        m_dot_K_stack->at(i) = dot_xi.block<3,1>(0,0);
+        m_ddot_K_stack->at(i) = ddot_xi.block<3,1>(0,0);
+
+        m_Lambda_stack->at(i) = xi.block<3,1>(3,0);
+        m_dot_Lambda_stack->at(i) = dot_xi.block<3,1>(3,0);
+        m_ddot_Lambda_stack->at(i) = ddot_xi.block<3,1>(3,0);
+
+    }
+
+}
+
+
+
 StrainParameterisation::StrainParameterisation(const unsigned int t_number_of_Chebyshev_points) :
     m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
 {}
