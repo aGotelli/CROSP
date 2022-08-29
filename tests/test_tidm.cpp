@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
     idm_integrators->m_linear_acceleration->integrate( Eigen::Vector3d::Zero() );
 
-    idm_integrators->m_internal_forces->integrate( Eigen::Vector3d::Zero() );
+    idm_integrators->m_internal_forces->integrate( Eigen::Vector3d(0, 0, 0)/*::Zero()*/ );
 
     idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
 

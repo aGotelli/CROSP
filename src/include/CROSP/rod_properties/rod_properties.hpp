@@ -48,13 +48,13 @@ struct MaterialProperties {
     {}
 
     //  Young modulus [Pa]
-    const double m_E { 0.0 };
+    const double m_E { 210e9 };
 
     //  Shear modulus [Pa]
-    const double m_G {  0.0 };
+    const double m_G {  80e9 };
 
     //  Specific weight [kg/m^3]
-    const double m_rho { 0.0 };
+    const double m_rho { 7800 };
 
 };
 

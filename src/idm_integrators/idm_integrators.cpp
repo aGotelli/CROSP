@@ -247,7 +247,7 @@ Eigen::VectorXd InternalForcesIntegrator::computeDistributedForce(const unsigned
     const Eigen::Vector3d distributed_weight_force = -distributed_density*Eigen::Vector3d(0, 0, 9.81);
     Eigen::Vector3d N_bar = R.transpose()*distributed_weight_force;
 
-
+    std::cout << "At point : " << t_point << " distributed force : \n" << N_bar << "\n";
     return N_bar;
 }
 
