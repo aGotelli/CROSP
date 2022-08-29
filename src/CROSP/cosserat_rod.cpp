@@ -103,9 +103,9 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
     m_idm_integrators->m_linear_acceleration->integrate(t_initial_linear_acceleration);
 }
 
-void CosseratRod::updateParameterisationPerturbation(const Eigen::VectorXd &t_Delta_qe,
-                                        const Eigen::VectorXd &t_Delta_dot_qe,
-                                        const Eigen::VectorXd &t_Delta_ddot_qe)
+void CosseratRod::updateParameterisationVariation(const Eigen::VectorXd &t_Delta_qe,
+                                                  const Eigen::VectorXd &t_Delta_dot_qe,
+                                                  const Eigen::VectorXd &t_Delta_ddot_qe)
 {
     m_strain_parameterisation_Delta->update(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
 }

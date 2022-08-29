@@ -66,13 +66,37 @@ public:
 
 
 
-
+    /*!
+     * \brief updateParameterisation updates the parameterisation of the strain describing the rod shape
+     * \param t_qe the set of generalised coordinates
+     * \param t_dot_qe the set of the first derivatives of the generalised coordinates
+     * \param t_ddot_qe the set of the second derivatives of the generalised coordinates
+     *
+     * This function call the StrainParameterisation::updateStacks in order to compute the current values
+     * for all the K and Gamma, the angular and linear part of the strain and their derivatives
+     */
     void updateParameterisation(const Eigen::VectorXd &t_qe,
                                 const Eigen::VectorXd &t_dot_qe,
                                 const Eigen::VectorXd &t_ddot_qe);
 
+    /*!
+     * \brief forwardKinematics computes the forward kinematics of the rod starting from the identity pose
+     *
+     * This function computes the forward kinematics of the rod starting from the indentity pose and with null
+     * velocities and accelerations
+     */
     void forwardKinematics();
 
+
+    /*!
+     * \brief forwardKinematics computes the forward kinematics of the rod starting from the given states
+     * \param t_initial_quaternion the initial state for the quaternion
+     * \param t_initial_position the initial state for the position
+     * \param t_initial_angular_velocity the initial state for the angular velocities
+     * \param t_initial_linear_velocity the initial state for the linear velocities
+     * \param t_initial_angular_acceleration the initial state for the angular accelerations
+     * \param t_initial_linear_acceleration the initial state for the linear accelerations
+     */
     void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                            const Eigen::Vector3d &t_initial_position,
                            const Eigen::Vector3d &t_initial_angular_velocity,
@@ -81,12 +105,35 @@ public:
                            const Eigen::Vector3d &t_initial_linear_acceleration);
 
 
-    void updateParameterisationPerturbation(const Eigen::VectorXd &t_Delta_qe,
-                                            const Eigen::VectorXd &t_Delta_dot_qe,
-                                            const Eigen::VectorXd &t_Delta_ddot_qe);
+    /*!
+     * \brief updateParameterisationVariation updates the variation of the strain due to the delta
+     * \param t_Delta_qe the variation on the generalised coordinates
+     * \param t_Delta_dot_qe the variation on the first derivative of the generalised coordinates
+     * \param t_Delta_ddot_qe the variation on the second derivative of the  generalised coordinates
+     */
+    void updateParameterisationVariation(const Eigen::VectorXd &t_Delta_qe,
+                                         const Eigen::VectorXd &t_Delta_dot_qe,
+                                         const Eigen::VectorXd &t_Delta_ddot_qe);
 
+
+    /*!
+     * \brief forwardTangentKinematics computes the forward tangent kinematics of the rod starting from the null tangent state
+     *
+     * This function computes the forward kinematics of the rod starting from the null tangent state with null
+     * delta rotation, delta position as well as velocities and accelerations
+     */
     void forwardTangentKinematics();
 
+
+    /*!
+     * \brief forwardTangentKinematics computes the forward tangent kinematics of the rod starting from the given states
+     * \param t_initial_Delta_orientation the initial variation in the orientation
+     * \param t_initial_Delta_position the initial variation in the position
+     * \param t_initial_Delta_angular_velocity the initial variation in the angular velocity
+     * \param t_initial_Delta_linear_velocity the initial variation in the linear velocity
+     * \param t_initial_Delta_angular_acceleration the initial variation in the angular acceleration
+     * \param t_initial_Delta_linear_acceleration the initial variation in the linear acceleration
+     */
     void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
                                   const Eigen::Vector3d &t_initial_Delta_position,
                                   const Eigen::Vector3d &t_initial_Delta_angular_velocity,
@@ -94,25 +141,50 @@ public:
                                   const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
                                   const Eigen::Vector3d &t_initial_Delta_linear_acceleration);
 
+
+    /*!
+     * \brief getKinematicsAtTip gives the kinematics at the rod tip
+     *
+     * \return the kinematics state of the rod tip
+     */
     ::LieAlgebra::Kinematics getKinematicsAtTip()const;
 
 
-
+    /*!
+     * \brief backwardDynamics computes the backward dynamics starting from the given state at the rod tip
+     * \param t_couple_at_tip The couple expressed in reference coordinates that acts on the rod tip
+     * \param t_force_at_tip The force expressed in reference coordinates that acts on the rod tip
+     */
     void backwardDynamics(const Eigen::Vector3d &t_couple_at_tip,
                           const Eigen::Vector3d &t_force_at_tip);
 
 
-
+    /*!
+     * \brief backwardTangentDynamics computes the tangent backward dynamics starting from the given state at the rod tip
+     * \param t_Delta_couple_at_tip The tangent couple expressed in reference coordinates that acts on the rod tip
+     * \param t_Delta_force_at_tip The tangent force expressed in reference coordinates that acts on the rod tip
+     */
     void backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_at_tip,
                                  const Eigen::Vector3d &t_Delta_force_at_tip);
 
 
-
+    /*!
+     * \brief getLambdaAtBase give Lambda at the rod base, expressed in local coordinates of the rod base frame
+     * \return give Lambda at the rod base, expressed in local coordinates of the rod base frame
+     */
     Vector6d getLambdaAtBase()const;
 
+    /*!
+     * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
+     * \return the dimension of the rod parameterisation, namely ne*na
+     */
     unsigned int getCoordinatesDimension()const;
 
-
+    /*!
+     * \brief getStaticEquilibrium returns the static equilibrium of the rod Kee*qe - Q
+     * \param t_qe the current set of generalised coordinates
+     * \return the static equilibrium of the rod
+     */
     Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
 
 
@@ -122,32 +194,39 @@ private:
 #endif
 
 
-
+    //  The set of admitted deformations
     const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
 
+    //  The number of degree of freedom for the deformation
     const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
 
+    //  Number of modes per admitted deformation
     const unsigned int m_ne { 3 };
 
+    //  Number of Chebyshev points used to discretise the rod
     const unsigned int m_number_of_Chebyshev_points { 17 };
 
 
-
+    //  The set of rod properties
     std::shared_ptr<rod_properties::RodProperties> m_rod_properties { std::make_shared<rod_properties::RodProperties>(m_ne,
                                                                                                                       m_na,
                                                                                                                       base_maps::getB(m_admitted_deformations)) };
 
+    //  All the strain releted variables
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { std::make_shared<strain_parameterisation::StrainParameterisation>(m_ne,
                                                                                                                                                                    m_admitted_deformations,
                                                                                                                                                                    m_number_of_Chebyshev_points) };
 
+    //  Variables related the perturbation of the strain parameterisation
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta { std::make_shared<strain_parameterisation::StrainParameterisation>(m_ne,
                                                                                                                                                                          m_admitted_deformations,
                                                                                                                                                                          ::LieAlgebra::Vector6d::Zero(),
                                                                                                                                                                          m_number_of_Chebyshev_points) };
-
+    //  The set of integrators needed for the IDM
     std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators { std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
                                                                                                                            m_rod_properties )};
+
+    //  The set of integrators needed for the TIDM
     std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators { std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
                                                                                                                                 m_strain_parameterisation_Delta,
                                                                                                                                 m_idm_integrators,
@@ -158,7 +237,7 @@ private:
      * \brief setForwardIntegratorsInitialConditions sets the initial conditions for the forward integrators.
      *
      * This function sets the initial conditions for the forward integrators. For these integrators, we integrate from a fixed
-     * reference configuration so we can set their ivp once and for all.
+     * reference configuration that can be defined in initialisation.
      */
     void setForwardIntegratorsInitialConditions();
 
