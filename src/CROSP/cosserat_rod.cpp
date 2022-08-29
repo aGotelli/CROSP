@@ -16,23 +16,44 @@
 
 namespace CROSP {
 
-
-CosseratRod::CosseratRod(const unsigned int t_number_of_chebyshev_points) :
-    m_strain_parameterisation( std::make_shared<strain_parameterisation::StrainParameterisation>(t_number_of_chebyshev_points) ),
-    m_strain_parameterisation_perturbation( std::make_shared<strain_parameterisation::StrainParameterisationDelta>(t_number_of_chebyshev_points) )
+CosseratRod::CosseratRod()
 {
     setForwardIntegratorsInitialConditions();
 }
 
 
-CosseratRod::CosseratRod(std::shared_ptr<rod_properties::RodProperties> t_rod_properties,
-                         std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                         std::shared_ptr<strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation) :   m_rod_properties(t_rod_properties),
-                                                                                                            m_strain_parameterisation(t_strain_parameterisation),
-                                                                                                            m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation)
+CosseratRod::CosseratRod(unsigned int t_number_of_Chebyshev_points)
+    :   m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
 {
     setForwardIntegratorsInitialConditions();
 }
+
+
+//CosseratRod::CosseratRod(const base_maps::BaseFunction &t_polynomial_function);
+
+
+//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
+//                         unsigned int t_ne);
+
+
+//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
+//                         unsigned int t_ne,
+//                         const base_maps::BaseFunction &t_polynomial_function);
+
+
+//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
+//                         unsigned int t_ne,
+//                         unsigned int t_number_of_Chebyshev_points);
+
+
+//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
+//                         unsigned int t_ne,
+//                         unsigned int t_number_of_Chebyshev_points,
+//                         const base_maps::BaseFunction &t_polynomial_function);
+
+
+
+
 
 void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
                                          const Eigen::VectorXd &t_dot_qe,
@@ -86,7 +107,7 @@ void CosseratRod::updateParameterisationPerturbation(const Eigen::VectorXd &t_De
                                         const Eigen::VectorXd &t_Delta_dot_qe,
                                         const Eigen::VectorXd &t_Delta_ddot_qe)
 {
-    m_strain_parameterisation_perturbation->update(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
+    m_strain_parameterisation_Delta->update(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
 }
 
 void CosseratRod::forwardTangentKinematics()
@@ -192,7 +213,7 @@ unsigned int CosseratRod::getCoordinatesDimension()const
 
 Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) const
 {
-    return m_Kee*t_qe
+    return m_rod_properties->m_Kee*t_qe
             - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
 }
 
