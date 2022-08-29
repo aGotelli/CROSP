@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
 
     const unsigned int na = 1;
-    std::vector<bool> admitted_deformations {
+    std::array<bool, 6> admitted_deformations {
         false,
         true,
         false,
@@ -43,8 +43,9 @@ int main(int argc, char *argv[])
                                                                                                                admitted_deformations,
                                                                                                                number_of_Chebyshev_points);
 
-    std::shared_ptr<::strain_parameterisation::StrainParameterisationDelta> strain_parameterisation_perturbation = std::make_shared<::strain_parameterisation::StrainParameterisationDelta>(ne,
+    std::shared_ptr<::strain_parameterisation::StrainParameterisation> strain_parameterisation_Delta = std::make_shared<::strain_parameterisation::StrainParameterisation>(ne,
                                                                                                                                                     admitted_deformations,
+                                                                                                                                                    ::LieAlgebra::Vector6d::Zero(),
                                                                                                                                                     number_of_Chebyshev_points);
 
 
@@ -53,7 +54,7 @@ int main(int argc, char *argv[])
                                                                                                                              material_properties);
 
     std::shared_ptr<::tidm_integrators::TIDMIntegrators> tidm_integrators = std::make_shared<::tidm_integrators::TIDMIntegrators>(strain_parameterisation,
-                                                                                                                                  strain_parameterisation_perturbation,
+                                                                                                                                  strain_parameterisation_Delta,
                                                                                                                                   idm_integrators,
                                                                                                                                   material_properties);
 
@@ -131,7 +132,7 @@ int main(int argc, char *argv[])
         Delta_dot_qe = a*Delta_qe;
         Delta_ddot_qe = b*Delta_qe;
 
-        strain_parameterisation_perturbation->update(Delta_qe, Delta_dot_qe, Delta_ddot_qe);
+        strain_parameterisation_Delta->update(Delta_qe, Delta_dot_qe, Delta_ddot_qe);
 
         tidm_integrators->m_Delta_rotation->integrate( Eigen::Vector3d::Zero() );
         tidm_integrators->m_Delta_position->integrate( Eigen::Vector3d::Zero() );
@@ -216,7 +217,7 @@ int main(int argc, char *argv[])
                 Delta_dot_qe = a*Delta_qe;
                 Delta_ddot_qe = b*Delta_qe;
 
-                strain_parameterisation_perturbation->update(Delta_qe, Delta_dot_qe, Delta_ddot_qe);
+                strain_parameterisation_Delta->update(Delta_qe, Delta_dot_qe, Delta_ddot_qe);
 
                 tidm_integrators->m_Delta_rotation->integrate( Eigen::Vector3d::Zero() );
                 tidm_integrators->m_Delta_position->integrate( Eigen::Vector3d::Zero() );
