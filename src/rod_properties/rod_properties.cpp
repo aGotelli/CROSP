@@ -1,21 +1,41 @@
 #include "CROSP/rod_properties/rod_properties.hpp"
 
+#include <boost/numeric/odeint.hpp>
+
 namespace CROSP::rod_properties {
 
-
-RodProperties::RodProperties(const MaterialProperties &t_material_properties) :
-    m_material_properties(t_material_properties)
+RodProperties::RodProperties(const unsigned int t_ne,
+                             const unsigned int t_na,
+                             const Eigen::MatrixXd &t_B)
+    :   m_Kee( defineKee(t_ne, t_na, t_B) )
 {}
 
-RodProperties::RodProperties(const RodDimensions &t_rod_dimensions) :
-    m_rod_dimensions(t_rod_dimensions)
+
+RodProperties::RodProperties(const MaterialProperties &t_material_properties)
+    :   m_material_properties(t_material_properties)
+{}
+
+RodProperties::RodProperties(const RodDimensions &t_rod_dimensions)
+    :   m_rod_dimensions(t_rod_dimensions)
 {}
 
 RodProperties::RodProperties(const MaterialProperties &t_material_properties,
-                             const RodDimensions &t_rod_dimensions) :
-    m_material_properties(t_material_properties),
-    m_rod_dimensions(t_rod_dimensions)
+                             const RodDimensions &t_rod_dimensions)
+    :   m_material_properties(t_material_properties),
+        m_rod_dimensions(t_rod_dimensions)
 {}
+
+
+RodProperties::RodProperties(const unsigned int t_ne,
+                             const unsigned int t_na,
+                             const Eigen::MatrixXd &t_B,
+                             const MaterialProperties &t_material_properties,
+                             const RodDimensions &t_rod_dimensions)
+    :   m_material_properties(t_material_properties),
+        m_rod_dimensions(t_rod_dimensions),
+        m_Kee( defineKee(t_ne, t_na, t_B) )
+{}
+
 
 
 
@@ -42,6 +62,34 @@ Eigen::Matrix3d RodProperties::getHAngular()const
 Eigen::Matrix3d RodProperties::getHLinear()const
 {
     return m_H.block<3, 3>(3, 3);
+}
+
+
+Eigen::MatrixXd RodProperties::defineKee(const unsigned int t_ne,
+                                         const unsigned int t_na,
+                                         const Eigen::MatrixXd &t_B)const
+{
+
+    const unsigned int n = t_ne*t_na;
+
+    const auto Ha = t_B.transpose() * m_H * t_B;
+
+    typedef Eigen::MatrixXd Kee_state_type;
+
+
+    typedef boost::numeric::odeint::runge_kutta_dopri5< Kee_state_type, double,
+                                                         Kee_state_type, double,
+                                                         boost::numeric::odeint::vector_space_algebra> Ke_stepper;
+    Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
+
+    boost::numeric::odeint::integrate_const(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_X){
+        const auto Phi = base_maps::getPhi(t_ne,
+                                           t_na,
+                                           t_X);
+
+        t_dKeeds = Phi.transpose()*Ha*Phi;}, Kee, 0.0, 1.0, 0.0005);
+
+    return Kee;
 }
 
 

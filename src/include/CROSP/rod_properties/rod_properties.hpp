@@ -18,6 +18,9 @@
 #include <math.h>
 
 
+#include "CROSP/base_maps/base_maps.hpp"
+
+
 namespace CROSP::rod_properties {
 
 
@@ -93,15 +96,30 @@ struct RodDimensions {
 };
 
 
-struct RodProperties {
+
+
+
+class RodProperties {
+
+public:
 
     RodProperties()=default;
+
+    RodProperties(const unsigned int t_ne,
+                  const unsigned int t_na,
+                  const Eigen::MatrixXd &t_B);
 
     RodProperties(const MaterialProperties &t_material_properties);
 
     RodProperties(const RodDimensions &t_rod_dimensions);
 
     RodProperties(const MaterialProperties &t_material_properties,
+                  const RodDimensions &t_rod_dimensions);
+
+    RodProperties(const unsigned int t_ne,
+                  const unsigned int t_na,
+                  const Eigen::MatrixXd &t_B,
+                  const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
 
 
@@ -147,6 +165,22 @@ struct RodProperties {
                             m_material_properties.m_rho * m_rod_dimensions.m_A,
                             m_material_properties.m_rho * m_rod_dimensions.m_A;
             return M;}() };
+
+
+    const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
+
+    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
+
+    const unsigned int m_ne { 3 };
+
+    const Eigen::MatrixXd m_Kee { defineKee( m_ne, m_na, base_maps::getB(m_admitted_deformations) ) };
+
+
+private:
+
+    Eigen::MatrixXd defineKee(const unsigned int t_ne,
+                              const unsigned int t_na,
+                              const Eigen::MatrixXd &t_B)const;
 
 };
 
