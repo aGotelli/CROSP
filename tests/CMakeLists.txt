@@ -3,7 +3,7 @@
 
 
 
-include_directories(../src/include/CROSP)
+include_directories(../src/include)
 include_directories(include)
 
 
@@ -41,7 +41,7 @@ target_link_libraries(test_tidm
         utilities
         benchmark::benchmark
         StrainParameterisation
-        MaterialProperties
+        RodProperties
         IDMIntegrators
         TIDMIntegrators
 )

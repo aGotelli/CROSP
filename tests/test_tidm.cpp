@@ -1,7 +1,7 @@
-#include "strain_parameterisation/strain_parameterisation.hpp"
-#include "idm_integrators/idm_integrators.hpp"
-#include "CROSP/cosserat_rod.hpp"
-#include "tidm_integrators/tidm_integrators.hpp"
+#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+#include "CROSP/idm_integrators/idm_integrators.hpp"
+#include "CROSP/CROSP/cosserat_rod.hpp"
+#include "CROSP/tidm_integrators/tidm_integrators.hpp"
 
 
 #include <utilities/Eigen/eigen_io.hpp>
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
 
 
-    std::shared_ptr<::material_properties::MaterialProperties> material_properties = std::make_shared<::material_properties::MaterialProperties>();
+    std::shared_ptr<::rod_properties::RodProperties> material_properties = std::make_shared<::rod_properties::RodProperties>();
 
 
 

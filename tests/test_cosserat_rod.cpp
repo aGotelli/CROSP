@@ -1,4 +1,4 @@
-#include "CROSP/cosserat_rod.hpp"
+#include "CROSP/CROSP/cosserat_rod.hpp"
 
 #include "utilities/Eigen/eigen_io.hpp"
 

@@ -1,8 +1,8 @@
 
 #include <iostream>
 
-#include "CROSP/cosserat_rod.hpp"
-#include "strain_parameterisation/strain_parameterisation.hpp"
+#include "CROSP/CROSP/cosserat_rod.hpp"
+#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 
 
 
