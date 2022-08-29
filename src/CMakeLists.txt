@@ -88,7 +88,6 @@ target_compile_options(RodProperties
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp
-                            include/${PROJECT_NAME}/${PROJECT_NAME}/kee_integrator.hpp
 )
 target_link_libraries(${PROJECT_NAME}
     PRIVATE

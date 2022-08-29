@@ -24,7 +24,6 @@
 #include "CROSP/idm_integrators/idm_integrators.hpp"
 #include "CROSP/tidm_integrators/tidm_integrators.hpp"
 
-#include "kee_integrator.hpp"
 
 #include <boost/numeric/odeint.hpp>
 
