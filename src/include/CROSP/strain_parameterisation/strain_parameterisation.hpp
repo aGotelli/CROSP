@@ -21,7 +21,7 @@
 #include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-#include "CROSP/base/base.hpp"
+#include "CROSP/base_maps/base_maps.hpp"
 
 
 namespace CROSP::strain_parameterisation {
@@ -42,40 +42,43 @@ public:
     StrainParameterisation(const unsigned int t_number_of_Chebyshev_points);
 
 
+    StrainParameterisation(const Eigen::VectorXd &t_constant_strain);
+
+
     StrainParameterisation(const unsigned int t_ne,
                            const unsigned int t_number_of_Chebyshev_points);
 
 
     StrainParameterisation(const unsigned int t_ne,
-                           const std::vector<bool> &t_admitted_deformations);
+                           std::array<bool, 6> &t_admitted_deformations);
 
 
     StrainParameterisation(const unsigned int t_ne,
-                           const std::vector<bool> &t_admitted_deformations,
+                           const std::array<bool, 6> &t_admitted_deformations,
                            const unsigned int t_number_of_Chebyshev_points);
 
 
     StrainParameterisation(const unsigned int t_ne,
-                           const std::vector<bool> &t_admitted_deformations,
+                           const std::array<bool, 6> &t_admitted_deformations,
                            const Eigen::VectorXd &t_constant_strain);
 
 
     StrainParameterisation(const unsigned int t_ne,
-                           const std::vector<bool> &t_admitted_deformations,
+                           const std::array<bool, 6> &t_admitted_deformations,
                            const Eigen::VectorXd &t_constant_strain,
                            const unsigned int t_number_of_Chebyshev_points);
 
 
     StrainParameterisation(const unsigned int t_ne,
-                           const std::vector<bool> &t_admitted_deformations,
+                           const std::array<bool, 6> &t_admitted_deformations,
                            const Eigen::VectorXd &t_constant_strain,
-                           const base::BaseFunction t_polynomial_base);
+                           const base_maps::BaseFunction t_polynomial_base);
 
 
     StrainParameterisation(const unsigned int t_ne,
-                           const std::vector<bool> &t_admitted_deformations,
+                           const std::array<bool, 6> &t_admitted_deformations,
                            const Eigen::VectorXd &t_constant_strain,
-                           const base::BaseFunction t_polynomial_base,
+                           const base_maps::BaseFunction t_polynomial_base,
                            const unsigned int t_number_of_Chebyshev_points);
 
     ~StrainParameterisation()=default;
@@ -93,38 +96,15 @@ public:
 
 
 
-    const std::vector<bool> m_admitted_deformations { true, true, true, false, false, false };
+    const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
 
     const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
 
     const unsigned int m_ne { 3 };
 
-    const Eigen::MatrixXd m_B { [&](){
-            Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
+    const Eigen::MatrixXd m_B { base_maps::getB(m_admitted_deformations) };
 
-            std::vector<int> indexes;
-            std::for_each(m_admitted_deformations.begin(),
-                          m_admitted_deformations.end(),
-                          [&indexes, index=0](const bool dof)mutable{   if(dof == true)
-                                                                            indexes.push_back(index);
-                                                                        index++;});
-            const Eigen::MatrixXd map = I(Eigen::all, indexes);
-            return map;
-        }() };
-
-    const Eigen::MatrixXd m_B_bar { [&](){
-
-            Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
-
-            std::vector<int> indexes;
-            std::for_each(m_admitted_deformations.begin(),
-                          m_admitted_deformations.end(),
-                          [&indexes, index=0](const bool dof)mutable{   if(dof == false)
-                                                                            indexes.push_back(index);
-                                                                        index++;});
-            const Eigen::MatrixXd map = I(Eigen::all, indexes);
-            return map;
-        }() };
+    const Eigen::MatrixXd m_B_bar { base_maps::getBbar(m_admitted_deformations) };
 
     const Eigen::VectorXd m_constrained_strain { [&](){
 
@@ -144,9 +124,7 @@ public:
 
     const unsigned int m_number_of_Chebyshev_points { 17 };
 
-    const std::function<double(const unsigned int, const double&)> m_polynomial_base { [](const unsigned int t_point, const double& t_x) {return boost::math::legendre_p(t_point, t_x);} };
-
-    const std::vector<Eigen::MatrixXd> m_Phi_stack { base::generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points), m_polynomial_base) };
+    const std::vector<Eigen::MatrixXd> m_Phi_stack { base_maps::generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
 
     const std::vector<Eigen::MatrixXd> m_strains_map_stack { [&](){
             std::vector<Eigen::MatrixXd> strains_map_stack(m_number_of_Chebyshev_points);
@@ -171,6 +149,15 @@ public:
 
 private:
 
+    /*!
+     * \brief defineConstrainedStrain defines the constrained strains without the degrees of freedom
+     * \param t_constant_strain the constant strain along the rod with is 6 components
+     * \return the constrained strain of dimension 6-na
+     *
+     * This function takes the constant strain as a full 6x1 vector and returns the corresponding
+     * subvector of dimension (6-na)x1 that contains the components that do not belong to the
+     * rod allowed deformations.
+     */
     Eigen::VectorXd defineConstrainedStrain(const Eigen::VectorXd &t_constant_strain)const;
 
 };

@@ -26,13 +26,23 @@ StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
       m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
 {}
 
+
+/*!
+ * \brief StrainParameterisation
+ * \param t_constant_strain
+ */
+StrainParameterisation::StrainParameterisation(const Eigen::VectorXd &t_constant_strain)
+    :   m_constrained_strain( defineConstrainedStrain(t_constant_strain) )
+{}
+
+
 /*!
  * \brief StrainParameterisation
  * \param t_ne the number of modes per degree of deformations
  * \param t_admitted_deformations the admitted deformations in the rod
  */
 StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
-                                               const std::vector<bool> &t_admitted_deformations)
+                                               std::array<bool, 6> &t_admitted_deformations)
     : m_ne(t_ne),
       m_admitted_deformations(t_admitted_deformations)
 {}
@@ -44,7 +54,7 @@ StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
  * \param t_number_of_Chebyshev_points
  */
 StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
-                                               const std::vector<bool> &t_admitted_deformations,
+                                               const std::array<bool, 6> &t_admitted_deformations,
                                                const unsigned int t_number_of_Chebyshev_points)
     : m_ne(t_ne),
       m_admitted_deformations(t_admitted_deformations),
@@ -54,7 +64,7 @@ StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
 
 
 StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
-                                               const std::vector<bool> &t_admitted_deformations,
+                                               const std::array<bool, 6> &t_admitted_deformations,
                                                const Eigen::VectorXd &t_constant_strain)
     : m_ne(t_ne),
       m_admitted_deformations(t_admitted_deformations),
@@ -63,7 +73,7 @@ StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
 
 
 StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
-                                               const std::vector<bool> &t_admitted_deformations,
+                                               const std::array<bool, 6> &t_admitted_deformations,
                                                const Eigen::VectorXd &t_constant_strain,
                                                const unsigned int t_number_of_Chebyshev_points)
     :   m_ne(t_ne),
@@ -74,25 +84,31 @@ StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
 
 
 StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
-                                               const std::vector<bool> &t_admitted_deformations,
+                                               const std::array<bool, 6> &t_admitted_deformations,
                                                const Eigen::VectorXd &t_constant_strain,
-                                               const base::BaseFunction t_polynomial_base)
+                                               const base_maps::BaseFunction t_polynomial_base)
     :   m_ne(t_ne),
         m_admitted_deformations(t_admitted_deformations),
         m_constrained_strain( defineConstrainedStrain(t_constant_strain) ),
-        m_polynomial_base(t_polynomial_base)
+        m_Phi_stack( base_maps::generatePhiStack(m_ne,
+                                                 m_na,
+                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points),
+                                                                                     t_polynomial_base) )
 {}
 
 
 StrainParameterisation::StrainParameterisation(const unsigned int t_ne,
-                                               const std::vector<bool> &t_admitted_deformations,
+                                               const std::array<bool, 6> &t_admitted_deformations,
                                                const Eigen::VectorXd &t_constant_strain,
-                                               const base::BaseFunction t_polynomial_base,
+                                               const base_maps::BaseFunction t_polynomial_base,
                                                const unsigned int t_number_of_Chebyshev_points)
     :   m_ne(t_ne),
         m_admitted_deformations(t_admitted_deformations),
         m_constrained_strain( defineConstrainedStrain(t_constant_strain) ),
-        m_polynomial_base(t_polynomial_base),
+        m_Phi_stack( base_maps::generatePhiStack(m_ne,
+                                                 m_na,
+                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points),
+                                                                                     t_polynomial_base) ),
         m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
 {}
 
