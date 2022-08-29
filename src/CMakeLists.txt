@@ -1,14 +1,32 @@
 include_directories(include)
 
-
-
-add_library(MaterialProperties SHARED
-    include/${PROJECT_NAME}/material_properties/material_properties.hpp
-    material_properties/material_properties.cpp
-)
-target_link_libraries(MaterialProperties
+add_library(Base SHARED
+    include/${PROJECT_NAME}/base/base.hpp
+    base/base.cpp)
+target_link_libraries(Base
     PRIVATE
         Eigen3::Eigen
+)
+target_compile_options(Base
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+)
+
+add_library(RodProperties SHARED
+    include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
+    rod_properties/rod_properties.cpp
+)
+target_link_libraries(RodProperties
+    PRIVATE
+        Eigen3::Eigen
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
 )
 
 add_library(StrainParameterisation SHARED
@@ -19,6 +37,13 @@ target_link_libraries(StrainParameterisation
     PRIVATE
         Eigen3::Eigen
 )
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+)
+
 
 add_library(IDMIntegrators SHARED
     include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
@@ -30,7 +55,13 @@ target_link_libraries(IDMIntegrators
         math_tools
         Eigen3::Eigen
         StrainParameterisation
-        MaterialProperties
+        RodProperties
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
 )
 
 add_library(TIDMIntegrators SHARED
@@ -43,7 +74,13 @@ target_link_libraries(TIDMIntegrators
         OSNI
         math_tools
         StrainParameterisation
-        MaterialProperties
+        RodProperties
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
 )
 
 
@@ -58,10 +95,16 @@ target_link_libraries(${PROJECT_NAME}
         math_tools
         Eigen3::Eigen
         StrainParameterisation
-        MaterialProperties
+        RodProperties
         IDMIntegrators
         TIDMIntegrators
         OSNI
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
 )
 
 
