@@ -98,7 +98,9 @@ struct RodDimensions {
 
 
 
-
+/*!
+ * \brief The RodProperties class contains the properties of the Cosserat rod
+ */
 class RodProperties {
 
 public:
@@ -129,19 +131,42 @@ public:
     const RodDimensions m_rod_dimensions { RodDimensions() };
 
 
+    /*!
+     * \brief distributedDensity returns the distributed density of the rod
+     * \return the distributed density of the rod
+     */
     double distributedDensity()const;
 
+    /*!
+     * \brief getMAngular returns the angular subset of the inertia matrix
+     * \return the angular subset of the inertia matrix
+     */
     Eigen::Matrix3d getMAngular()const;
 
+
+    /*!
+     * \brief getMLinear returns the linear subset of the inertia matrix
+     * \return the linear subset of the inertia matrix
+     */
     Eigen::Matrix3d getMLinear()const;
 
+
+    /*!
+     * \brief getHAngular returns the angular subset of the Hookean matrix
+     * \return the angular subset of the Hookean matrix
+     */
     Eigen::Matrix3d getHAngular()const;
 
+
+    /*!
+     * \brief getHLinear returns the linear subset of the Hookean matrix
+     * \return the linear subset of the Hookean matrix
+     */
     Eigen::Matrix3d getHLinear()const;
 
 
 
-
+    //  The Hookean matrix default initialised
     const Eigen::Matrix<double, 6, 6> m_H { [&](){
             Eigen::Matrix<double, 6, 6> H;
             H.setZero();
@@ -154,7 +179,7 @@ public:
 
             return H;}() };
 
-
+    //  The inertia matrix default initialised
     const  Eigen::Matrix<double, 6, 6>  m_M{ [&](){
             Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
 
@@ -166,18 +191,28 @@ public:
                             m_material_properties.m_rho * m_rod_dimensions.m_A;
             return M;}() };
 
-
+    //  The array of admitted deformations
     const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
 
+    //  The number of deformations degrees of freedom
     const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
 
+    //  The number of modes per admitted deformation
     const unsigned int m_ne { 3 };
 
+    //  The generalised elasticity matrix
     const Eigen::MatrixXd m_Kee { defineKee( m_ne, m_na, base_maps::getB(m_admitted_deformations) ) };
 
 
 private:
 
+    /*!
+     * \brief defineKee defines the elasticity matrix Kee
+     * \param t_ne the number of modes per admitted deformation
+     * \param t_na the number of deformations degrees of freedom
+     * \param t_B the map matrix to map the allowed strains in the space of the full strain
+     * \return
+     */
     Eigen::MatrixXd defineKee(const unsigned int t_ne,
                               const unsigned int t_na,
                               const Eigen::MatrixXd &t_B)const;

@@ -26,7 +26,16 @@ static const BaseFunction chebyshev_polynomial_base { [](const unsigned int t_po
                                                     };
 
 
-
+/*!
+ * \brief getPhi this function computes the base matrix Phi
+ * \param t_ne the number of modes per admitted deformation
+ * \param t_na the number of admitted deformations
+ * \param t_X the current abscissa along the normalized arc-length
+ * \param t_polynomial_base the polynomial base used to define the matrix
+ * \param t_begin the begin of the rod domain
+ * \param t_end the end of the rod domain
+ * \return the matrix of bases function, namely Phi
+ */
 Eigen::MatrixXd getPhi(const unsigned int t_ne,
                               const unsigned int t_na,
                               const double& t_X,
@@ -34,14 +43,34 @@ Eigen::MatrixXd getPhi(const unsigned int t_ne,
                               const double& t_begin=0,
                               const double& t_end=1);
 
+
+/*!
+ * \brief generatePhiStack generates a stack of Phi matrices, one for every Chebyshev points and relative to its abscissa
+ * \param t_ne the number of modes per admitted deformation
+ * \param t_na the number of admitted deformations
+ * \param t_Chebyshev_points the number of Chebyshev points used to discretise the rod
+ * \param t_polynomial_base the polynomial base used to define the matrix
+ * \return the stack of Phi matrices
+ */
 std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
                                               const unsigned int t_na,
                                               const std::vector<double> &t_Chebyshev_points,
                                               const BaseFunction t_polynomial_base=legendre_polynomial_base);
 
 
+/*!
+ * \brief getB computes the map matrix used to map the allowed strain into the full strain field
+ * \param t_allowed_deformations the set of allowed deformation
+ * \return the map matrix used to map the allowed strain into the full strain field
+ */
 Eigen::MatrixXd getB(const std::array<bool, 6> &t_allowed_deformations);
 
+
+/*!
+ * \brief getBbar computes the map matrix used to map the constrained strain into the full strain field
+ * \param t_allowed_deformations the set of allowed deformation
+ * \return the map matrix used to map the constrained strain into the full strain field
+ */
 Eigen::MatrixXd getBbar(const std::array<bool, 6> &t_allowed_deformations);
 
 
