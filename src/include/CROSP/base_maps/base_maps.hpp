@@ -1,11 +1,11 @@
-#ifndef BASE_HPP
-#define BASE_HPP
+#ifndef BASE_MAPS_HPP
+#define BASE_MAPS_HPP
 
 #include <functional>
 #include <boost/math/special_functions.hpp>
 #include <Eigen/Dense>
 
-namespace CROSP::base {
+namespace CROSP::base_maps {
 
 
 
@@ -40,6 +40,11 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
                                               const BaseFunction t_polynomial_base=legendre_polynomial_base);
 
 
-}   //  namespace CROSP::base
+Eigen::MatrixXd getB(const std::array<bool, 6> &t_allowed_deformations);
 
-#endif // BASE_HPP
+Eigen::MatrixXd getBbar(const std::array<bool, 6> &t_allowed_deformations);
+
+
+}   //  namespace CROSP::base_maps
+
+#endif // BASE_MAPS_HPP

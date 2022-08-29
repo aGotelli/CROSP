@@ -1,9 +1,9 @@
-#include "CROSP/base/base.hpp"
+#include "CROSP/base_maps/base_maps.hpp"
 
 #include <eigen3/unsupported/Eigen/KroneckerProduct>
 
 
-namespace CROSP::base {
+namespace CROSP::base_maps {
 
 
 
@@ -47,4 +47,34 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
 }
 
 
-}   //  namespace CROSP::base
+Eigen::MatrixXd getB(const std::array<bool, 6> &t_allowed_deformations)
+{
+    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
+
+    std::vector<int> indexes;
+    std::for_each(t_allowed_deformations.begin(),
+                  t_allowed_deformations.end(),
+                  [&indexes, index=0](const bool dof)mutable{   if(dof == true)
+                                                                    indexes.push_back(index);
+                                                                index++;});
+    const Eigen::MatrixXd map = I(Eigen::all, indexes);
+    return map;
+}
+
+
+Eigen::MatrixXd getBbar(const std::array<bool, 6> &t_allowed_deformations)
+{
+    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
+
+    std::vector<int> indexes;
+    std::for_each(t_allowed_deformations.begin(),
+                  t_allowed_deformations.end(),
+                  [&indexes, index=0](const bool dof)mutable{   if(dof == false)
+                                                                    indexes.push_back(index);
+                                                                index++;});
+    const Eigen::MatrixXd map = I(Eigen::all, indexes);
+    return map;
+}
+
+
+}   //  namespace CROSP::base_maps
