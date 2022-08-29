@@ -18,7 +18,7 @@ namespace CROSP::tidm_integrators {
 
 
 DeltaRotation::DeltaRotation(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                             std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_Delta) :
+                             std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta) :
     OSNI::ODEAb(3,
                 ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                 t_strain_parameterisation->getNumberOfChebyshewPoints()),
@@ -43,7 +43,7 @@ Eigen::VectorXd DeltaRotation::computerParametersVectorAtPoint(const unsigned in
 
 
 DeltaPosition::DeltaPosition(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                             std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_Delta,
+                             std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_delta_rotation) :
     OSNI::ODEAb(3,
                 ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
@@ -70,7 +70,7 @@ Eigen::VectorXd DeltaPosition::computerParametersVectorAtPoint(const unsigned in
 
 
 DeltaAngularVelocity::DeltaAngularVelocity(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                           std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_Delta,
+                                           std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                            std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators) :
      OSNI::ODEAb(3,
                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
@@ -94,7 +94,7 @@ Eigen::VectorXd DeltaAngularVelocity::computerParametersVectorAtPoint(const unsi
 
 
 DeltaLinearVelocity::DeltaLinearVelocity(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                         std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_Delta,
+                                         std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                          std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                          std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator) :
     OSNI::ODEAb(3,
@@ -127,7 +127,7 @@ Eigen::VectorXd DeltaLinearVelocity::computerParametersVectorAtPoint(const unsig
 
 
 DeltaAngularAccelerations::DeltaAngularAccelerations(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                                     std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_Delta,
+                                                     std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                                      std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator) :
     OSNI::ODEAb(3,
@@ -160,7 +160,7 @@ Eigen::VectorXd DeltaAngularAccelerations::computerParametersVectorAtPoint(const
 
 
 DeltaLinearAccelerations::DeltaLinearAccelerations(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                                   std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_Delta,
+                                                   std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                                    std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_acceleration_integrator,
@@ -208,7 +208,7 @@ Eigen::MatrixXd DeltaLinearAccelerations::computeMatrixAtChebyshevPoint(const un
 
 
 DeltaInternalForcesIntegrator::DeltaInternalForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                                             std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
+                                                             std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_perturbation,
                                                              std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                                              std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
@@ -282,7 +282,7 @@ Eigen::Vector3d DeltaInternalForcesIntegrator::computeLocalExternalForces(unsign
 
 
 DeltaInternalCouplesIntegrator::DeltaInternalCouplesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                                               std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
+                                                               std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_perturbation,
                                                                std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                                                std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                                std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
@@ -364,11 +364,11 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
 
 
 TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                    std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
+                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_perturbation,
                     std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                     std::shared_ptr<const rod_properties::RodProperties> t_rod_properties) :
     m_strain_parameterisation(t_strain_parameterisation),
-    m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation),
+    m_strain_parameterisation_Delta(t_strain_parameterisation_perturbation),
     m_idm_integrators(t_idm_integrators),
     m_rod_properties(t_rod_properties)
 {}

@@ -66,24 +66,24 @@ target_compile_options(RodProperties
         -Wextra
 )
 
-#add_library(TIDMIntegrators SHARED
-#    include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
-#    tidm_integrators/tidm_integrators.cpp
-#)
-#target_link_libraries(TIDMIntegrators
-#    PUBLIC
-#        Eigen3::Eigen
-#        OSNI
-#        math_tools
-#        StrainParameterisation
-#        RodProperties
-#)
-#target_compile_options(RodProperties
-#    PRIVATE
-#        -Werror
-#        -Wall
-#        -Wextra
-#)
+add_library(TIDMIntegrators SHARED
+    include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
+    tidm_integrators/tidm_integrators.cpp
+)
+target_link_libraries(TIDMIntegrators
+    PUBLIC
+        Eigen3::Eigen
+        OSNI
+        math_tools
+        StrainParameterisation
+        RodProperties
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+)
 
 
 
