@@ -210,7 +210,7 @@ Eigen::MatrixXd DeltaLinearAccelerations::computeMatrixAtChebyshevPoint(const un
 DeltaInternalForcesIntegrator::DeltaInternalForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                              std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
                                                              std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                                                             std::shared_ptr<const material_properties::MaterialProperties> t_material_properties,
+                                                             std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_linear_velocity_integrator,
@@ -219,7 +219,7 @@ DeltaInternalForcesIntegrator::DeltaInternalForcesIntegrator(std::shared_ptr<con
                 ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                 t_strain_parameterisation->getNumberOfChebyshewPoints()),
     m_number_of_Chebyshev_points(t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_material_properties(t_material_properties),
+    m_rod_properties(t_rod_properties),
     m_K_stack(t_strain_parameterisation->m_K_stack),
     m_Delta_K_stack(t_strain_parameterisation_perturbation->m_K_stack),
     m_quaternion_integrator(t_idm_integrators->m_quaternion),
@@ -266,7 +266,10 @@ Eigen::Vector3d DeltaInternalForcesIntegrator::computeLocalExternalForces(unsign
     Eigen::Vector3d Delta_rotation = m_Delta_rotation_integrator->getStateAtPoint(t_point);
 
     Eigen::Vector3d Delta_N_bar = -::LieAlgebra::skew( Delta_rotation ).transpose()
-                                    *R.transpose()*m_material_properties->m_rho*m_material_properties->m_A*Eigen::Vector3d(0, 0, 9.81);
+                                    *R.transpose()
+                                    *m_rod_properties->m_material_properties.m_rho
+                                    *m_rod_properties->m_rod_dimensions.m_A
+                                    *Eigen::Vector3d(0, 0, 9.81);
 
 
     return Delta_N_bar;
@@ -281,7 +284,7 @@ Eigen::Vector3d DeltaInternalForcesIntegrator::computeLocalExternalForces(unsign
 DeltaInternalCouplesIntegrator::DeltaInternalCouplesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                                std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
                                                                std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                                                               std::shared_ptr<const material_properties::MaterialProperties> t_material_properties,
+                                                               std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                                std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
                                                                std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                                                                std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_acceleration_integrator,
@@ -291,7 +294,7 @@ DeltaInternalCouplesIntegrator::DeltaInternalCouplesIntegrator(std::shared_ptr<c
                 ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                 t_strain_parameterisation->getNumberOfChebyshewPoints()),
     m_number_of_Chebyshev_points(t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_material_properties(t_material_properties),
+    m_rod_properties(t_rod_properties),
     m_idm_integrators(t_idm_integrators),
     m_strain_parameterisation(t_strain_parameterisation),
     m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation),
@@ -363,11 +366,11 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
 TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                     std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
                     std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                    std::shared_ptr<const material_properties::MaterialProperties> t_material_properties) :
+                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties) :
     m_strain_parameterisation(t_strain_parameterisation),
     m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation),
     m_idm_integrators(t_idm_integrators),
-    m_material_properties(t_material_properties)
+    m_rod_properties(t_rod_properties)
 {}
 
 

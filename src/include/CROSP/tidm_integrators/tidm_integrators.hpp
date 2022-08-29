@@ -18,7 +18,7 @@
 
 #include "OSNI/OSNI.hpp"
 
-#include "CROSP/material_properties/material_properties.hpp"
+#include "CROSP/rod_properties/rod_properties.hpp"
 
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/idm_integrators/idm_integrators.hpp"
@@ -181,7 +181,7 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
     DeltaInternalForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                   std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
                                   std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                                  std::shared_ptr<const material_properties::MaterialProperties> t_material_properties,
+                                  std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                   std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
                                   std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                                   std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_linear_velocity_integrator,
@@ -198,7 +198,7 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
     const unsigned int m_number_of_Chebyshev_points;
 
-    const std::shared_ptr<const material_properties::MaterialProperties> m_material_properties;
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack;
@@ -215,7 +215,7 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
     const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_linear_velocity_integrator;
     const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_linear_acceleration_integrator;
 
-    const Eigen::Matrix3d m_M_linear { m_material_properties->getMLinear() };
+    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
 
     const std::shared_ptr<const OSNI::ODESolverInterface> m_internal_forces_integrator;
 
@@ -231,7 +231,7 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
     DeltaInternalCouplesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                    std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
                                    std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                                   std::shared_ptr<const material_properties::MaterialProperties> t_material_properties,
+                                   std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_acceleration_integrator,
@@ -252,7 +252,7 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 
     const unsigned int m_number_of_Chebyshev_points;
 
-    const std::shared_ptr<const material_properties::MaterialProperties> m_material_properties;
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
     const std::shared_ptr<const idm_integrators::IDMIntegrators> m_idm_integrators;
 
@@ -288,8 +288,8 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
     const std::shared_ptr<const OSNI::ODESolverInterface> m_internal_couples_integrator { m_idm_integrators->m_internal_couples };
 
 
-    const Eigen::Matrix3d m_M_angular { m_material_properties->m_M.block<3,3>(0, 0) };
-    const Eigen::Matrix3d m_M_linear { m_material_properties->m_M.block<3,3>(3, 3) };
+    const Eigen::Matrix3d m_M_angular { m_rod_properties->m_M.block<3,3>(0, 0) };
+    const Eigen::Matrix3d m_M_linear { m_rod_properties->m_M.block<3,3>(3, 3) };
 
 
 
@@ -321,14 +321,14 @@ struct TIDMIntegrators{
     TIDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                     std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation,
                     std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                    std::shared_ptr<const material_properties::MaterialProperties> t_material_properties);
+                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
     const std::shared_ptr<const strain_parameterisation::StrainParameterisationDelta> m_strain_parameterisation_perturbation;
     const std::shared_ptr<const idm_integrators::IDMIntegrators> m_idm_integrators;
 
-    const std::shared_ptr<const material_properties::MaterialProperties> m_material_properties;
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
     const unsigned int m_number_of_Chebyshev_points { m_strain_parameterisation->getNumberOfChebyshewPoints() };
 
@@ -368,7 +368,7 @@ struct TIDMIntegrators{
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_forces { std::make_shared<DeltaInternalForcesIntegrator>(m_strain_parameterisation,
                                                                                                                         m_strain_parameterisation_perturbation,
                                                                                                                         m_idm_integrators,
-                                                                                                                        m_material_properties,
+                                                                                                                        m_rod_properties,
                                                                                                                         m_Delta_rotation,
                                                                                                                         m_Delta_angular_velocity,
                                                                                                                         m_Delta_linear_velocity,
@@ -378,7 +378,7 @@ struct TIDMIntegrators{
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_couples { std::make_shared<DeltaInternalCouplesIntegrator>(m_strain_parameterisation,
                                                                                                                           m_strain_parameterisation_perturbation,
                                                                                                                           m_idm_integrators,
-                                                                                                                          m_material_properties,
+                                                                                                                          m_rod_properties,
                                                                                                                           m_Delta_rotation,
                                                                                                                           m_Delta_angular_velocity,
                                                                                                                           m_Delta_angular_acceleration,

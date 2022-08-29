@@ -25,9 +25,9 @@ CosseratRod::CosseratRod(const unsigned int t_number_of_chebyshev_points) :
 }
 
 
-CosseratRod::CosseratRod(std::shared_ptr<material_properties::MaterialProperties> t_material_properties,
+CosseratRod::CosseratRod(std::shared_ptr<rod_properties::RodProperties> t_rod_properties,
                          std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                         std::shared_ptr<strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation) :   m_material_properties(t_material_properties),
+                         std::shared_ptr<strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation) :   m_rod_properties(t_rod_properties),
                                                                                                             m_strain_parameterisation(t_strain_parameterisation),
                                                                                                             m_strain_parameterisation_perturbation(t_strain_parameterisation_perturbation)
 {

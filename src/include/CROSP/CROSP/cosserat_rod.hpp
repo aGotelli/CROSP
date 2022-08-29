@@ -19,7 +19,7 @@
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
-#include "CROSP/material_properties/material_properties.hpp"
+#include "CROSP/rod_properties/rod_properties.hpp"
 
 #include "CROSP/idm_integrators/idm_integrators.hpp"
 #include "CROSP/tidm_integrators/tidm_integrators.hpp"
@@ -42,7 +42,7 @@ public:
 
     CosseratRod(unsigned int t_number_of_Chebyshev_points);
 
-    CosseratRod(std::shared_ptr<material_properties::MaterialProperties> t_material_properties,
+    CosseratRod(std::shared_ptr<rod_properties::RodProperties> t_rod_properties,
                 std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                 std::shared_ptr<strain_parameterisation::StrainParameterisationDelta> t_strain_parameterisation_perturbation);
 
@@ -108,7 +108,7 @@ private:
      */
     void setForwardIntegratorsInitialConditions();
 
-    std::shared_ptr<material_properties::MaterialProperties> m_material_properties { std::make_shared<material_properties::MaterialProperties>() };
+    std::shared_ptr<rod_properties::RodProperties> m_rod_properties { std::make_shared<rod_properties::RodProperties>() };
 
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { std::make_shared<strain_parameterisation::StrainParameterisation>() };
 
@@ -121,7 +121,7 @@ private:
             const unsigned int n = ne*na;
 
             const auto B = m_strain_parameterisation->m_B;
-            const auto Ha = B.transpose() * m_material_properties->m_H * B;
+            const auto Ha = B.transpose() * m_rod_properties->m_H * B;
 
             typedef Eigen::MatrixXd Kee_state_type;
 
@@ -144,12 +144,12 @@ private:
     std::shared_ptr<strain_parameterisation::StrainParameterisationDelta> m_strain_parameterisation_perturbation { std::make_shared<strain_parameterisation::StrainParameterisationDelta>() };
 
     std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators { std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
-                                                                                                                           m_material_properties )};
+                                                                                                                           m_rod_properties )};
 
     std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators { std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
                                                                                                                                 m_strain_parameterisation_perturbation,
                                                                                                                                 m_idm_integrators,
-                                                                                                                                m_material_properties) };
+                                                                                                                                m_rod_properties) };
 };
 
 

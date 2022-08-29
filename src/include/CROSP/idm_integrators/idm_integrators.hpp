@@ -16,7 +16,7 @@
 
 #include <memory>
 
-#include "CROSP/material_properties/material_properties.hpp"
+#include "CROSP/rod_properties/rod_properties.hpp"
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 
 #include "OSNI/OSNI.hpp"
@@ -180,7 +180,7 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
 struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     InternalForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                             std::shared_ptr<const material_properties::MaterialProperties> t_material_properties,
+                             std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
@@ -202,9 +202,9 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     const unsigned int m_number_of_Chebyshev_points;
 
-    const std::shared_ptr<const material_properties::MaterialProperties> m_material_properties;
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
-    const Eigen::Matrix3d m_M_linear { m_material_properties->getMLinear() };
+    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
 
@@ -224,7 +224,7 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
     InternalCouplesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                              std::shared_ptr<const material_properties::MaterialProperties> t_material_properties,
+                              std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
@@ -244,11 +244,11 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
     virtual Eigen::VectorXd computeDistributedCouple(const unsigned int t_point) const;
 
 
-    const std::shared_ptr<const material_properties::MaterialProperties> m_material_properties;
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
-    const Eigen::Matrix3d m_M_angular { m_material_properties->getMAngular() };
+    const Eigen::Matrix3d m_M_angular { m_rod_properties->getMAngular() };
 
-    const Eigen::Matrix3d m_M_linear { m_material_properties->getMLinear() };
+    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack;
 
@@ -290,16 +290,16 @@ struct GeneralisedForcesIntegrator : public OSNI::ODEb {
 struct IDMIntegrators {
 
     IDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                   std::shared_ptr<const material_properties::MaterialProperties> t_material_properties);
+                   std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
 
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
 
 
-    const std::shared_ptr<const material_properties::MaterialProperties> m_material_properties;
-    const Eigen::Matrix3d m_M_angular { m_material_properties->getMAngular() };
-    const Eigen::Matrix3d m_M_linear { m_material_properties->getMLinear() };
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
+    const Eigen::Matrix3d m_M_angular { m_rod_properties->getMAngular() };
+    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
 
     const unsigned int m_number_of_Chebyshev_points { m_strain_parameterisation->getNumberOfChebyshewPoints() };
 
@@ -323,7 +323,7 @@ struct IDMIntegrators {
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces { std::make_shared<InternalForcesIntegrator>(m_strain_parameterisation,
-                                                                                                             m_material_properties,
+                                                                                                             m_rod_properties,
                                                                                                              m_angular_velocity,
                                                                                                              m_linear_velocity,
                                                                                                              m_linear_acceleration,
@@ -331,7 +331,7 @@ struct IDMIntegrators {
                                                                                                              m_position )};
 
     std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples { std::make_shared<InternalCouplesIntegrator>(m_strain_parameterisation,
-                                                                                                               m_material_properties,
+                                                                                                               m_rod_properties,
                                                                                                                m_angular_velocity,
                                                                                                                m_linear_velocity,
                                                                                                                m_angular_acceleration,
