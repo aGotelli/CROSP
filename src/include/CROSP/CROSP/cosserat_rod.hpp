@@ -123,9 +123,6 @@ private:
             const auto B = m_strain_parameterisation->m_B;
             const auto Ha = B.transpose() * m_material_properties->m_H * B;
 
-            std::cout << "H : \n" << m_material_properties->m_H << "\n\n";
-            std::cout << "Ha : \n" << Ha << "\n\n";
-
             typedef Eigen::MatrixXd Kee_state_type;
 
 
@@ -140,8 +137,6 @@ private:
                                                                  t_X);
 
                 t_dKeeds = Phi.transpose()*Ha*Phi;}, Kee, 0.0, 1.0, 0.0005);
-
-            std::cout << Kee << std::endl;
 
             return Kee;}() };
 
