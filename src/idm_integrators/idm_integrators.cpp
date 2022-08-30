@@ -249,10 +249,11 @@ Eigen::VectorXd InternalForcesIntegrator::computeDistributedForce(const unsigned
                                            q(2),
                                            q(3)).toRotationMatrix();
 
-    const double distributed_density = m_rod_properties->m_material_properties.m_rho
-                                        *m_rod_properties->m_rod_dimensions.m_A;
-    const Eigen::Vector3d distributed_weight_force = -distributed_density*Eigen::Vector3d(0, 0, 9.81);
+
+    const Eigen::Vector3d distributed_weight_force = -m_rod_properties->distributedDensity()*Eigen::Vector3d(0, 0, 9.81);
     Eigen::Vector3d N_bar = R.transpose()*distributed_weight_force;
+
+    std::cout << "At point : " << t_point << " N_bar : \n" << N_bar << "\n\n";
 
     return N_bar;
 }
