@@ -107,9 +107,7 @@ public:
 
     RodProperties()=default;
 
-    RodProperties(const unsigned int t_ne,
-                  const unsigned int t_na,
-                  const Eigen::MatrixXd &t_B);
+    RodProperties(const base_maps::PolynomialRepresentation t_polynomial_representation);
 
     RodProperties(const MaterialProperties &t_material_properties);
 
@@ -118,9 +116,7 @@ public:
     RodProperties(const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
 
-    RodProperties(const unsigned int t_ne,
-                  const unsigned int t_na,
-                  const Eigen::MatrixXd &t_B,
+    RodProperties(const base_maps::PolynomialRepresentation t_polynomial_representation,
                   const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
 
@@ -191,17 +187,14 @@ public:
                             m_material_properties.m_rho * m_rod_dimensions.m_A;
             return M;}() };
 
-    //  The array of admitted deformations
-    const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
+    //  The polynomial representation of the field of strain
+    const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
 
-    //  The number of deformations degrees of freedom
-    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
-
-    //  The number of modes per admitted deformation
-    const unsigned int m_ne { 3 };
 
     //  The generalised elasticity matrix
-    const Eigen::MatrixXd m_Kee { defineKee( m_ne, m_na, base_maps::getB(m_admitted_deformations) ) };
+    const Eigen::MatrixXd m_Kee { defineKee( m_polynomial_representation.m_ne,
+                                             m_polynomial_representation.m_na,
+                                             base_maps::getB(m_polynomial_representation.m_admitted_deformations) ) };
 
 
 private:

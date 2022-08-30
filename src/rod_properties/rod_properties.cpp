@@ -4,36 +4,32 @@
 
 namespace CROSP::rod_properties {
 
-RodProperties::RodProperties(const unsigned int t_ne,
-                             const unsigned int t_na,
-                             const Eigen::MatrixXd &t_B)
-    :   m_Kee( defineKee(t_ne, t_na, t_B) )
+RodProperties::RodProperties(const base_maps::PolynomialRepresentation t_polynomial_representation)
+    : m_polynomial_representation(t_polynomial_representation)
 {}
 
 
 RodProperties::RodProperties(const MaterialProperties &t_material_properties)
-    :   m_material_properties(t_material_properties)
+    : m_material_properties(t_material_properties)
 {}
 
 RodProperties::RodProperties(const RodDimensions &t_rod_dimensions)
-    :   m_rod_dimensions(t_rod_dimensions)
+    : m_rod_dimensions(t_rod_dimensions)
 {}
 
 RodProperties::RodProperties(const MaterialProperties &t_material_properties,
                              const RodDimensions &t_rod_dimensions)
-    :   m_material_properties(t_material_properties),
-        m_rod_dimensions(t_rod_dimensions)
+    : m_material_properties(t_material_properties),
+      m_rod_dimensions(t_rod_dimensions)
 {}
 
 
-RodProperties::RodProperties(const unsigned int t_ne,
-                             const unsigned int t_na,
-                             const Eigen::MatrixXd &t_B,
+RodProperties::RodProperties(const base_maps::PolynomialRepresentation t_polynomial_representation,
                              const MaterialProperties &t_material_properties,
                              const RodDimensions &t_rod_dimensions)
-    :   m_material_properties(t_material_properties),
-        m_rod_dimensions(t_rod_dimensions),
-        m_Kee( defineKee(t_ne, t_na, t_B) )
+    : m_material_properties(t_material_properties),
+      m_rod_dimensions(t_rod_dimensions),
+      m_polynomial_representation(t_polynomial_representation)
 {}
 
 
