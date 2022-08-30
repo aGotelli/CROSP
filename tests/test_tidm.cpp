@@ -2,7 +2,7 @@
 #include "CROSP/idm_integrators/idm_integrators.hpp"
 #include "CROSP/CROSP/cosserat_rod.hpp"
 #include "CROSP/tidm_integrators/tidm_integrators.hpp"
-#include "CROSP/base_maps/base_maps.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
 #include <utilities/Eigen/eigen_io.hpp>
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     const unsigned int number_of_Chebyshev_points = 21;
 
 
-    ::base_maps::PolynomialRepresentation polynomial_representation;
+    ::polynomial_representation::PolynomialRepresentation polynomial_representation;
 
 
 
