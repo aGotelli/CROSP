@@ -67,53 +67,55 @@ target_compile_options(RodProperties
         -Wextra
 )
 
-#add_library(TIDMIntegrators SHARED
-#    include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
-#    tidm_integrators/tidm_integrators.cpp
-#)
-#target_link_libraries(TIDMIntegrators
-#    PUBLIC
-#        Eigen3::Eigen
-#        OSNI
-#        math_tools
-#        StrainParameterisation
-#        RodProperties
-#)
-#target_compile_options(RodProperties
-#    PRIVATE
-#        -Werror
-#        -Wall
-#        -Wextra
-#)
+add_library(TIDMIntegrators SHARED
+    include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
+    tidm_integrators/tidm_integrators.cpp
+)
+target_link_libraries(TIDMIntegrators
+    PUBLIC
+        Eigen3::Eigen
+        OSNI
+        math_tools
+        StrainParameterisation
+        RodProperties
+        BaseMaps
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+)
 
 
 
-#add_library(${PROJECT_NAME} SHARED
-#                            include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
-#                            ${PROJECT_NAME}/cosserat_rod.cpp
-#)
-#target_link_libraries(${PROJECT_NAME}
-#    PRIVATE
-#        math_tools
-#        Eigen3::Eigen
-#        StrainParameterisation
-#        RodProperties
-#        IDMIntegrators
-#        TIDMIntegrators
-#        OSNI
-#)
-#target_compile_options(RodProperties
-#    PRIVATE
-#        -Werror
-#        -Wall
-#        -Wextra
-#)
+add_library(${PROJECT_NAME} SHARED
+                            include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
+                            ${PROJECT_NAME}/cosserat_rod.cpp
+)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        math_tools
+        Eigen3::Eigen
+        StrainParameterisation
+        RodProperties
+        IDMIntegrators
+        TIDMIntegrators
+        OSNI
+        BaseMaps
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+)
 
 
-#install(TARGETS ${PROJECT_NAME}
-#    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#)
-#install(DIRECTORY include/${PROJECT_NAME}
-#    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-#)
+install(TARGETS ${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(DIRECTORY include/${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 

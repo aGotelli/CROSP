@@ -281,7 +281,7 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 struct GeneralisedForcesIntegrator : public OSNI::ODEb {
 
     GeneralisedForcesIntegrator(const unsigned int t_number_of_Chebyshev_points,
-                                std::shared_ptr<const base_maps::PolynomialRepresentation> t_polynomial_representation,
+                                const base_maps::PolynomialRepresentation &t_polynomial_representation,
                                 std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                 std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
                                 std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator);
@@ -305,13 +305,15 @@ struct GeneralisedForcesIntegrator : public OSNI::ODEb {
 struct IDMIntegrators {
 
     IDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
-                   std::shared_ptr<const base_maps::PolynomialRepresentation> t_polynomial_representation,
+                   const base_maps::PolynomialRepresentation &t_polynomial_representation,
                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
+    //  Instance of the number of points to be used in the integration
+    const unsigned int m_number_of_Chebyshev_points;
 
     //  Instance of the polynomial representation of the field of strain
-    const std::shared_ptr<const base_maps::PolynomialRepresentation> m_polynomial_representation;
+    const base_maps::PolynomialRepresentation m_polynomial_representation;
 
     //  Instance of the strain parameterisation
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
@@ -323,8 +325,7 @@ struct IDMIntegrators {
     const Eigen::Matrix3d m_M_angular { m_rod_properties->getMAngular() };
     const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
 
-    //  Instance of the number of points to be used in the integration
-    const unsigned int m_number_of_Chebyshev_points;
+
 
     //  Integrator for the quaternions
     std::shared_ptr<OSNI::ODESolverInterface> m_quaternion { std::make_shared<QuaternionIntegrator>(m_number_of_Chebyshev_points,

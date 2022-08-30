@@ -310,11 +310,11 @@ Eigen::VectorXd InternalCouplesIntegrator::computeDistributedCouple(const unsign
 
 
 GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(const unsigned int t_number_of_Chebyshev_points,
-                                                         std::shared_ptr<const base_maps::PolynomialRepresentation> t_polynomial_representation,
+                                                         const base_maps::PolynomialRepresentation &t_polynomial_representation,
                                                          std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator)
-    : OSNI::ODEb(t_polynomial_representation->m_ne,
+    : OSNI::ODEb(t_polynomial_representation.m_ne,
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                  t_number_of_Chebyshev_points),
       m_strain_parameterisation(t_strain_parameterisation),
@@ -342,13 +342,13 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
 
 
 IDMIntegrators::IDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
-                               std::shared_ptr<const base_maps::PolynomialRepresentation> t_polynomial_representation,
+                               const base_maps::PolynomialRepresentation &t_polynomial_representation,
                                std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
-    : m_polynomial_representation(t_polynomial_representation),
+    : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_polynomial_representation(t_polynomial_representation),
       m_strain_parameterisation(t_strain_parameterisation),
-      m_rod_properties(t_rod_properties),
-      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+      m_rod_properties(t_rod_properties)
 {}
 
 

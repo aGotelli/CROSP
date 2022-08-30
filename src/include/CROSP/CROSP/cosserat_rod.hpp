@@ -18,6 +18,8 @@
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
+#include "CROSP/base_maps/base_maps.hpp"
+
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
@@ -194,40 +196,33 @@ private:
 #endif
 
 
-    //  The set of admitted deformations
-    const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
-
-    //  The number of degree of freedom for the deformation
-    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
-
-    //  Number of modes per admitted deformation
-    const unsigned int m_ne { 3 };
+    const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
 
     //  Number of Chebyshev points used to discretise the rod
     const unsigned int m_number_of_Chebyshev_points { 17 };
 
 
     //  The set of rod properties
-    std::shared_ptr<rod_properties::RodProperties> m_rod_properties { std::make_shared<rod_properties::RodProperties>(m_ne,
-                                                                                                                      m_na,
-                                                                                                                      base_maps::getB(m_admitted_deformations)) };
+    std::shared_ptr<rod_properties::RodProperties> m_rod_properties { std::make_shared<rod_properties::RodProperties>(m_polynomial_representation) };
 
     //  All the strain releted variables
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { std::make_shared<strain_parameterisation::StrainParameterisation>(m_ne,
-                                                                                                                                                                   m_admitted_deformations,
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
                                                                                                                                                                    m_number_of_Chebyshev_points) };
 
     //  Variables related the perturbation of the strain parameterisation
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta { std::make_shared<strain_parameterisation::StrainParameterisation>(m_ne,
-                                                                                                                                                                         m_admitted_deformations,
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta { std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
                                                                                                                                                                          ::LieAlgebra::Vector6d::Zero(),
                                                                                                                                                                          m_number_of_Chebyshev_points) };
     //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators { std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
+    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators { std::make_shared<idm_integrators::IDMIntegrators>(m_number_of_Chebyshev_points,
+                                                                                                                           m_polynomial_representation,
+                                                                                                                           m_strain_parameterisation,
                                                                                                                            m_rod_properties )};
 
     //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators { std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
+    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators { std::make_shared<tidm_integrators::TIDMIntegrators>(m_number_of_Chebyshev_points,
+                                                                                                                                m_polynomial_representation,
+                                                                                                                                m_strain_parameterisation,
                                                                                                                                 m_strain_parameterisation_Delta,
                                                                                                                                 m_idm_integrators,
                                                                                                                                 m_rod_properties) };

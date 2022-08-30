@@ -49,7 +49,7 @@ struct PolynomialRepresentation {
                              const unsigned int t_ne,
                              const PolynomialBase t_polynomial_base);
 
-
+    unsigned int getCoordinatesDimension()const{return m_ne*m_na;}
 
     const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
 
