@@ -38,9 +38,11 @@ int main(int argc, char *argv[])
 
 
     ::CROSP::rod_properties::RodDimensions rod_dimensions(0.01, 1.0);
+    ::CROSP::rod_properties::MaterialProperties material_properties(210e9, 80e9, 0);
 
     std::shared_ptr<::rod_properties::RodProperties> rod_properties =
             std::make_shared<::rod_properties::RodProperties>(polynomial_representation,
+//                                                              material_properties,
                                                               rod_dimensions);
 
 
@@ -80,6 +82,10 @@ int main(int argc, char *argv[])
     Eigen::VectorXd ddot_qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
     ddot_qe = -0.15*qe;
 
+
+    const Eigen::Vector3d N1(0, 0.5, -1.5);
+    const Eigen::Vector3d C1(0, 0, -1.0);
+
     strain_parameterisation->updateStacks(qe, dot_qe, ddot_qe);
 
     idm_integrators->m_quaternion->integrate( Eigen::Vector4d(1, 0, 0, 0) );
@@ -94,9 +100,15 @@ int main(int argc, char *argv[])
 
     idm_integrators->m_linear_acceleration->integrate( Eigen::Vector3d::Zero() );
 
-    idm_integrators->m_internal_forces->integrate( Eigen::Vector3d::Zero() );
+    //  Map force and couple into local coordinates
+    const auto q1 = idm_integrators->m_quaternion->getStateAtPoint(0);
+    const auto R1 = Eigen::Quaterniond(q1[0], q1[1], q1[2], q1[3]).toRotationMatrix();
+    Eigen::Vector3d force_at_tip_local_coord = R1.transpose()*N1;
+    Eigen::Vector3d couple_at_tip_local_coord = R1.transpose()*C1;
 
-    idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
+    idm_integrators->m_internal_forces->integrate( force_at_tip_local_coord );
+
+    idm_integrators->m_internal_couples->integrate( couple_at_tip_local_coord );
 
     idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation.m_ne) );
 
