@@ -342,13 +342,14 @@ Eigen::Vector3d DeltaInternalCouplesIntegrator::computeLocalExternalCouples(unsi
 
 
 DeltaGeneralisedForcesIntegrator::DeltaGeneralisedForcesIntegrator(const unsigned int t_number_of_Chebyshev_points,
-                                                                   const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                                                                   const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                                                                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_couples_integrator,
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator)
     : OSNI::ODEb(t_polynomial_representation.m_ne,
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                  t_number_of_Chebyshev_points),
+      m_B(t_polynomial_representation.m_B),
       m_strain_parameterisation(t_strain_parameterisation),
       m_Delta_internal_couples_integrator(t_Delta_internal_couples_integrator),
       m_Delta_internal_forces_integrator(t_Delta_internal_forces_integrator)
@@ -364,8 +365,7 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
                     Delta_N;
 
     const auto Phi = m_strain_parameterisation->m_Phi_stack.at(t_point);
-    const auto B = m_strain_parameterisation->m_B;
-    return -Phi.transpose()*B.transpose()*Delta_Lambda;
+    return -Phi.transpose()*m_B.transpose()*Delta_Lambda;
 }
 
 
@@ -373,7 +373,7 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
 
 
 TIDMIntegrators::TIDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
-                                 const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                                 const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                                  std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                  std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                  std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
