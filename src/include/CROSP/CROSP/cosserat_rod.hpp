@@ -18,7 +18,7 @@
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-#include "CROSP/base_maps/base_maps.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
@@ -196,7 +196,7 @@ private:
 #endif
 
 
-    const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
+    const polynomial_representation::PolynomialRepresentation m_polynomial_representation { polynomial_representation::PolynomialRepresentation() };
 
     //  Number of Chebyshev points used to discretise the rod
     const unsigned int m_number_of_Chebyshev_points { 17 };
