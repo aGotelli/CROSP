@@ -31,7 +31,16 @@ namespace CROSP::strain_parameterisation {
 
 
 
-
+/*!
+ * \brief The StrainParameterisation class contains the strains and its derivatives with respect to time
+ *
+ * This class contains all the terms related to the rod strain, with the function needed to update such strain.
+ * It contains the strains with their first and second derivatives.
+ *
+ * This class is build on the assumption that the rod is observed with a fixed number of Chebyshev points.
+ * As a result, all the strain and their derivatives are evaluated at these Chebyshev points and stored in
+ * a std::vector.
+ */
 class StrainParameterisation {
 
 public:
@@ -84,16 +93,45 @@ public:
     ~StrainParameterisation()=default;
 
 
-    inline unsigned int getNumberOfChebyshewPoints()const{return m_number_of_Chebyshev_points;}
+    /*!
+     * \brief updateStacks updates the stacks of strain and its first and second derivative
+     * \param t_qe the generalised elastic coordinates
+     * \param t_dot_qe the first derivative of the generalised elastic coordinates
+     * \param t_ddot_qe the second derivative of the generalised elastic coordinates
+     */
+    void updateStacks(const Eigen::VectorXd &t_qe,
+                      const Eigen::VectorXd &t_dot_qe,
+                      const Eigen::VectorXd &t_ddot_qe);
 
-    inline unsigned int getCoordinatesDimention()const{return m_na*m_ne;}
 
 
-    void update(const Eigen::VectorXd &t_qe,
-                const Eigen::VectorXd &t_dot_qe,
-                const Eigen::VectorXd &t_ddot_qe);
 
 
+
+    //  The stacks for the strain, decomposed in angular and linear part
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+
+    //  The stacks for the first derivative of the strain, decomposed in angular and linear part
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack{ std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+
+    //  The stacks for the first derivative of the strain, decomposed in angular and linear part
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+
+private:
+
+    /*!
+     * \brief defineConstrainedStrain defines the constrained strains without the degrees of freedom
+     * \param t_constant_strain the constant strain along the rod with is 6 components
+     * \return the constrained strain of dimension 6-na
+     *
+     * This function takes the constant strain as a full 6x1 vector and returns the corresponding
+     * subvector of dimension (6-na)x1 that contains the components that do not belong to the
+     * rod allowed deformations.
+     */
+    Eigen::VectorXd defineConstrainedStrain(const Eigen::VectorXd &t_constant_strain)const;
 
 
     const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
@@ -136,29 +174,6 @@ public:
             return strains_map_stack;
         }() };
 
-
-
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack{ std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-
-private:
-
-    /*!
-     * \brief defineConstrainedStrain defines the constrained strains without the degrees of freedom
-     * \param t_constant_strain the constant strain along the rod with is 6 components
-     * \return the constrained strain of dimension 6-na
-     *
-     * This function takes the constant strain as a full 6x1 vector and returns the corresponding
-     * subvector of dimension (6-na)x1 that contains the components that do not belong to the
-     * rod allowed deformations.
-     */
-    Eigen::VectorXd defineConstrainedStrain(const Eigen::VectorXd &t_constant_strain)const;
 
 };
 

@@ -9,6 +9,35 @@ namespace CROSP::base_maps {
 
 
 
+/*!
+ * \brief The StrainDiscretization struct contains the reduction of the strain into a polynomial base
+ *
+ * This struct contains the choosen reduction in order to represent the strain vector field.
+ */
+struct StrainDiscretization {
+    StrainDiscretization()=default;
+
+
+    StrainDiscretization(const unsigned int t_ne);
+
+
+    StrainDiscretization(const std::array<bool, 6> t_admitted_deformations);
+
+
+    StrainDiscretization(const std::array<bool, 6> t_admitted_deformations,
+                         const unsigned int t_ne);
+
+
+
+    const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
+
+    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
+
+    const unsigned int m_ne { 3 };
+};
+
+
+
 typedef std::function<double(const unsigned int, const double&)> BaseFunction;
 
 /// legendre_polynomial_base defines a base function using the Legendre polynomials
