@@ -23,7 +23,7 @@
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-#include "CROSP/base_maps/base_maps.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
 
@@ -281,13 +281,14 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 struct GeneralisedForcesIntegrator : public OSNI::ODEb {
 
     GeneralisedForcesIntegrator(const unsigned int t_number_of_Chebyshev_points,
-                                const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                                const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                                 std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                 std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
                                 std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator);
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
 
+    Eigen::MatrixXd m_B;
 
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
     const std::shared_ptr<const OSNI::ODESolverInterface> m_internal_couples_integrator;
@@ -305,7 +306,7 @@ struct GeneralisedForcesIntegrator : public OSNI::ODEb {
 struct IDMIntegrators {
 
     IDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
-                   const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                   const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
@@ -313,7 +314,7 @@ struct IDMIntegrators {
     const unsigned int m_number_of_Chebyshev_points;
 
     //  Instance of the polynomial representation of the field of strain
-    const base_maps::PolynomialRepresentation m_polynomial_representation;
+    const polynomial_representation::PolynomialRepresentation m_polynomial_representation;
 
     //  Instance of the strain parameterisation
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
