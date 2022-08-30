@@ -21,8 +21,7 @@
 #include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-#include "CROSP/base_maps/base_maps.hpp"
-
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 namespace CROSP::strain_parameterisation {
 
@@ -54,17 +53,17 @@ public:
     StrainParameterisation(const Eigen::VectorXd &t_constant_strain);
 
 
-    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation);
+    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
 
-    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation,
+    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                            const unsigned int t_number_of_Chebyshev_points);
 
-    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation,
+    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                            const Eigen::VectorXd &t_constant_strain);
 
 
-    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation,
+    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                            const Eigen::VectorXd &t_constant_strain,
                            const unsigned int t_number_of_Chebyshev_points);
 
@@ -102,18 +101,17 @@ public:
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
 
+private:
 
-    //  The matrix to map the allowed strain into the full strain space
-    const Eigen::MatrixXd m_B { base_maps::getB(m_polynomial_representation.m_admitted_deformations) };
+    //  The polynomial representation of the field of strain
+    const polynomial_representation::PolynomialRepresentation m_polynomial_representation { polynomial_representation::PolynomialRepresentation() };
 
-    //  The matrix to map the constrained strain into the full strain space
-    const Eigen::MatrixXd m_B_bar { base_maps::getBbar(m_polynomial_representation.m_admitted_deformations) };
 
+public:
 
     //  The stack of Phi along the Chebyshev points
-    const std::vector<Eigen::MatrixXd> m_Phi_stack { base_maps::generatePhiStack(m_polynomial_representation.m_ne,
-                                                                                 m_polynomial_representation.m_na,
-                                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
+    const std::vector<Eigen::MatrixXd> m_Phi_stack { polynomial_representation::generatePhiStack(m_polynomial_representation,
+                                                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
 
 private:
 
@@ -128,8 +126,6 @@ private:
      */
     Eigen::VectorXd defineConstrainedStrain(const Eigen::VectorXd &t_constant_strain)const;
 
-    //  The polynomial representation of the field of strain
-    const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
 
     //  The constrained strain xi_c
     const Eigen::VectorXd m_constrained_strain { [&](){
@@ -152,13 +148,12 @@ private:
             std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
 
             const std::vector<Eigen::MatrixXd> Phi_stack =
-                    base_maps::generatePhiStack(m_polynomial_representation.m_ne,
-                                                m_polynomial_representation.m_na,
-                                                ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
+                    polynomial_representation::generatePhiStack(m_polynomial_representation,
+                                                                ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
 
 
             std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
-               return m_B*Phi_stack[index++];
+               return m_polynomial_representation.m_B*Phi_stack[index++];
             });
 
             return map_to_strain_stack;

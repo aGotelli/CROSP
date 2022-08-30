@@ -44,7 +44,7 @@ target_link_libraries(test_tidm
         RodProperties
         IDMIntegrators
         TIDMIntegrators
-        BaseMaps
+        PolynomialRepresentation
 )
 target_compile_definitions(test_tidm
     PRIVATE

@@ -18,7 +18,7 @@
 
 #include "OSNI/OSNI.hpp"
 
-#include "CROSP/base_maps/base_maps.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
 #include "CROSP/rod_properties/rod_properties.hpp"
@@ -314,13 +314,14 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
 
     DeltaGeneralisedForcesIntegrator(const unsigned int t_number_of_Chebyshev_points,
-                                     const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                                     const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                                      std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                      std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_couples_integrator,
                                      std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator);
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
 
+    Eigen::MatrixXd m_B;
 
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
     const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_internal_couples_integrator;
@@ -334,7 +335,7 @@ struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
 struct TIDMIntegrators{
 
     TIDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
-                    const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                    const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                     std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                     std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                     std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
@@ -344,7 +345,7 @@ struct TIDMIntegrators{
     const unsigned int m_number_of_Chebyshev_points;
 
     //  Instance of the polynomial representation of the field of strain
-    const base_maps::PolynomialRepresentation m_polynomial_representation;
+    const polynomial_representation::PolynomialRepresentation m_polynomial_representation;
 
     //  Instance of the strain parameterisation
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;

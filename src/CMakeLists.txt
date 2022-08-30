@@ -1,13 +1,13 @@
 include_directories(include)
 
-add_library(BaseMaps SHARED
-    include/${PROJECT_NAME}/base_maps/base_maps.hpp
-    base_maps/base_maps.cpp)
-target_link_libraries(BaseMaps
+add_library(PolynomialRepresentation SHARED
+    include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
+    polynomial_representation/polynomial_representation.cpp)
+target_link_libraries(PolynomialRepresentation
     PRIVATE
         Eigen3::Eigen
 )
-target_compile_options(BaseMaps
+target_compile_options(PolynomialRepresentation
     PRIVATE
         -Werror
         -Wall
@@ -21,7 +21,7 @@ add_library(RodProperties SHARED
 target_link_libraries(RodProperties
     PRIVATE
         Eigen3::Eigen
-        BaseMaps
+        PolynomialRepresentation
 )
 target_compile_options(RodProperties
     PRIVATE
@@ -37,7 +37,7 @@ add_library(StrainParameterisation SHARED
 target_link_libraries(StrainParameterisation
     PRIVATE
         Eigen3::Eigen
-        BaseMaps
+        PolynomialRepresentation
 )
 target_compile_options(RodProperties
     PRIVATE
@@ -58,7 +58,7 @@ target_link_libraries(IDMIntegrators
         Eigen3::Eigen
         StrainParameterisation
         RodProperties
-        BaseMaps
+        PolynomialRepresentation
 )
 target_compile_options(RodProperties
     PRIVATE
@@ -78,7 +78,7 @@ target_link_libraries(TIDMIntegrators
         math_tools
         StrainParameterisation
         RodProperties
-        BaseMaps
+        PolynomialRepresentation
 )
 target_compile_options(RodProperties
     PRIVATE
@@ -102,7 +102,7 @@ target_link_libraries(${PROJECT_NAME}
         IDMIntegrators
         TIDMIntegrators
         OSNI
-        BaseMaps
+        PolynomialRepresentation
 )
 target_compile_options(RodProperties
     PRIVATE

@@ -2,7 +2,7 @@
 #include "CROSP/idm_integrators/idm_integrators.hpp"
 #include "CROSP/CROSP/cosserat_rod.hpp"
 #include "CROSP/tidm_integrators/tidm_integrators.hpp"
-#include "CROSP/base_maps/base_maps.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
 #include <utilities/Eigen/eigen_io.hpp>
@@ -22,12 +22,26 @@ int main(int argc, char *argv[])
     const unsigned int number_of_Chebyshev_points = 21;
 
 
-    ::base_maps::PolynomialRepresentation polynomial_representation;
+    const unsigned int ne = 3;
+    const std::array<bool, 6> admitted_deformations {
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+    };
 
 
+    ::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations,
+                                                                                    ne);
 
-    std::shared_ptr<::rod_properties::RodProperties> material_properties =
-            std::make_shared<::rod_properties::RodProperties>(polynomial_representation);
+
+    ::CROSP::rod_properties::RodDimensions rod_dimensions(0.01, 1.0);
+
+    std::shared_ptr<::rod_properties::RodProperties> rod_properties =
+            std::make_shared<::rod_properties::RodProperties>(polynomial_representation,
+                                                              rod_dimensions);
 
 
 
@@ -46,7 +60,7 @@ int main(int argc, char *argv[])
             std::make_shared<::idm_integrators::IDMIntegrators>(number_of_Chebyshev_points,
                                                                 polynomial_representation,
                                                                 strain_parameterisation,
-                                                                material_properties);
+                                                                rod_properties);
 
     std::shared_ptr<::tidm_integrators::TIDMIntegrators> tidm_integrators =
             std::make_shared<::tidm_integrators::TIDMIntegrators>(number_of_Chebyshev_points,
@@ -54,7 +68,7 @@ int main(int argc, char *argv[])
                                                                   strain_parameterisation,
                                                                   strain_parameterisation_Delta,
                                                                   idm_integrators,
-                                                                  material_properties);
+                                                                  rod_properties);
 
     Eigen::VectorXd qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
     qe << -0.2,
@@ -80,7 +94,7 @@ int main(int argc, char *argv[])
 
     idm_integrators->m_linear_acceleration->integrate( Eigen::Vector3d::Zero() );
 
-    idm_integrators->m_internal_forces->integrate( Eigen::Vector3d(0, 0, 0)/*::Zero()*/ );
+    idm_integrators->m_internal_forces->integrate( Eigen::Vector3d::Zero() );
 
     idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
 
