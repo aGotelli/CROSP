@@ -58,6 +58,7 @@ struct PolynomialRepresentation {
     const unsigned int m_ne { 3 };
 
     const PolynomialBase m_polynomial_base { legendre_polynomial_base };
+
 };
 
 

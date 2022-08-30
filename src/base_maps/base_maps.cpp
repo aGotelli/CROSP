@@ -7,6 +7,39 @@ namespace CROSP::base_maps {
 
 
 
+
+
+PolynomialRepresentation::PolynomialRepresentation(const unsigned int t_ne)
+    : m_ne(t_ne)
+{}
+
+
+
+PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations)
+    : m_admitted_deformations(t_admitted_deformations)
+{}
+
+
+
+PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
+                                                   const unsigned int t_ne)
+    : m_admitted_deformations(t_admitted_deformations),
+      m_ne(t_ne)
+{}
+
+
+PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
+                                                   const unsigned int t_ne,
+                                                   const PolynomialBase t_polynomial_base)
+    : m_admitted_deformations(t_admitted_deformations),
+      m_ne(t_ne),
+      m_polynomial_base(t_polynomial_base)
+{}
+
+
+
+
+
 Eigen::MatrixXd getPhi(const unsigned int t_ne,
                        const unsigned int t_na,
                        const double& t_X,
