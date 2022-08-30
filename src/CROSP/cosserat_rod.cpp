@@ -59,7 +59,7 @@ void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
                                          const Eigen::VectorXd &t_dot_qe,
                                          const Eigen::VectorXd &t_ddot_qe)
 {
-    m_strain_parameterisation->update(t_qe, t_dot_qe, t_ddot_qe);
+    m_strain_parameterisation->updateStacks(t_qe, t_dot_qe, t_ddot_qe);
 }
 
 
@@ -107,7 +107,7 @@ void CosseratRod::updateParameterisationVariation(const Eigen::VectorXd &t_Delta
                                                   const Eigen::VectorXd &t_Delta_dot_qe,
                                                   const Eigen::VectorXd &t_Delta_ddot_qe)
 {
-    m_strain_parameterisation_Delta->update(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
+    m_strain_parameterisation_Delta->updateStacks(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
 }
 
 void CosseratRod::forwardTangentKinematics()
@@ -192,7 +192,7 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
     m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip_local_coord);
     m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip_local_coord);
 
-    m_tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(m_strain_parameterisation->getCoordinatesDimention()));
+    m_tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension()));
 }
 
 
@@ -207,7 +207,7 @@ Vector6d CosseratRod::getLambdaAtBase()const
 
 unsigned int CosseratRod::getCoordinatesDimension()const
 {
-    return m_strain_parameterisation->getCoordinatesDimention();
+    return m_polynomial_representation.getCoordinatesDimension();
 }
 
 

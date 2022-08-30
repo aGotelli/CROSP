@@ -7,10 +7,43 @@ namespace CROSP::base_maps {
 
 
 
+
+
+PolynomialRepresentation::PolynomialRepresentation(const unsigned int t_ne)
+    : m_ne(t_ne)
+{}
+
+
+
+PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations)
+    : m_admitted_deformations(t_admitted_deformations)
+{}
+
+
+
+PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
+                                                   const unsigned int t_ne)
+    : m_admitted_deformations(t_admitted_deformations),
+      m_ne(t_ne)
+{}
+
+
+PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
+                                                   const unsigned int t_ne,
+                                                   const PolynomialBase t_polynomial_base)
+    : m_admitted_deformations(t_admitted_deformations),
+      m_ne(t_ne),
+      m_polynomial_base(t_polynomial_base)
+{}
+
+
+
+
+
 Eigen::MatrixXd getPhi(const unsigned int t_ne,
                        const unsigned int t_na,
                        const double& t_X,
-                       const BaseFunction t_polynomial_base,
+                       const PolynomialBase t_polynomial_base,
                        const double& t_begin,
                        const double& t_end)
 {
@@ -33,7 +66,7 @@ Eigen::MatrixXd getPhi(const unsigned int t_ne,
 std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
                                               const unsigned int t_na,
                                               const std::vector<double> &t_Chebyshev_points,
-                                              const BaseFunction t_polynomial_base)
+                                              const PolynomialBase t_polynomial_base)
 {
     std::vector<Eigen::MatrixXd> Phi_stack( t_Chebyshev_points.size() );
 

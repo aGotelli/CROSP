@@ -54,41 +54,22 @@ public:
     StrainParameterisation(const Eigen::VectorXd &t_constant_strain);
 
 
-    StrainParameterisation(const unsigned int t_ne,
+    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation);
+
+
+    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation,
                            const unsigned int t_number_of_Chebyshev_points);
 
-
-    StrainParameterisation(const unsigned int t_ne,
-                           std::array<bool, 6> &t_admitted_deformations);
-
-
-    StrainParameterisation(const unsigned int t_ne,
-                           const std::array<bool, 6> &t_admitted_deformations,
-                           const unsigned int t_number_of_Chebyshev_points);
-
-
-    StrainParameterisation(const unsigned int t_ne,
-                           const std::array<bool, 6> &t_admitted_deformations,
+    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation,
                            const Eigen::VectorXd &t_constant_strain);
 
 
-    StrainParameterisation(const unsigned int t_ne,
-                           const std::array<bool, 6> &t_admitted_deformations,
+    StrainParameterisation(const base_maps::PolynomialRepresentation t_polynomial_representation,
                            const Eigen::VectorXd &t_constant_strain,
                            const unsigned int t_number_of_Chebyshev_points);
 
 
-    StrainParameterisation(const unsigned int t_ne,
-                           const std::array<bool, 6> &t_admitted_deformations,
-                           const Eigen::VectorXd &t_constant_strain,
-                           const base_maps::BaseFunction t_polynomial_base);
 
-
-    StrainParameterisation(const unsigned int t_ne,
-                           const std::array<bool, 6> &t_admitted_deformations,
-                           const Eigen::VectorXd &t_constant_strain,
-                           const base_maps::BaseFunction t_polynomial_base,
-                           const unsigned int t_number_of_Chebyshev_points);
 
     ~StrainParameterisation()=default;
 
@@ -105,7 +86,8 @@ public:
 
 
 
-
+    //  The number of Chebyshev points used to represent the rod
+    const unsigned int m_number_of_Chebyshev_points { 17 };
 
 
     //  The stacks for the strain, decomposed in angular and linear part
@@ -120,6 +102,19 @@ public:
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
 
+
+    //  The matrix to map the allowed strain into the full strain space
+    const Eigen::MatrixXd m_B { base_maps::getB(m_polynomial_representation.m_admitted_deformations) };
+
+    //  The matrix to map the constrained strain into the full strain space
+    const Eigen::MatrixXd m_B_bar { base_maps::getBbar(m_polynomial_representation.m_admitted_deformations) };
+
+
+    //  The stack of Phi along the Chebyshev points
+    const std::vector<Eigen::MatrixXd> m_Phi_stack { base_maps::generatePhiStack(m_polynomial_representation.m_ne,
+                                                                                 m_polynomial_representation.m_na,
+                                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
+
 private:
 
     /*!
@@ -133,17 +128,10 @@ private:
      */
     Eigen::VectorXd defineConstrainedStrain(const Eigen::VectorXd &t_constant_strain)const;
 
+    //  The polynomial representation of the field of strain
+    const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
 
-    const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
-
-    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
-
-    const unsigned int m_ne { 3 };
-
-    const Eigen::MatrixXd m_B { base_maps::getB(m_admitted_deformations) };
-
-    const Eigen::MatrixXd m_B_bar { base_maps::getBbar(m_admitted_deformations) };
-
+    //  The constrained strain xi_c
     const Eigen::VectorXd m_constrained_strain { [&](){
 
             //  constrain only the evolution along x
@@ -159,19 +147,21 @@ private:
         }() };
 
 
+    //  The vector stack of B Phi used to map the generalised coordinates into the strain field
+    const std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
+            std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
 
-    const unsigned int m_number_of_Chebyshev_points { 17 };
+            const std::vector<Eigen::MatrixXd> Phi_stack =
+                    base_maps::generatePhiStack(m_polynomial_representation.m_ne,
+                                                m_polynomial_representation.m_na,
+                                                ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
 
-    const std::vector<Eigen::MatrixXd> m_Phi_stack { base_maps::generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
 
-    const std::vector<Eigen::MatrixXd> m_strains_map_stack { [&](){
-            std::vector<Eigen::MatrixXd> strains_map_stack(m_number_of_Chebyshev_points);
-
-            std::generate(strains_map_stack.begin(), strains_map_stack.end(), [&, index=0]()mutable{
-               return m_B*m_Phi_stack[index++];
+            std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
+               return m_B*Phi_stack[index++];
             });
 
-            return strains_map_stack;
+            return map_to_strain_stack;
         }() };
 
 

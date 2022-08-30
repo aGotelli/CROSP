@@ -18,11 +18,12 @@ namespace CROSP::idm_integrators {
 
 
 
-QuaternionIntegrator::QuaternionIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation) :
-    OSNI::ODEA(4,
-               ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-               t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_K_stack(t_strain_parameterisation->m_K_stack)
+QuaternionIntegrator::QuaternionIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                           std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
+    : OSNI::ODEA(4,
+                 ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                 t_number_of_Chebyshev_points),
+      m_K_stack(t_strain_parameterisation->m_K_stack)
 {}
 
 Eigen::MatrixXd QuaternionIntegrator::computeMatrixAtChebyshevPoint(const unsigned int t_point)
@@ -39,13 +40,14 @@ Eigen::MatrixXd QuaternionIntegrator::computeMatrixAtChebyshevPoint(const unsign
 
 
 
-PositionIntegrator::PositionIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                       std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator) :
-    OSNI::ODEb(3,
-               ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-               t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_quaternion(t_quaternion_integrator),
-    m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack)
+PositionIntegrator::PositionIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                       std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                                       std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator)
+    : OSNI::ODEb(3,
+                 ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                 t_number_of_Chebyshev_points),
+      m_quaternion(t_quaternion_integrator),
+      m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack)
 {}
 
 Eigen::VectorXd PositionIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
@@ -63,12 +65,13 @@ Eigen::VectorXd PositionIntegrator::computerParametersVectorAtPoint(const unsign
 
 
 
-AngularVelocityIntegrator::AngularVelocityIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation) :
-    OSNI::ODEAb(3,
-                ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_K_stack(t_strain_parameterisation->m_dot_K_stack),
-    m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack)
+AngularVelocityIntegrator::AngularVelocityIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                                     std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
+    : OSNI::ODEAb(3,
+                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                  t_number_of_Chebyshev_points),
+      m_K_stack(t_strain_parameterisation->m_dot_K_stack),
+      m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack)
 {}
 
 
@@ -86,15 +89,16 @@ Eigen::VectorXd AngularVelocityIntegrator::computerParametersVectorAtPoint(const
 
 
 
-LinearVelocityIntegrator::LinearVelocityIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                                   std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator) :
-    OSNI::ODEAb(3,
-                ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_K_stack(t_strain_parameterisation->m_K_stack),
-    m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack),
-    m_dot_Lambda_stack(t_strain_parameterisation->m_dot_Lambda_stack),
-    m_angular_velocity(t_angular_velocity_integrator)
+LinearVelocityIntegrator::LinearVelocityIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                                   std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                                                   std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator)
+    : OSNI::ODEAb(3,
+                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                  t_number_of_Chebyshev_points),
+      m_K_stack(t_strain_parameterisation->m_K_stack),
+      m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack),
+      m_dot_Lambda_stack(t_strain_parameterisation->m_dot_Lambda_stack),
+      m_angular_velocity(t_angular_velocity_integrator)
 {}
 
 
@@ -117,15 +121,16 @@ Eigen::VectorXd LinearVelocityIntegrator::computerParametersVectorAtPoint(const 
 
 
 
-AngularAccelerationIntegrator::AngularAccelerationIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                                             std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator) :
-    OSNI::ODEAb(3,
-                ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_K_stack(t_strain_parameterisation->m_K_stack),
-    m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack),
-    m_ddot_K_stack(t_strain_parameterisation->m_ddot_K_stack),
-    m_angular_velocity(t_angular_velocity_integrator)
+AngularAccelerationIntegrator::AngularAccelerationIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                                             std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                                                             std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator)
+    : OSNI::ODEAb(3,
+                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                  t_number_of_Chebyshev_points),
+      m_K_stack(t_strain_parameterisation->m_K_stack),
+      m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack),
+      m_ddot_K_stack(t_strain_parameterisation->m_ddot_K_stack),
+      m_angular_velocity(t_angular_velocity_integrator)
 {}
 
 
@@ -150,21 +155,22 @@ Eigen::VectorXd AngularAccelerationIntegrator::computerParametersVectorAtPoint(c
 
 
 
-LinearAccelerationIntegrator::LinearAccelerationIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
-                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
-                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator) :
-    OSNI::ODEAb(3,
-                ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_K_stack(t_strain_parameterisation->m_K_stack),
-    m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack),
-    m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack),
-    m_dot_Lambda_stack(t_strain_parameterisation->m_dot_Lambda_stack),
-    m_ddot_Lambda_stack(t_strain_parameterisation->m_ddot_Lambda_stack),
-    m_angular_velocity(t_angular_velocity_integrator),
-    m_linear_velocity(t_linear_velocity_integrator),
-    m_angular_acceleration(t_angular_acceleration_integrator)
+LinearAccelerationIntegrator::LinearAccelerationIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                                           std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                                                           std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                                                           std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
+                                                           std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator)
+    : OSNI::ODEAb(3,
+                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
+                  t_number_of_Chebyshev_points),
+      m_K_stack(t_strain_parameterisation->m_K_stack),
+      m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack),
+      m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack),
+      m_dot_Lambda_stack(t_strain_parameterisation->m_dot_Lambda_stack),
+      m_ddot_Lambda_stack(t_strain_parameterisation->m_ddot_Lambda_stack),
+      m_angular_velocity(t_angular_velocity_integrator),
+      m_linear_velocity(t_linear_velocity_integrator),
+      m_angular_acceleration(t_angular_acceleration_integrator)
 {}
 
 
@@ -186,24 +192,25 @@ Eigen::VectorXd LinearAccelerationIntegrator::computerParametersVectorAtPoint(co
 
 
 
-InternalForcesIntegrator::InternalForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+InternalForcesIntegrator::InternalForcesIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                                   std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
-                                                   std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator) :
-    OSNI::ODEAb(3,
-                ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_number_of_Chebyshev_points(t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_rod_properties(t_rod_properties),
-    m_K_stack(t_strain_parameterisation->m_K_stack),
-    m_angular_velocity(t_angular_velocity_integrator),
-    m_linear_velocity(t_linear_velocity_integrator),
-    m_linear_acceleration(t_linear_acceleration_integrator),
-    m_quaternion(t_quaternion_integrator),
-    m_position(t_position_integrator)
+                                                   std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator)
+    : OSNI::ODEAb(3,
+                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
+                  t_number_of_Chebyshev_points),
+      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_rod_properties(t_rod_properties),
+      m_K_stack(t_strain_parameterisation->m_K_stack),
+      m_angular_velocity(t_angular_velocity_integrator),
+      m_linear_velocity(t_linear_velocity_integrator),
+      m_linear_acceleration(t_linear_acceleration_integrator),
+      m_quaternion(t_quaternion_integrator),
+      m_position(t_position_integrator)
 {}
 
 
@@ -247,32 +254,32 @@ Eigen::VectorXd InternalForcesIntegrator::computeDistributedForce(const unsigned
     const Eigen::Vector3d distributed_weight_force = -distributed_density*Eigen::Vector3d(0, 0, 9.81);
     Eigen::Vector3d N_bar = R.transpose()*distributed_weight_force;
 
-    std::cout << "At point : " << t_point << " distributed force : \n" << N_bar << "\n";
     return N_bar;
 }
 
 
 
-InternalCouplesIntegrator::InternalCouplesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+InternalCouplesIntegrator::InternalCouplesIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                                     std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                      std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
-                                                     std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator) :
-    OSNI::ODEAb(3,
-                ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                t_strain_parameterisation->getNumberOfChebyshewPoints()),
-    m_rod_properties( t_rod_properties ),
-    m_K_stack(t_strain_parameterisation->m_K_stack),
-    m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack),
-    m_angular_velocity(t_angular_velocity_integrator),
-    m_linear_velocity(t_linear_velocity_integrator),
-    m_angular_acceleration(t_angular_acceleration_integrator),
-    m_quaternion(t_quaternion_integrator),
-    m_position(t_position_integrator),
-    m_internal_forces(t_internal_forces_integrator)
+                                                     std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator)
+    : OSNI::ODEAb(3,
+                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
+                  t_number_of_Chebyshev_points),
+      m_rod_properties( t_rod_properties ),
+      m_K_stack(t_strain_parameterisation->m_K_stack),
+      m_Lambda_stack(t_strain_parameterisation->m_Lambda_stack),
+      m_angular_velocity(t_angular_velocity_integrator),
+      m_linear_velocity(t_linear_velocity_integrator),
+      m_angular_acceleration(t_angular_acceleration_integrator),
+      m_quaternion(t_quaternion_integrator),
+      m_position(t_position_integrator),
+      m_internal_forces(t_internal_forces_integrator)
 {}
 
 
@@ -302,16 +309,17 @@ Eigen::VectorXd InternalCouplesIntegrator::computeDistributedCouple(const unsign
 
 
 
-GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(const unsigned int t_number_of_Chebyshev_points,
+                                                         const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                                                         std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
-                                                         std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
-                                                         const unsigned int t_number_of_Chebyshev_points) :
-    OSNI::ODEb(t_strain_parameterisation->m_ne,
-               ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-               t_number_of_Chebyshev_points),
-    m_strain_parameterisation(t_strain_parameterisation),
-    m_internal_couples_integrator(t_internal_couples_integrator),
-    m_internal_forces_integrator(t_internal_forces_integrator)
+                                                         std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator)
+    : OSNI::ODEb(t_polynomial_representation.m_ne,
+                 ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
+                 t_number_of_Chebyshev_points),
+      m_strain_parameterisation(t_strain_parameterisation),
+      m_internal_couples_integrator(t_internal_couples_integrator),
+      m_internal_forces_integrator(t_internal_forces_integrator)
 {}
 
 Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
@@ -333,10 +341,14 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
 
 
 
-IDMIntegrators::IDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                               std::shared_ptr<const rod_properties::RodProperties> t_rod_properties) :
-    m_strain_parameterisation(t_strain_parameterisation),
-    m_rod_properties(t_rod_properties)
+IDMIntegrators::IDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
+                               const base_maps::PolynomialRepresentation &t_polynomial_representation,
+                               std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                               std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+    : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_polynomial_representation(t_polynomial_representation),
+      m_strain_parameterisation(t_strain_parameterisation),
+      m_rod_properties(t_rod_properties)
 {}
 
 

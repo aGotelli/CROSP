@@ -58,6 +58,7 @@ target_link_libraries(IDMIntegrators
         Eigen3::Eigen
         StrainParameterisation
         RodProperties
+        BaseMaps
 )
 target_compile_options(RodProperties
     PRIVATE
@@ -77,6 +78,7 @@ target_link_libraries(TIDMIntegrators
         math_tools
         StrainParameterisation
         RodProperties
+        BaseMaps
 )
 target_compile_options(RodProperties
     PRIVATE
@@ -100,6 +102,7 @@ target_link_libraries(${PROJECT_NAME}
         IDMIntegrators
         TIDMIntegrators
         OSNI
+        BaseMaps
 )
 target_compile_options(RodProperties
     PRIVATE
