@@ -34,7 +34,9 @@ namespace CROSP {
 
 typedef Eigen::Matrix<double, 6, 1> Vector6d ;
 
-
+/*!
+ * \brief The CosseratRod class implements the functionalities needed to simulate a Cosserat rod
+ */
 class CosseratRod
 {
 public:

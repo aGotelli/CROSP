@@ -83,17 +83,19 @@ struct PolynomialRepresentation {
 
 
 
-
+    //  A vector representing the allowed deformation of the rod (default kirkhoff rod)
     const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
 
+    //  The number of allowed deformation (asserted from the vector)
     const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
 
+    //  Number of elastic modes per allowed deformation
     const unsigned int m_ne { 3 };
 
+    //  The polynomial base used to discretize the strain field
     const PolynomialBase m_polynomial_base { legendre_polynomial_base };
 
-
-
+    //  The matrix mapping the allowed strain into the full strain field
     const Eigen::MatrixXd m_B { [&](){
 
             Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
@@ -109,6 +111,7 @@ struct PolynomialRepresentation {
     }()};
 
 
+    //  The matrix mapping the constrained strain into the full strain field
     const Eigen::MatrixXd m_Bbar { [&](){
 
             Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
