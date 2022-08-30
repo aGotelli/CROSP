@@ -186,11 +186,11 @@ public:
                             m_material_properties.m_rho * m_rod_dimensions.m_A,
                             m_material_properties.m_rho * m_rod_dimensions.m_A;
             return M;}() };
-
+private:
     //  The polynomial representation of the field of strain
     const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
 
-
+public:
     //  The generalised elasticity matrix
     const Eigen::MatrixXd m_Kee { defineKee( m_polynomial_representation.m_ne,
                                              m_polynomial_representation.m_na,

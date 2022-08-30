@@ -86,7 +86,8 @@ public:
 
 
 
-
+    //  The number of Chebyshev points used to represent the rod
+    const unsigned int m_number_of_Chebyshev_points { 17 };
 
 
     //  The stacks for the strain, decomposed in angular and linear part
@@ -100,6 +101,19 @@ public:
     //  The stacks for the first derivative of the strain, decomposed in angular and linear part
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+
+
+    //  The matrix to map the allowed strain into the full strain space
+    const Eigen::MatrixXd m_B { base_maps::getB(m_polynomial_representation.m_admitted_deformations) };
+
+    //  The matrix to map the constrained strain into the full strain space
+    const Eigen::MatrixXd m_B_bar { base_maps::getBbar(m_polynomial_representation.m_admitted_deformations) };
+
+
+    //  The stack of Phi along the Chebyshev points
+    const std::vector<Eigen::MatrixXd> m_Phi_stack { base_maps::generatePhiStack(m_polynomial_representation.m_ne,
+                                                                                 m_polynomial_representation.m_na,
+                                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
 
 private:
 
@@ -117,12 +131,6 @@ private:
     //  The polynomial representation of the field of strain
     const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
 
-    //  The matrix to map the allowed strain into the full strain space
-    const Eigen::MatrixXd m_B { base_maps::getB(m_polynomial_representation.m_admitted_deformations) };
-
-    //  The matrix to map the constrained strain into the full strain space
-    const Eigen::MatrixXd m_B_bar { base_maps::getBbar(m_polynomial_representation.m_admitted_deformations) };
-
     //  The constrained strain xi_c
     const Eigen::VectorXd m_constrained_strain { [&](){
 
@@ -138,9 +146,6 @@ private:
             return defineConstrainedStrain(constant_strain);
         }() };
 
-
-    //  The number of Chebyshev points used to represent the rod
-    const unsigned int m_number_of_Chebyshev_points { 17 };
 
     //  The vector stack of B Phi used to map the generalised coordinates into the strain field
     const std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
