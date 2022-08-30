@@ -18,7 +18,7 @@
 #include <math.h>
 
 
-#include "CROSP/base_maps/base_maps.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
 namespace CROSP::rod_properties {
@@ -107,7 +107,7 @@ public:
 
     RodProperties()=default;
 
-    RodProperties(const base_maps::PolynomialRepresentation t_polynomial_representation);
+    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
     RodProperties(const MaterialProperties &t_material_properties);
 
@@ -116,7 +116,7 @@ public:
     RodProperties(const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
 
-    RodProperties(const base_maps::PolynomialRepresentation t_polynomial_representation,
+    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                   const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
 
@@ -186,15 +186,10 @@ public:
                             m_material_properties.m_rho * m_rod_dimensions.m_A,
                             m_material_properties.m_rho * m_rod_dimensions.m_A;
             return M;}() };
-private:
-    //  The polynomial representation of the field of strain
-    const base_maps::PolynomialRepresentation m_polynomial_representation { base_maps::PolynomialRepresentation() };
 
-public:
+
     //  The generalised elasticity matrix
-    const Eigen::MatrixXd m_Kee { defineKee( m_polynomial_representation.m_ne,
-                                             m_polynomial_representation.m_na,
-                                             base_maps::getB(m_polynomial_representation.m_admitted_deformations) ) };
+    const Eigen::MatrixXd m_Kee { defineKee( polynomial_representation::PolynomialRepresentation() ) };
 
 
 private:
@@ -206,9 +201,7 @@ private:
      * \param t_B the map matrix to map the allowed strains in the space of the full strain
      * \return
      */
-    Eigen::MatrixXd defineKee(const unsigned int t_ne,
-                              const unsigned int t_na,
-                              const Eigen::MatrixXd &t_B)const;
+    Eigen::MatrixXd defineKee(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)const;
 
 };
 

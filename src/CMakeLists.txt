@@ -14,21 +14,21 @@ target_compile_options(PolynomialRepresentation
         -Wextra
 )
 
-#add_library(RodProperties SHARED
-#    include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
-#    rod_properties/rod_properties.cpp
-#)
-#target_link_libraries(RodProperties
-#    PRIVATE
-#        Eigen3::Eigen
-#        BaseMaps
-#)
-#target_compile_options(RodProperties
-#    PRIVATE
-#        -Werror
-#        -Wall
-#        -Wextra
-#)
+add_library(RodProperties SHARED
+    include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
+    rod_properties/rod_properties.cpp
+)
+target_link_libraries(RodProperties
+    PRIVATE
+        Eigen3::Eigen
+        PolynomialRepresentation
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+)
 
 #add_library(StrainParameterisation SHARED
 #        include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
@@ -37,7 +37,7 @@ target_compile_options(PolynomialRepresentation
 #target_link_libraries(StrainParameterisation
 #    PRIVATE
 #        Eigen3::Eigen
-#        BaseMaps
+#        PolynomialRepresentation
 #)
 #target_compile_options(RodProperties
 #    PRIVATE
@@ -58,7 +58,7 @@ target_compile_options(PolynomialRepresentation
 #        Eigen3::Eigen
 #        StrainParameterisation
 #        RodProperties
-#        BaseMaps
+#        PolynomialRepresentation
 #)
 #target_compile_options(RodProperties
 #    PRIVATE
@@ -78,7 +78,7 @@ target_compile_options(PolynomialRepresentation
 #        math_tools
 #        StrainParameterisation
 #        RodProperties
-#        BaseMaps
+#        PolynomialRepresentation
 #)
 #target_compile_options(RodProperties
 #    PRIVATE
@@ -102,7 +102,7 @@ target_compile_options(PolynomialRepresentation
 #        IDMIntegrators
 #        TIDMIntegrators
 #        OSNI
-#        BaseMaps
+#        PolynomialRepresentation
 #)
 #target_compile_options(RodProperties
 #    PRIVATE
