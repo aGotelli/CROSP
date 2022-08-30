@@ -51,6 +51,28 @@ struct PolynomialRepresentation {
 
     unsigned int getCoordinatesDimension()const{return m_ne*m_na;}
 
+
+
+    /*!
+     * \brief getPhi this function computes the base matrix Phi
+     * \param t_ne the number of modes per admitted deformation
+     * \param t_na the number of admitted deformations
+     * \param t_X the current abscissa along the normalized arc-length
+     * \param t_polynomial_base the polynomial base used to define the matrix
+     * \param t_begin the begin of the rod domain
+     * \param t_end the end of the rod domain
+     * \return the matrix of bases function, namely Phi
+     */
+    Eigen::MatrixXd getPhi(const double& t_X,
+                           const double& t_begin=0,
+                           const double& t_end=1)const;
+
+
+
+
+
+
+
     const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
 
     const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
@@ -59,30 +81,44 @@ struct PolynomialRepresentation {
 
     const PolynomialBase m_polynomial_base { legendre_polynomial_base };
 
+
+
+    const Eigen::MatrixXd m_B { [&](){
+
+            Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
+
+            std::vector<int> indexes;
+            std::for_each(m_admitted_deformations.begin(),
+                          m_admitted_deformations.end(),
+                          [&indexes, index=0](const bool dof)mutable{   if(dof == true)
+                                                                            indexes.push_back(index);
+                                                                        index++;});
+            const Eigen::MatrixXd map = I(Eigen::all, indexes);
+            return map;
+    }};
+
+
+    const Eigen::MatrixXd m_Bbar { [&](){
+
+            Eigen::MatrixXd I = Eigen::MatrixXd::Identity(6, 6);
+
+            std::vector<int> indexes;
+            std::for_each(m_admitted_deformations.begin(),
+                          m_admitted_deformations.end(),
+                          [&indexes, index=0](const bool dof)mutable{   if(dof == false)
+                                                                            indexes.push_back(index);
+                                                                        index++;});
+            const Eigen::MatrixXd map = I(Eigen::all, indexes);
+    }};
+
+
+
+
 };
 
 
 
 
-
-
-
-/*!
- * \brief getPhi this function computes the base matrix Phi
- * \param t_ne the number of modes per admitted deformation
- * \param t_na the number of admitted deformations
- * \param t_X the current abscissa along the normalized arc-length
- * \param t_polynomial_base the polynomial base used to define the matrix
- * \param t_begin the begin of the rod domain
- * \param t_end the end of the rod domain
- * \return the matrix of bases function, namely Phi
- */
-Eigen::MatrixXd getPhi(const unsigned int t_ne,
-                              const unsigned int t_na,
-                              const double& t_X,
-                              const PolynomialBase t_polynomial_base=legendre_polynomial_base,
-                              const double& t_begin=0,
-                              const double& t_end=1);
 
 
 /*!
@@ -93,26 +129,10 @@ Eigen::MatrixXd getPhi(const unsigned int t_ne,
  * \param t_polynomial_base the polynomial base used to define the matrix
  * \return the stack of Phi matrices
  */
-std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
-                                              const unsigned int t_na,
-                                              const std::vector<double> &t_Chebyshev_points,
-                                              const PolynomialBase t_polynomial_base=legendre_polynomial_base);
+std::vector<Eigen::MatrixXd> generatePhiStack(const PolynomialRepresentation &t_polynomial_representation,
+                                              const std::vector<double> &t_Chebyshev_points);
 
 
-/*!
- * \brief getB computes the map matrix used to map the allowed strain into the full strain field
- * \param t_allowed_deformations the set of allowed deformation
- * \return the map matrix used to map the allowed strain into the full strain field
- */
-Eigen::MatrixXd getB(const std::array<bool, 6> &t_allowed_deformations);
-
-
-/*!
- * \brief getBbar computes the map matrix used to map the constrained strain into the full strain field
- * \param t_allowed_deformations the set of allowed deformation
- * \return the map matrix used to map the constrained strain into the full strain field
- */
-Eigen::MatrixXd getBbar(const std::array<bool, 6> &t_allowed_deformations);
 
 
 }   //  namespace CROSP::base_maps
