@@ -10,7 +10,7 @@ namespace CROSP::base_maps {
 Eigen::MatrixXd getPhi(const unsigned int t_ne,
                        const unsigned int t_na,
                        const double& t_X,
-                       const BaseFunction t_polynomial_base,
+                       const PolynomialBase t_polynomial_base,
                        const double& t_begin,
                        const double& t_end)
 {
@@ -33,7 +33,7 @@ Eigen::MatrixXd getPhi(const unsigned int t_ne,
 std::vector<Eigen::MatrixXd> generatePhiStack(const unsigned int t_ne,
                                               const unsigned int t_na,
                                               const std::vector<double> &t_Chebyshev_points,
-                                              const BaseFunction t_polynomial_base)
+                                              const PolynomialBase t_polynomial_base)
 {
     std::vector<Eigen::MatrixXd> Phi_stack( t_Chebyshev_points.size() );
 

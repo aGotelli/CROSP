@@ -78,17 +78,17 @@ public:
                            const unsigned int t_number_of_Chebyshev_points);
 
 
-    StrainParameterisation(const unsigned int t_ne,
-                           const std::array<bool, 6> &t_admitted_deformations,
-                           const Eigen::VectorXd &t_constant_strain,
-                           const base_maps::BaseFunction t_polynomial_base);
+//    StrainParameterisation(const unsigned int t_ne,
+//                           const std::array<bool, 6> &t_admitted_deformations,
+//                           const Eigen::VectorXd &t_constant_strain,
+//                           const base_maps::BaseFunction t_polynomial_base);
 
 
-    StrainParameterisation(const unsigned int t_ne,
-                           const std::array<bool, 6> &t_admitted_deformations,
-                           const Eigen::VectorXd &t_constant_strain,
-                           const base_maps::BaseFunction t_polynomial_base,
-                           const unsigned int t_number_of_Chebyshev_points);
+//    StrainParameterisation(const unsigned int t_ne,
+//                           const std::array<bool, 6> &t_admitted_deformations,
+//                           const Eigen::VectorXd &t_constant_strain,
+//                           const base_maps::BaseFunction t_polynomial_base,
+//                           const unsigned int t_number_of_Chebyshev_points);
 
     ~StrainParameterisation()=default;
 
@@ -162,16 +162,18 @@ private:
 
     const unsigned int m_number_of_Chebyshev_points { 17 };
 
-    const std::vector<Eigen::MatrixXd> m_Phi_stack { base_maps::generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
+    const std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
+            std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
 
-    const std::vector<Eigen::MatrixXd> m_strains_map_stack { [&](){
-            std::vector<Eigen::MatrixXd> strains_map_stack(m_number_of_Chebyshev_points);
+            const std::vector<Eigen::MatrixXd> Phi_stack =
+                    base_maps::generatePhiStack(m_ne, m_na, ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
 
-            std::generate(strains_map_stack.begin(), strains_map_stack.end(), [&, index=0]()mutable{
-               return m_B*m_Phi_stack[index++];
+
+            std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
+               return m_B*Phi_stack[index++];
             });
 
-            return strains_map_stack;
+            return map_to_strain_stack;
         }() };
 
 
