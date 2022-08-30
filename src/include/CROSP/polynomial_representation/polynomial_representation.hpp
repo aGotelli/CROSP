@@ -149,4 +149,4 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const PolynomialRepresentation &t_
 
 }   //  namespace CROSP::polynomial_representation
 
-#endif // POLYNOMIAL_RPRESENTATION_HPPS
+#endif // POLYNOMIAL_RPRESENTATION_HPP
