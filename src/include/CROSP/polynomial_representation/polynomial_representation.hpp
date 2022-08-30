@@ -1,11 +1,22 @@
-#ifndef BASE_MAPS_HPP
-#define BASE_MAPS_HPP
+/**
+ * \file polynomial_representation.hpp
+ * \author Andrea Gotelli (Andrea.Gotelli@ls2n.fr)
+ * \brief This files contains the definition of class and function used for the parameterisation of the strain field with a polynomial basis
+ * \date 12-07-2022
+ *
+ * \copyright Copyright (c) 2022 Andrea Gotelli
+ *
+ *
+ */
+
+#ifndef POLYNOMIAL_RPRESENTATION_HPP
+#define POLYNOMIAL_RPRESENTATION_HPP
 
 #include <functional>
 #include <boost/math/special_functions.hpp>
 #include <Eigen/Dense>
 
-namespace CROSP::base_maps {
+namespace CROSP::polynomial_representation {
 
 typedef std::function<double(const unsigned int, const double&)> PolynomialBase;
 
@@ -95,7 +106,7 @@ struct PolynomialRepresentation {
                                                                         index++;});
             const Eigen::MatrixXd map = I(Eigen::all, indexes);
             return map;
-    }};
+    }()};
 
 
     const Eigen::MatrixXd m_Bbar { [&](){
@@ -109,7 +120,8 @@ struct PolynomialRepresentation {
                                                                             indexes.push_back(index);
                                                                         index++;});
             const Eigen::MatrixXd map = I(Eigen::all, indexes);
-    }};
+            return map;
+    }()};
 
 
 
@@ -135,6 +147,6 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const PolynomialRepresentation &t_
 
 
 
-}   //  namespace CROSP::base_maps
+}   //  namespace CROSP::polynomial_representation
 
-#endif // BASE_MAPS_HPP
+#endif // POLYNOMIAL_RPRESENTATION_HPPS

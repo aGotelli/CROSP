@@ -1,9 +1,20 @@
-#include "CROSP/base_maps/base_maps.hpp"
+/**
+ * \file polynomial_representation.cpp
+ * \author Andrea Gotelli (Andrea.Gotelli@ls2n.fr)
+ * \brief This files contains the definition of class and function used for the parameterisation of the strain field with a polynomial basis
+ * \date 12-07-2022
+ *
+ * \copyright Copyright (c) 2022 Andrea Gotelli
+ *
+ *
+ */
+
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 #include <eigen3/unsupported/Eigen/KroneckerProduct>
 
 
-namespace CROSP::base_maps {
+namespace CROSP::polynomial_representation {
 
 
 
@@ -80,4 +91,4 @@ std::vector<Eigen::MatrixXd> generatePhiStack(const PolynomialRepresentation &t_
 
 
 
-}   //  namespace CROSP::base_maps
+}   //  namespace CROSP::polynomial_representation

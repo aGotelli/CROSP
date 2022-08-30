@@ -30,7 +30,7 @@ set(CMAKE_DEBUG_POSTFIX "-debug")
 
 add_subdirectory(src)
 
-add_subdirectory(tests)
+#add_subdirectory(tests)
 
 
 #   Install the library using the default routine
