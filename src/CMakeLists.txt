@@ -47,24 +47,25 @@ target_compile_options(RodProperties
 )
 
 
-#add_library(IDMIntegrators SHARED
-#    include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
-#    idm_integrators/idm_integrators.cpp
-#)
-#target_link_libraries(IDMIntegrators
-#    PUBLIC
-#        OSNI
-#        math_tools
-#        Eigen3::Eigen
-#        StrainParameterisation
-#        RodProperties
-#)
-#target_compile_options(RodProperties
-#    PRIVATE
-#        -Werror
-#        -Wall
-#        -Wextra
-#)
+add_library(IDMIntegrators SHARED
+    include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
+    idm_integrators/idm_integrators.cpp
+)
+target_link_libraries(IDMIntegrators
+    PUBLIC
+        OSNI
+        math_tools
+        Eigen3::Eigen
+        StrainParameterisation
+        RodProperties
+        BaseMaps
+)
+target_compile_options(RodProperties
+    PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+)
 
 #add_library(TIDMIntegrators SHARED
 #    include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
