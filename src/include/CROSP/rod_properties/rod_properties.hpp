@@ -81,7 +81,7 @@ struct RodDimensions {
 
 
     //  Radius of the section [m]
-    const double m_r { 0.01 };
+    const double m_r { 0.001 };
 
     //  Area of the section [m^2]
     const double m_A { M_PI*m_r*m_r };
@@ -111,7 +111,13 @@ public:
 
     RodProperties(const MaterialProperties &t_material_properties);
 
+    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                  const MaterialProperties &t_material_properties);
+
     RodProperties(const RodDimensions &t_rod_dimensions);
+
+    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                  const RodDimensions &t_rod_dimensions);
 
     RodProperties(const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
