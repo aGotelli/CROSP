@@ -19,7 +19,7 @@ using namespace CROSP;
 int main(int argc, char *argv[])
 {
 
-    const unsigned int number_of_Chebyshev_points = 21;
+    const unsigned int number_of_Chebyshev_points = 17;
 
 
     const unsigned int ne = 3;
@@ -226,10 +226,11 @@ int main(int argc, char *argv[])
 
             idm_integrators->m_linear_acceleration->integrate( Eigen::Vector3d::Zero() );
 
+
+
             idm_integrators->m_internal_forces->integrate( Eigen::Vector3d::Zero() );
 
             idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
-
 
             idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation.m_ne) );
 
@@ -260,11 +261,11 @@ int main(int argc, char *argv[])
             }
 
         }
-    })->Repetitions(50);
+    })->Repetitions(5);
 
     ::benchmark::Initialize(&argc, argv);
 
-    //::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RunSpecifiedBenchmarks();
 
 
 
