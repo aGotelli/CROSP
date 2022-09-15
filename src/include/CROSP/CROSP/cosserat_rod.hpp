@@ -195,6 +195,10 @@ public:
     Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
 
 
+    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const;
+
+
+
     inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
 
 #ifndef DEVELOPER

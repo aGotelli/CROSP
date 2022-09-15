@@ -259,6 +259,12 @@ Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) c
             - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
 }
 
+Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const
+{
+    return m_rod_properties->m_Kee*t_Delta_qe
+            - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+}
+
 
 
 void CosseratRod::setForwardIntegratorsInitialConditions()
