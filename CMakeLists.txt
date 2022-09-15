@@ -17,6 +17,10 @@ find_package(OSNI REQUIRED)
 
 find_package(benchmark REQUIRED)
 
+find_package(Ceres REQUIRED)
+
+find_package(Qt5Charts REQUIRED)
+
 #   External utilities to configure the package
 include(GNUInstallDirs)
 set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
