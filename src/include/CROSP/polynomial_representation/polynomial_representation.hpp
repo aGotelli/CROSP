@@ -36,6 +36,9 @@ static const PolynomialBase chebyshev_polynomial_base { [](const unsigned int t_
                                                     };
 
 
+static constexpr unsigned int default_number_of_modes = 4;
+
+
 
 
 /*!
@@ -84,13 +87,13 @@ struct PolynomialRepresentation {
 
 
     //  A vector representing the allowed deformation of the rod (default kirkhoff rod)
-    const std::array<bool, 6> m_admitted_deformations { true, true, true, false, false, false };
+    const std::array<bool, 6> m_admitted_deformations { false, true, false, false, false, false };
 
     //  The number of allowed deformation (asserted from the vector)
     const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
 
     //  Number of elastic modes per allowed deformation
-    const unsigned int m_ne { 3 };
+    const unsigned int m_ne { default_number_of_modes };
 
     //  The polynomial base used to discretize the strain field
     const PolynomialBase m_polynomial_base { legendre_polynomial_base };
