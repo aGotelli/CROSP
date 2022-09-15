@@ -45,28 +45,17 @@ public:
 
     CosseratRod(unsigned int t_number_of_Chebyshev_points);
 
+    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation);
 
-//    CosseratRod(const base_maps::BaseFunction &t_polynomial_function);
+    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                unsigned int t_number_of_Chebyshev_points);
 
+    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                const rod_properties::RodProperties &t_rod_properties);
 
-//    CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                unsigned int t_ne);
-
-
-//    CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                unsigned int t_ne,
-//                const base_maps::BaseFunction &t_polynomial_function);
-
-
-//    CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                unsigned int t_ne,
-//                unsigned int t_number_of_Chebyshev_points);
-
-
-//    CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                unsigned int t_ne,
-//                unsigned int t_number_of_Chebyshev_points,
-//                const base_maps::BaseFunction &t_polynomial_function);
+    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                const rod_properties::RodProperties &t_rod_properties,
+                unsigned int t_number_of_Chebyshev_points);
 
 
 
@@ -172,11 +161,25 @@ public:
                                  const Eigen::Vector3d &t_Delta_force_at_tip);
 
 
+    ::LieAlgebra::Vector6d IDM(const Eigen::Vector3d &t_couple_at_tip,
+                               const Eigen::Vector3d &t_force_at_tip);
+
+    ::LieAlgebra::Vector6d TIDM(const Eigen::Vector3d &t_Delta_couple_at_tip,
+                                const Eigen::Vector3d &t_Delta_force_at_tip);
+
+
     /*!
      * \brief getLambdaAtBase give Lambda at the rod base, expressed in local coordinates of the rod base frame
-     * \return give Lambda at the rod base, expressed in local coordinates of the rod base frame
+     * \return Lambda at the rod base, expressed in local coordinates of the rod base frame
      */
     Vector6d getLambdaAtBase()const;
+
+
+    /*!
+     * \brief getDeltaLambdaAtBase give Delta Lambda at the rod base, expressed in local coordinates of the rod base frame
+     * \return Delta Lambda at the rod base, expressed in local coordinates of the rod base frame
+     */
+    Vector6d getDeltaLambdaAtBase()const;
 
     /*!
      * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
@@ -192,6 +195,7 @@ public:
     Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
 
 
+    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
 
 #ifndef DEVELOPER
 private:

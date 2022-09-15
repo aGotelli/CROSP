@@ -23,35 +23,42 @@ CosseratRod::CosseratRod()
 
 
 CosseratRod::CosseratRod(unsigned int t_number_of_Chebyshev_points)
-    :   m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
 {
     setForwardIntegratorsInitialConditions();
 }
 
+CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)
+    : m_polynomial_representation(t_polynomial_representation)
+{
+    setForwardIntegratorsInitialConditions();
+}
 
-//CosseratRod::CosseratRod(const base_maps::BaseFunction &t_polynomial_function);
+CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                         unsigned int t_number_of_Chebyshev_points)
+    : m_polynomial_representation(t_polynomial_representation),
+      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+{
+    setForwardIntegratorsInitialConditions();
+}
 
+CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                         const rod_properties::RodProperties &t_rod_properties)
+    : m_polynomial_representation(t_polynomial_representation),
+      m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
+{
+    setForwardIntegratorsInitialConditions();
+}
 
-//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                         unsigned int t_ne);
-
-
-//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                         unsigned int t_ne,
-//                         const base_maps::BaseFunction &t_polynomial_function);
-
-
-//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                         unsigned int t_ne,
-//                         unsigned int t_number_of_Chebyshev_points);
-
-
-//CosseratRod::CosseratRod(const std::array<bool, 6> t_admitted_deformations,
-//                         unsigned int t_ne,
-//                         unsigned int t_number_of_Chebyshev_points,
-//                         const base_maps::BaseFunction &t_polynomial_function);
-
-
+CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                         const rod_properties::RodProperties &t_rod_properties,
+                         unsigned int t_number_of_Chebyshev_points)
+    : m_polynomial_representation(t_polynomial_representation),
+      m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) ),
+      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+{
+    setForwardIntegratorsInitialConditions();
+}
 
 
 
@@ -176,6 +183,9 @@ void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_couple_at_tip,
     m_idm_integrators->m_internal_forces->integrate(force_at_tip_local_coord);
     m_idm_integrators->m_internal_couples->integrate(couple_at_tip_local_coord);
 
+
+    m_idm_integrators->m_generalised_forces->integrate(Eigen::VectorXd::Zero(getCoordinatesDimension()));
+
 }
 
 
@@ -196,6 +206,27 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
 }
 
 
+
+::LieAlgebra::Vector6d CosseratRod::IDM(const Eigen::Vector3d &t_couple_at_tip,
+                                        const Eigen::Vector3d &t_force_at_tip)
+{
+    forwardKinematics();
+    backwardDynamics(t_couple_at_tip,
+                     t_force_at_tip);
+
+    return getLambdaAtBase();
+}
+
+::LieAlgebra::Vector6d CosseratRod::TIDM(const Eigen::Vector3d &t_Delta_couple_at_tip,
+                                         const Eigen::Vector3d &t_Delta_force_at_tip)
+{
+    forwardTangentKinematics();
+    backwardTangentDynamics(t_Delta_couple_at_tip,
+                            t_Delta_force_at_tip);
+
+    return getDeltaLambdaAtBase();
+}
+
 Vector6d CosseratRod::getLambdaAtBase()const
 {
     Vector6d Lambda;
@@ -203,6 +234,17 @@ Vector6d CosseratRod::getLambdaAtBase()const
                 m_idm_integrators->m_internal_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
 
     return Lambda;
+}
+
+
+
+Vector6d CosseratRod::getDeltaLambdaAtBase()const
+{
+    Vector6d Delta_Lambda;
+    Delta_Lambda <<   m_tidm_integrators->m_Delta_internal_couples->getStateAtPoint(::OSNI::ROD_POSITION::BASE),
+                      m_tidm_integrators->m_Delta_internal_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+
+    return Delta_Lambda;
 }
 
 unsigned int CosseratRod::getCoordinatesDimension()const
@@ -216,6 +258,7 @@ Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) c
     return m_rod_properties->m_Kee*t_qe
             - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
 }
+
 
 
 void CosseratRod::setForwardIntegratorsInitialConditions()
