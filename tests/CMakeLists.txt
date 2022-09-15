@@ -71,3 +71,22 @@ target_compile_definitions(test_cosserat_rod
 
 
 
+
+
+add_executable(test_static_solution test_static_solution.cpp)
+target_link_libraries(test_static_solution
+    PRIVATE
+        Eigen3::Eigen
+        ${PROJECT_NAME}
+        math_tools
+        utilities
+        ${CERES_LIBRARIES}
+        Qt5::Widgets
+        Qt5::Charts
+)
+target_compile_definitions(test_static_solution
+    PRIVATE
+        DEVELOPER
+)
+
+

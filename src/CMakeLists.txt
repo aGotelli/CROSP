@@ -92,16 +92,21 @@ target_compile_options(RodProperties
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp
+                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
+                            static_initialiser/static_initialiser.cpp
 )
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         math_tools
         Eigen3::Eigen
+        OSNI
+        ${CERES_LIBRARIES}
+        utilities
+    PUBLIC
         StrainParameterisation
         RodProperties
         IDMIntegrators
         TIDMIntegrators
-        OSNI
         PolynomialRepresentation
 )
 target_compile_options(RodProperties
@@ -112,8 +117,11 @@ target_compile_options(RodProperties
 )
 
 
-install(TARGETS ${PROJECT_NAME}
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+install(
+    TARGETS
+        ${PROJECT_NAME}
+    DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}
 )
 install(DIRECTORY include/${PROJECT_NAME}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
