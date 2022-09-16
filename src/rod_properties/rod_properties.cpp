@@ -80,7 +80,7 @@ Eigen::MatrixXd RodProperties::defineKee(const polynomial_representation::Polyno
 
     const unsigned int n = t_polynomial_representation.getCoordinatesDimension();
 
-    const auto Ha = t_polynomial_representation.m_B.transpose() * m_H * t_polynomial_representation.m_B;
+    const Eigen::MatrixXd Ha = t_polynomial_representation.m_B.transpose() * m_H * t_polynomial_representation.m_B;
 
     typedef Eigen::MatrixXd Kee_state_type;
 
@@ -90,7 +90,7 @@ Eigen::MatrixXd RodProperties::defineKee(const polynomial_representation::Polyno
                                                          boost::numeric::odeint::vector_space_algebra> Ke_stepper;
     Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
 
-    boost::numeric::odeint::integrate_const(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_X){
+    boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_X){
         const auto Phi = t_polynomial_representation.getPhi(t_X);
 
         t_dKeeds = Phi.transpose()*Ha*Phi;}, Kee, 0.0, 1.0, 0.0005);
