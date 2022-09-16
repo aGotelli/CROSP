@@ -32,6 +32,25 @@ target_compile_definitions(test_strain_parameterisation
 )
 
 
+add_executable(test_rod_dynamics_vincent test_rod_dynamics_vincent.cpp)
+target_link_libraries(test_rod_dynamics_vincent
+    PRIVATE
+        Eigen3::Eigen
+        ${PROJECT_NAME}
+        math_tools
+        utilities
+        StrainParameterisation
+        RodProperties
+        IDMIntegrators
+        TIDMIntegrators
+        PolynomialRepresentation
+)
+target_compile_definitions(test_rod_dynamics_vincent
+    PRIVATE
+        DEVELOPER
+)
+
+
 add_executable(test_tidm test_tidm.cpp)
 target_link_libraries(test_tidm
     PRIVATE
@@ -50,6 +69,8 @@ target_compile_definitions(test_tidm
     PRIVATE
         DEVELOPER
 )
+
+
 
 
 add_executable(benchmark benchmark.cpp)

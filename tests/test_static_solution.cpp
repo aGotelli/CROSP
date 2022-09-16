@@ -67,7 +67,8 @@ int main(int argc, char *argv[])
                                    stack_of_points(Eigen::all, {0, 2}),
                                    "Rod Static Solution",
                                    "x [m]",
-                                   "z [m]");
+                                   "z [m]",
+                                   "Rod Shape");
 
 
 
