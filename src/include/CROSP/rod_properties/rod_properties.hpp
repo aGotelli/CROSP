@@ -54,7 +54,7 @@ struct MaterialProperties {
     const double m_G {  80e9 };
 
     //  Specific weight [kg/m^3]
-    const double m_rho { 0.0 };
+    const double m_rho { 7800 };
 
 };
 
@@ -196,6 +196,10 @@ public:
 
     //  The generalised elasticity matrix
     const Eigen::MatrixXd m_Kee { defineKee( polynomial_representation::PolynomialRepresentation() ) };
+
+    const double m_mu { 1e-3 };
+
+    const Eigen::MatrixXd m_Dee { m_mu*m_Kee };
 
 
 private:
