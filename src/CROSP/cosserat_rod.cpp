@@ -28,6 +28,15 @@ CosseratRod::CosseratRod(unsigned int t_number_of_Chebyshev_points)
     setForwardIntegratorsInitialConditions();
 }
 
+
+CosseratRod::CosseratRod(const rod_properties::RodProperties &t_rod_properties)
+    : m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
+{
+    setForwardIntegratorsInitialConditions();
+}
+
+
+
 CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)
     : m_polynomial_representation(t_polynomial_representation)
 {
