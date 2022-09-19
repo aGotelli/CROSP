@@ -54,7 +54,7 @@ struct MaterialProperties {
     const double m_G {  80e9 };
 
     //  Specific weight [kg/m^3]
-    const double m_rho { 7800 };
+    const double m_rho { 0.0 };
 
 };
 
