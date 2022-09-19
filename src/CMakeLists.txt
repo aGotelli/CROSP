@@ -2,7 +2,8 @@ include_directories(include)
 
 add_library(PolynomialRepresentation SHARED
     include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
-    polynomial_representation/polynomial_representation.cpp)
+    polynomial_representation/polynomial_representation.cpp
+)
 target_link_libraries(PolynomialRepresentation
     PRIVATE
         Eigen3::Eigen
@@ -94,6 +95,17 @@ add_library(${PROJECT_NAME} SHARED
                             ${PROJECT_NAME}/cosserat_rod.cpp
                             include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
                             static_initialiser/static_initialiser.cpp
+
+                            include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
+                            polynomial_representation/polynomial_representation.cpp
+                            include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
+                            rod_properties/rod_properties.cpp
+                            include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
+                            strain_parameterisation/strain_parameterisation.cpp
+                            include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
+                            idm_integrators/idm_integrators.cpp
+                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
+                            tidm_integrators/tidm_integrators.cpp
 )
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
@@ -102,12 +114,12 @@ target_link_libraries(${PROJECT_NAME}
         OSNI
         ${CERES_LIBRARIES}
         utilities
-    PUBLIC
-        StrainParameterisation
-        RodProperties
-        IDMIntegrators
-        TIDMIntegrators
-        PolynomialRepresentation
+#    PUBLIC
+#        StrainParameterisation
+#        RodProperties
+#        IDMIntegrators
+#        TIDMIntegrators
+#        PolynomialRepresentation
 )
 target_compile_options(RodProperties
     PRIVATE
