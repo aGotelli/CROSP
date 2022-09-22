@@ -197,7 +197,7 @@ public:
     //  The generalised elasticity matrix
     const Eigen::MatrixXd m_Kee { defineKee( polynomial_representation::PolynomialRepresentation() ) };
 
-    const double m_mu { 1e-3 };
+    const double m_mu { 1e-2 };
 
     const Eigen::MatrixXd m_Dee { m_mu*m_Kee };
 
