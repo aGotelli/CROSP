@@ -39,11 +39,11 @@ target_link_libraries(test_rod_dynamics_vincent
         ${PROJECT_NAME}
         math_tools
         utilities
-        StrainParameterisation
-        RodProperties
-        IDMIntegrators
-        TIDMIntegrators
-        PolynomialRepresentation
+#        StrainParameterisation
+#        RodProperties
+#        IDMIntegrators
+#        TIDMIntegrators
+#        PolynomialRepresentation
 )
 target_compile_definitions(test_rod_dynamics_vincent
     PRIVATE
@@ -59,11 +59,11 @@ target_link_libraries(test_tidm
         math_tools
         utilities
         benchmark::benchmark
-        StrainParameterisation
-        RodProperties
-        IDMIntegrators
-        TIDMIntegrators
-        PolynomialRepresentation
+#        StrainParameterisation
+#        RodProperties
+#        IDMIntegrators
+#        TIDMIntegrators
+#        PolynomialRepresentation
 )
 target_compile_definitions(test_tidm
     PRIVATE
