@@ -18,8 +18,8 @@
 #include <vector>
 
 
-#include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
-#include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
+//#include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
+//#include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
@@ -110,8 +110,8 @@ private:
 public:
 
     //  The stack of Phi along the Chebyshev points
-    const std::vector<Eigen::MatrixXd> m_Phi_stack { polynomial_representation::generatePhiStack(m_polynomial_representation,
-                                                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
+//    const std::vector<Eigen::MatrixXd> m_Phi_stack { polynomial_representation::generatePhiStack(m_polynomial_representation,
+//                                                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
 
 private:
 
@@ -147,14 +147,14 @@ private:
     const std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
             std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
 
-            const std::vector<Eigen::MatrixXd> Phi_stack =
-                    polynomial_representation::generatePhiStack(m_polynomial_representation,
-                                                                ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
+//            const std::vector<Eigen::MatrixXd> Phi_stack =
+//                    polynomial_representation::generatePhiStack(m_polynomial_representation,
+//                                                                ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
 
 
-            std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
-               return m_polynomial_representation.m_B*Phi_stack[index++];
-            });
+//            std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
+//               return m_polynomial_representation.m_B*Phi_stack[index++];
+//            });
 
             return map_to_strain_stack;
         }() };

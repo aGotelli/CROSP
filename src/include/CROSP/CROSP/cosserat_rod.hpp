@@ -23,8 +23,8 @@
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
-#include "CROSP/idm_integrators/idm_integrators.hpp"
-#include "CROSP/tidm_integrators/tidm_integrators.hpp"
+//#include "CROSP/idm_integrators/idm_integrators.hpp"
+//#include "CROSP/tidm_integrators/tidm_integrators.hpp"
 
 
 #include <boost/numeric/odeint.hpp>
@@ -194,33 +194,33 @@ public:
      * \param t_qe the current set of generalised coordinates
      * \return the static equilibrium of the rod
      */
-    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
+//    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
 
 
-    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe,
-                                         const Eigen::VectorXd &t_dot_qe) const
-    {
-        return m_rod_properties->m_Kee*t_qe
-                + m_rod_properties->m_Dee*t_dot_qe
-                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
-    }
-
-
-
-    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
-                                                const Eigen::VectorXd &t_Delta_dot_qe)const
-    {
-        return m_rod_properties->m_Kee*t_Delta_qe
-                + m_rod_properties->m_Dee*t_Delta_dot_qe
-                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
-    }
-
-
-    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const;
+//    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe,
+//                                         const Eigen::VectorXd &t_dot_qe) const
+//    {
+//        return m_rod_properties->m_Kee*t_qe
+//                + m_rod_properties->m_Dee*t_dot_qe
+//                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+//    }
 
 
 
-    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
+//    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
+//                                                const Eigen::VectorXd &t_Delta_dot_qe)const
+//    {
+//        return m_rod_properties->m_Kee*t_Delta_qe
+//                + m_rod_properties->m_Dee*t_Delta_dot_qe
+//                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+//    }
+
+
+//    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const;
+
+
+
+//    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
 
 #ifndef DEVELOPER
 private:
@@ -244,19 +244,19 @@ private:
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta { std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
                                                                                                                                                                          ::LieAlgebra::Vector6d::Zero(),
                                                                                                                                                                          m_number_of_Chebyshev_points) };
-    //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators { std::make_shared<idm_integrators::IDMIntegrators>(m_number_of_Chebyshev_points,
-                                                                                                                           m_polynomial_representation,
-                                                                                                                           m_strain_parameterisation,
-                                                                                                                           m_rod_properties )};
+//    //  The set of integrators needed for the IDM
+//    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators { std::make_shared<idm_integrators::IDMIntegrators>(m_number_of_Chebyshev_points,
+//                                                                                                                           m_polynomial_representation,
+//                                                                                                                           m_strain_parameterisation,
+//                                                                                                                           m_rod_properties )};
 
-    //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators { std::make_shared<tidm_integrators::TIDMIntegrators>(m_number_of_Chebyshev_points,
-                                                                                                                                m_polynomial_representation,
-                                                                                                                                m_strain_parameterisation,
-                                                                                                                                m_strain_parameterisation_Delta,
-                                                                                                                                m_idm_integrators,
-                                                                                                                                m_rod_properties) };
+//    //  The set of integrators needed for the TIDM
+//    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators { std::make_shared<tidm_integrators::TIDMIntegrators>(m_number_of_Chebyshev_points,
+//                                                                                                                                m_polynomial_representation,
+//                                                                                                                                m_strain_parameterisation,
+//                                                                                                                                m_strain_parameterisation_Delta,
+//                                                                                                                                m_idm_integrators,
+//                                                                                                                                m_rod_properties) };
 
 
     /*!
