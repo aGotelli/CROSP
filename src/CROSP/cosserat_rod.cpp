@@ -63,8 +63,8 @@ CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentati
                          const rod_properties::RodProperties &t_rod_properties,
                          unsigned int t_number_of_Chebyshev_points)
     : m_polynomial_representation(t_polynomial_representation),
-      m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) ),
-      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
 {
     setForwardIntegratorsInitialConditions();
 }
