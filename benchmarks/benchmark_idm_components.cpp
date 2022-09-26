@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     const unsigned int repetitions = 5;
 
     std::array<bool, 6> admitted_deformations = {
-        false,
+        true,
         true,
         false,
 
@@ -61,8 +61,15 @@ int main(int argc, char *argv[])
         rod.updateParameterisation(q, dot_q, ddot_q);
 
 
-        while(t_state.KeepRunning())
+        while(t_state.KeepRunning()){
             rod.m_idm_integrators->m_quaternion->solveSystem();
+
+            if(std::isnan(rod.m_idm_integrators->m_quaternion->getStateAtPoint(0).x()) ||
+                std::isnan(rod.m_idm_integrators->m_quaternion->getStateAtPoint(0).y()) ||
+                std::isnan(rod.m_idm_integrators->m_quaternion->getStateAtPoint(0).z()) ||
+                std::isnan(rod.m_idm_integrators->m_quaternion->getStateAtPoint(0).w()) )
+                t_state.SkipWithError("Result is nan!");
+        }
 
 
     })->Repetitions(repetitions);

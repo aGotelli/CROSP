@@ -25,8 +25,8 @@ StrainParameterisation::StrainParameterisation(const polynomial_representation::
 
 StrainParameterisation::StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                                                const unsigned int t_number_of_Chebyshev_points)
-    : m_polynomial_representation(t_polynomial_representation),
-      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_polynomial_representation(t_polynomial_representation)
 {}
 
 
@@ -40,9 +40,9 @@ StrainParameterisation::StrainParameterisation(const polynomial_representation::
 StrainParameterisation::StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                                                const Eigen::VectorXd &t_constant_strain,
                                                const unsigned int t_number_of_Chebyshev_points)
-    : m_polynomial_representation(t_polynomial_representation),
-      m_constrained_strain( defineConstrainedStrain(t_constant_strain) ),
-      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_polynomial_representation(t_polynomial_representation),
+      m_constrained_strain( defineConstrainedStrain(t_constant_strain) )
 {}
 
 

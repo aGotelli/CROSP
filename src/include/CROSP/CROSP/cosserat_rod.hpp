@@ -259,13 +259,6 @@ private:
                                                                                                                                 m_rod_properties) };
 
 
-    /*!
-     * \brief setForwardIntegratorsInitialConditions sets the initial conditions for the forward integrators.
-     *
-     * This function sets the initial conditions for the forward integrators. For these integrators, we integrate from a fixed
-     * reference configuration that can be defined in initialisation.
-     */
-    void setForwardIntegratorsInitialConditions();
 
 };
 

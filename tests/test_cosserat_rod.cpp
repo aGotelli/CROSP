@@ -8,11 +8,37 @@
 
 int main()
 {
-    constexpr unsigned int number_of_Chebyshev_points = 17;
-    CROSP::CosseratRod rod;
+    static constexpr unsigned int number_of_Chebyshev_points = 17;
 
 
-    writeToFile("Kee_cpp", rod.m_rod_properties->m_Kee, "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
+    static constexpr std::array<bool, 6> admitted_deformations = {
+        true,
+        true,
+        false,
+
+        false,
+        false,
+        false
+    };
+
+    static constexpr unsigned int na = std::count(admitted_deformations.begin(),
+                                                  admitted_deformations.end(),
+                                                  true);
+
+    static constexpr unsigned int ne = 4;
+
+
+
+    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+
+    ::CROSP::CosseratRod rod(polynomial_representation);
+
+
+    rod.forwardKinematics();
+
+    Eigen::Vector3d zeros = Eigen::Vector3d::Zero();
+    rod.backwardDynamics(zeros, zeros);
+
 
     return 0;
 }

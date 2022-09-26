@@ -17,47 +17,36 @@
 namespace CROSP {
 
 CosseratRod::CosseratRod()
-{
-    setForwardIntegratorsInitialConditions();
-}
+{}
+
 
 
 CosseratRod::CosseratRod(unsigned int t_number_of_Chebyshev_points)
     : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
-{
-    setForwardIntegratorsInitialConditions();
-}
+{}
 
 
 CosseratRod::CosseratRod(const rod_properties::RodProperties &t_rod_properties)
     : m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
-{
-    setForwardIntegratorsInitialConditions();
-}
+{}
 
 
 
 CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)
     : m_polynomial_representation(t_polynomial_representation)
-{
-    setForwardIntegratorsInitialConditions();
-}
+{}
 
 CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                          unsigned int t_number_of_Chebyshev_points)
     : m_polynomial_representation(t_polynomial_representation),
       m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
-{
-    setForwardIntegratorsInitialConditions();
-}
+{}
 
 CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                          const rod_properties::RodProperties &t_rod_properties)
     : m_polynomial_representation(t_polynomial_representation),
       m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
-{
-    setForwardIntegratorsInitialConditions();
-}
+{}
 
 CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                          const rod_properties::RodProperties &t_rod_properties,
@@ -65,9 +54,7 @@ CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentati
     : m_polynomial_representation(t_polynomial_representation),
       m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
       m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
-{
-    setForwardIntegratorsInitialConditions();
-}
+{}
 
 
 
@@ -276,33 +263,6 @@ Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &
 
 
 
-void CosseratRod::setForwardIntegratorsInitialConditions()
-{
-    //  Integrate Quaternions
-    m_idm_integrators->m_quaternion->setInitialConditions( Eigen::Vector4d(1, 0, 0, 0) );
 
-    //  Integrate Positions
-    m_idm_integrators->m_position->setInitialConditions( Eigen::Vector3d::Zero() );
-
-    //  Integrate twist
-    m_idm_integrators->m_angular_velocity->setInitialConditions( Eigen::Vector3d::Zero() );
-    m_idm_integrators->m_linear_velocity->setInitialConditions( Eigen::Vector3d::Zero() );
-
-    //  Integrate accelerations
-    m_idm_integrators->m_angular_acceleration->setInitialConditions( Eigen::Vector3d::Zero() );
-    m_idm_integrators->m_linear_acceleration->setInitialConditions( Eigen::Vector3d::Zero() );
-
-    //  Integrate Delta zeta
-    m_tidm_integrators->m_Delta_rotation->setInitialConditions( Eigen::Vector3d::Zero() );
-    m_tidm_integrators->m_Delta_position->setInitialConditions( Eigen::Vector3d::Zero() );
-
-    //  Integrate Delta eta
-    m_tidm_integrators->m_Delta_angular_velocity->setInitialConditions(Eigen::Vector3d::Zero());
-    m_tidm_integrators->m_Delta_linear_velocity->setInitialConditions(Eigen::Vector3d::Zero());
-
-    //  Integrate Delta dot eta
-    m_tidm_integrators->m_Delta_angular_acceleration->setInitialConditions(Eigen::Vector3d::Zero());
-    m_tidm_integrators->m_Delta_linear_acceleration->setInitialConditions(Eigen::Vector3d::Zero());
-}
 
 }   //  namespace CROSP

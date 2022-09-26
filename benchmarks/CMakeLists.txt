@@ -22,6 +22,18 @@ target_link_libraries(benchmark_idm
 )
 target_compile_definitions(benchmark_idm PRIVATE DEVELOPER)
 
+add_executable(benchmark_tidm benchmark_tidm.cpp
+)
+target_link_libraries(benchmark_tidm
+    PRIVATE
+        Eigen3::Eigen
+        ${PROJECT_NAME}
+        math_tools
+        utilities
+        benchmark::benchmark
+)
+target_compile_definitions(benchmark_tidm PRIVATE DEVELOPER)
+
 
 
 
