@@ -9,8 +9,8 @@
 
 static constexpr std::array<bool, 6> admitted_deformations = {
     true,
-    true,
-    true,
+    false,
+    false,
 
     false,
     false,
@@ -52,20 +52,27 @@ void benchmarkTIDM(::benchmark::State &t_state)
     Eigen::VectorXd Delta_dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
 
-    Delta_q.setZero();
-    Delta_q[0] = 1;
-
-    Delta_dot_q = 400*Delta_q;
-    Delta_ddot_q = 16000*Delta_q;
-
+    Eigen::MatrixXd J(coordinated_dimension, coordinated_dimension);
 
     while(t_state.KeepRunning()){
+
+        for(unsigned int i=0; i<coordinated_dimension; i++){
+            Delta_q.setZero();
+            Delta_q[i] = 1;
+
+            Delta_dot_q = 400*Delta_q;
+            Delta_ddot_q = 16000*Delta_q;
 
             rod.updateParameterisationVariation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
             rod.forwardTangentKinematics();
             rod.backwardTangentDynamics(F1.block<3,1>(0, 0),
                                         F1.block<3,1>(3, 0));
+
+            J.col(i) = rod.getTangentStaticEquilibrium(Delta_q);
+        }
+
+
 
     }
 };

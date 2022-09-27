@@ -10,8 +10,8 @@
 
 static constexpr std::array<bool, 6> admitted_deformations = {
     true,
-    true,
-    true,
+    false,
+    false,
 
     false,
     false,
@@ -22,19 +22,20 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
+static constexpr unsigned int ne = 4;
+
+static constexpr unsigned int coordinated_dimension = na * ne;
+
 
 void benchmarkIDM(::benchmark::State &t_state)
 {
 
-    const unsigned int ne = t_state.range(0);
-
-    const unsigned int coordinated_dimension = na * ne;
-
+    const unsigned int Nc = t_state.range(0);
 
 
     ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-    ::CROSP::CosseratRod rod(polynomial_representation);
+    ::CROSP::CosseratRod rod(polynomial_representation, Nc);
 
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -72,14 +73,13 @@ int main(int argc, char *argv[])
     const unsigned int repetitions = 20;
 
 
-    std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
+    std::vector<unsigned int> Nc_stack = {10, 15, 20, 25, 30, 35};
 
 
-    const std::string benchmark_name = "IDM_na" + std::to_string(na) + "_ne";
+    const std::string benchmark_name = "IDM_na" + std::to_string(na) + "_ne" + std::to_string(ne) + "_Nc";
 
-
-    for(const auto ne : ne_stack)
-        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions);
+    for(const auto Nc : Nc_stack)
+        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(Nc)->Repetitions(repetitions);
 
 
 
