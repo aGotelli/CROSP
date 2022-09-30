@@ -88,3 +88,17 @@ target_link_libraries(benchmark_tidm_Nc
 target_compile_definitions(benchmark_tidm_Nc PRIVATE DEVELOPER)
 
 
+add_executable(benchmark_jacobian_idm_tidm benchmark_jacobian_idm_tidm.cpp
+)
+target_link_libraries(benchmark_jacobian_idm_tidm
+    PRIVATE
+        Eigen3::Eigen
+        ${PROJECT_NAME}
+        math_tools
+        utilities
+        benchmark::benchmark
+)
+target_compile_definitions(benchmark_jacobian_idm_tidm PRIVATE DEVELOPER)
+
+
+

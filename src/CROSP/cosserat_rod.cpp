@@ -31,6 +31,12 @@ CosseratRod::CosseratRod(const rod_properties::RodProperties &t_rod_properties)
 {}
 
 
+CosseratRod::CosseratRod(const rod_properties::RodProperties &t_rod_properties,
+                         unsigned int t_number_of_Chebyshev_points)
+    : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
+{}
+
 
 CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)
     : m_polynomial_representation(t_polynomial_representation)

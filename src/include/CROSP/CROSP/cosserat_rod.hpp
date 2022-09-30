@@ -47,6 +47,9 @@ public:
 
     CosseratRod(const rod_properties::RodProperties &t_rod_properties);
 
+    CosseratRod(const rod_properties::RodProperties &t_rod_properties,
+                unsigned int t_number_of_Chebyshev_points);
+
     CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation);
 
     CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
