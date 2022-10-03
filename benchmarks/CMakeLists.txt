@@ -102,3 +102,18 @@ target_compile_definitions(benchmark_jacobian_idm_tidm PRIVATE DEVELOPER)
 
 
 
+
+add_executable(benchmark_jacobian_tidm_multi_threads
+    benchmark_jacobian_tidm.cpp
+    BS_thread_pool.hpp
+)
+target_link_libraries(benchmark_jacobian_tidm_multi_threads
+    PRIVATE
+        Eigen3::Eigen
+        ${PROJECT_NAME}
+        math_tools
+        utilities
+        benchmark::benchmark
+)
+target_compile_definitions(benchmark_jacobian_tidm_multi_threads PRIVATE DEVELOPER)
+
