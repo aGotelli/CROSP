@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
 
 
-    const std::string benchmark_name = "IDM_na" + std::to_string(na) + "_ne";
+    const std::string benchmark_name = "TIDM_na" + std::to_string(na) + "_ne";
 
 
     for(const auto ne : ne_stack)

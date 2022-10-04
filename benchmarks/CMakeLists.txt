@@ -104,7 +104,7 @@ target_compile_definitions(benchmark_jacobian_idm_tidm PRIVATE DEVELOPER)
 
 
 add_executable(benchmark_jacobian_tidm_multi_threads
-    benchmark_jacobian_tidm.cpp
+    benchmark_jacobian_tidm_multi_threads.cpp
     BS_thread_pool.hpp
 )
 target_link_libraries(benchmark_jacobian_tidm_multi_threads

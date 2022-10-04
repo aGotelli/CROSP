@@ -24,7 +24,8 @@ class Initializer {
 public:
     Initializer(::CROSP::CosseratRod &t_rod,
                 ::LieAlgebra::Vector6d &t_F1,
-                Eigen::VectorXd &t_initial_guess);
+                Eigen::VectorXd &t_initial_guess,
+                bool init_google_logging=true);
 
     bool operator()(const double* t_guess, double* t_residual) const;
 

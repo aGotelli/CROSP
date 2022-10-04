@@ -16,12 +16,13 @@ namespace CROSP::static_initialiser {
 
 Initializer::Initializer(::CROSP::CosseratRod &t_rod,
                          ::LieAlgebra::Vector6d &t_F1,
-                         Eigen::VectorXd &t_initial_guess)
+                         Eigen::VectorXd &t_initial_guess,
+                         bool init_google_logging)
         : m_rod_ptr(std::make_shared<::CROSP::CosseratRod>(t_rod)),
           m_F1(t_F1)
 {
-
-    google::InitGoogleLogging(std::string().c_str());
+    if(init_google_logging)
+        google::InitGoogleLogging(std::string().c_str());
 
     CostFunction* cost_function = new CostFunction( this, ceres::DO_NOT_TAKE_OWNERSHIP );
 
