@@ -27,14 +27,14 @@ public:
                 Eigen::VectorXd &t_initial_guess,
                 bool init_google_logging=true);
 
-    bool operator()(const double* t_guess, double* t_residual) const;
+    bool operator()(const double* const* t_guess, double* t_residual) const;
 
 private:
 
-    typedef ceres::NumericDiffCostFunction<Initializer,
-                                           ceres::NumericDiffMethodType::FORWARD,
-                                           ::CROSP::polynomial_representation::default_number_of_modes,
-                                           ::CROSP::polynomial_representation::default_number_of_modes> CostFunction;
+    typedef ceres::DynamicNumericDiffCostFunction<Initializer,
+                                                  ceres::NumericDiffMethodType::FORWARD> CostFunction;
+
+    CostFunction* m_cost_function;
 
     std::shared_ptr<::CROSP::CosseratRod> m_rod_ptr { nullptr };
 

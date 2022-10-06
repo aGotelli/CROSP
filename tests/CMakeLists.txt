@@ -111,3 +111,23 @@ target_compile_definitions(test_static_solution
 )
 
 
+
+add_executable(test_perturbed_idm test_perturbed_idm.cpp)
+target_link_libraries(test_perturbed_idm
+    PRIVATE
+        Eigen3::Eigen
+        ${PROJECT_NAME}
+        math_tools
+        utilities
+        ${CERES_LIBRARIES}
+        Qt5::Widgets
+        Qt5::Charts
+)
+target_compile_definitions(test_perturbed_idm
+    PRIVATE
+        DEVELOPER
+)
+
+
+
+

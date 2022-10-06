@@ -166,10 +166,16 @@ public:
                                  const Eigen::Vector3d &t_Delta_force_at_tip);
 
 
-    ::LieAlgebra::Vector6d IDM(const Eigen::Vector3d &t_couple_at_tip,
+    ::LieAlgebra::Vector6d IDM(const Eigen::VectorXd &t_qe,
+                               const Eigen::VectorXd &t_dot_qe,
+                               const Eigen::VectorXd &t_ddot_qe,
+                               const Eigen::Vector3d &t_couple_at_tip,
                                const Eigen::Vector3d &t_force_at_tip);
 
-    ::LieAlgebra::Vector6d TIDM(const Eigen::Vector3d &t_Delta_couple_at_tip,
+    ::LieAlgebra::Vector6d TIDM(const Eigen::VectorXd &t_Delta_qe,
+                                const Eigen::VectorXd &t_Delta_dot_qe,
+                                const Eigen::VectorXd &t_Delta_ddot_qe,
+                                const Eigen::Vector3d &t_Delta_couple_at_tip,
                                 const Eigen::Vector3d &t_Delta_force_at_tip);
 
 

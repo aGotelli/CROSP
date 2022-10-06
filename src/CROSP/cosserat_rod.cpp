@@ -209,9 +209,14 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
 
 
 
-::LieAlgebra::Vector6d CosseratRod::IDM(const Eigen::Vector3d &t_couple_at_tip,
+::LieAlgebra::Vector6d CosseratRod::IDM(const Eigen::VectorXd &t_qe,
+                                        const Eigen::VectorXd &t_dot_qe,
+                                        const Eigen::VectorXd &t_ddot_qe,
+                                        const Eigen::Vector3d &t_couple_at_tip,
                                         const Eigen::Vector3d &t_force_at_tip)
 {
+    updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
+
     forwardKinematics();
     backwardDynamics(t_couple_at_tip,
                      t_force_at_tip);
@@ -219,9 +224,15 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
     return getLambdaAtBase();
 }
 
-::LieAlgebra::Vector6d CosseratRod::TIDM(const Eigen::Vector3d &t_Delta_couple_at_tip,
+::LieAlgebra::Vector6d CosseratRod::TIDM(const Eigen::VectorXd &t_Delta_qe,
+                                         const Eigen::VectorXd &t_Delta_dot_qe,
+                                         const Eigen::VectorXd &t_Delta_ddot_qe,
+                                         const Eigen::Vector3d &t_Delta_couple_at_tip,
                                          const Eigen::Vector3d &t_Delta_force_at_tip)
 {
+    updateParameterisationVariation(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
+
+
     forwardTangentKinematics();
     backwardTangentDynamics(t_Delta_couple_at_tip,
                             t_Delta_force_at_tip);
@@ -257,8 +268,9 @@ unsigned int CosseratRod::getCoordinatesDimension()const
 
 Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) const
 {
-    return m_rod_properties->m_Kee*t_qe
-            - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+
+    const Eigen::VectorXd Qe = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+    return m_rod_properties->m_Kee*t_qe - Qe;
 }
 
 Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const

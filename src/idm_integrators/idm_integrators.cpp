@@ -452,7 +452,7 @@ GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(const unsigned int t_nu
                                                          std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator)
-    : OSNI::ODEb(t_polynomial_representation.m_ne,
+    : OSNI::ODEb(t_polynomial_representation.getCoordinatesDimension(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                  t_number_of_Chebyshev_points),
       m_B(t_polynomial_representation.m_B),
@@ -467,7 +467,7 @@ GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(const unsigned int t_nu
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
                                                          const Eigen::VectorXd t_initial_condition)
-    : OSNI::ODEb(t_polynomial_representation.m_ne,
+    : OSNI::ODEb(t_polynomial_representation.getCoordinatesDimension(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                  t_number_of_Chebyshev_points),
       m_B(t_polynomial_representation.m_B),
@@ -502,7 +502,9 @@ IDMIntegrators::IDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
       m_polynomial_representation(t_polynomial_representation),
       m_strain_parameterisation(t_strain_parameterisation),
       m_rod_properties(t_rod_properties)
-{}
+{
+
+}
 
 
 

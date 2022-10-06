@@ -109,6 +109,9 @@ public:
 
     RodProperties(const unsigned int t_mu);
 
+    RodProperties(const unsigned int t_mu,
+                  const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
+
     RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
     RodProperties(const MaterialProperties &t_material_properties);

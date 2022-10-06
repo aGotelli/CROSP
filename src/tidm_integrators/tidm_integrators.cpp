@@ -523,7 +523,7 @@ DeltaGeneralisedForcesIntegrator::DeltaGeneralisedForcesIntegrator(const unsigne
                                                                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_couples_integrator,
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator)
-    : OSNI::ODEb(t_polynomial_representation.m_ne,
+    : OSNI::ODEb(t_polynomial_representation.getCoordinatesDimension(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                  t_number_of_Chebyshev_points),
       m_B(t_polynomial_representation.m_B),
@@ -539,7 +539,7 @@ DeltaGeneralisedForcesIntegrator::DeltaGeneralisedForcesIntegrator(const unsigne
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_couples_integrator,
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator,
                                                                    const Eigen::Vector3d t_initial_condition)
-    : OSNI::ODEb(t_polynomial_representation.m_ne,
+    : OSNI::ODEb(t_polynomial_representation.getCoordinatesDimension(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
                  t_number_of_Chebyshev_points),
       m_B(t_polynomial_representation.m_B),

@@ -24,14 +24,16 @@ Initializer::Initializer(::CROSP::CosseratRod &t_rod,
     if(init_google_logging)
         google::InitGoogleLogging(std::string().c_str());
 
-    CostFunction* cost_function = new CostFunction( this, ceres::DO_NOT_TAKE_OWNERSHIP );
+    m_cost_function = new CostFunction( this, ceres::DO_NOT_TAKE_OWNERSHIP );
+    m_cost_function->AddParameterBlock( t_rod.getCoordinatesDimension() );
+    m_cost_function->SetNumResiduals( t_rod.getCoordinatesDimension() );
 
     m_options.max_num_iterations = 100;
     m_options.linear_solver_type = ceres::DENSE_QR;
     m_options.minimizer_progress_to_stdout = true;
 
     //  Add the cost function to the problem
-    m_problem.AddResidualBlock(cost_function, nullptr, t_initial_guess.data());
+    m_problem.AddResidualBlock(m_cost_function, nullptr, t_initial_guess.data());
 
     //  Use the non linear solver to find a solution
     ceres::Solve(m_options, &m_problem, &m_summary);
@@ -40,11 +42,11 @@ Initializer::Initializer(::CROSP::CosseratRod &t_rod,
     std::cout << m_summary.FullReport() << "\n";
 }
 
-bool Initializer::operator()(const double* t_guess, double* t_residual) const
+bool Initializer::operator()(double const* const* t_guess, double* t_residual) const
 {
-    Eigen::Matrix<double, ::CROSP::polynomial_representation::default_number_of_modes, 1> qe;
+    Eigen::VectorXd qe(m_n);
     for (unsigned int i=0;i<qe.size();i++)
-        qe[i] = t_guess[i];
+        qe[i] = t_guess[0][i];
 
 
     Eigen::VectorXd dot_qe, ddot_qe;
