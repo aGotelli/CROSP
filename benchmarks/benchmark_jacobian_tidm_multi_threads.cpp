@@ -25,7 +25,7 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
 
 const unsigned int number_of_Chebyshev_points = 17;
 
-const unsigned int ne = 4;
+const unsigned int ne = 6;
 
 const unsigned int coordinates_dimension = na * ne;
 
@@ -312,6 +312,60 @@ int main(int argc, char *argv[])
 
                 });
             }
+
+            pool.wait_for_tasks();
+        }
+    })/*->Arg(3)->Arg(4)->Arg(5)->Arg(6)->Arg(8)->Arg(10)->Arg(12)->Arg(14)->Arg(16)->Arg(20)*/->Repetitions(20)->Unit(::benchmark::kMicrosecond)->UseRealTime();
+
+
+    name = "Jacobian tidm multithreads loop na=" + std::to_string(na)+" ne="+std::to_string(ne)+" threads=" +std::to_string(pool.get_thread_count());
+    ::benchmark::RegisterBenchmark(name.c_str(), [&](::benchmark::State &t_state){
+
+        //  Map force and couple into local coordinates
+        Eigen::Vector3d Delta_force_at_tip_local_coord = Eigen::Vector3d::Zero();//tip_pose.getRotationMatrix().transpose()*t_Delta_force_at_tip;
+        Eigen::Vector3d Delta_couple_at_tip_local_coord = Eigen::Vector3d::Zero();//tip_pose.getRotationMatrix().transpose()*t_Delta_couple_at_tip;
+
+        Eigen::VectorXd Delta_q = Eigen::VectorXd::Zero(coordinates_dimension);
+        Eigen::VectorXd Delta_dot_q = Eigen::VectorXd::Zero(coordinates_dimension);
+        Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(coordinates_dimension);
+
+        while(t_state.KeepRunning()){
+
+            pool.push_loop(coordinates_dimension,
+                           [&](const int begin, const int end){
+
+                for(int i=begin; i<end; i++){
+                    //  Integrate Delta zeta
+                    tidm_integrators[i]->m_Delta_rotation->solveSystem();
+                    tidm_integrators[i]->m_Delta_position->solveSystem();
+
+                    //  Integrate Delta eta
+                    tidm_integrators[i]->m_Delta_angular_velocity->solveSystem();
+                    tidm_integrators[i]->m_Delta_linear_velocity->solveSystem();
+
+                    //  Integrate Delta dot eta
+                    tidm_integrators[i]->m_Delta_angular_acceleration->solveSystem();
+                    tidm_integrators[i]->m_Delta_linear_acceleration->solveSystem();
+
+
+                    tidm_integrators[i]->m_Delta_internal_forces->integrate(Delta_force_at_tip_local_coord);
+                    tidm_integrators[i]->m_Delta_internal_couples->integrate(Delta_couple_at_tip_local_coord);
+
+                    tidm_integrators[i]->m_Delta_generalised_forces->integrate( Eigen::VectorXd::Zero(coordinates_dimension) );
+
+
+                    Delta_q[i] = 1;
+                    Delta_dot_q = a * Delta_q;
+                    Delta_ddot_q = b * Delta_q;
+
+
+                    Jacobian.col(i) = rod_properties->m_Kee*Delta_q
+                                        + rod_properties->m_Dee*Delta_dot_q
+                                        - tidm_integrators[i]->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+
+                }
+            });
+
 
             pool.wait_for_tasks();
         }
