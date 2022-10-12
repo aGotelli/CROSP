@@ -45,6 +45,8 @@ public:
 
     CosseratRod(unsigned int t_number_of_Chebyshev_points);
 
+    CosseratRod(const rod_properties::MaterialProperties &t_material_properties);
+
     CosseratRod(const rod_properties::RodProperties &t_rod_properties);
 
     CosseratRod(const rod_properties::RodProperties &t_rod_properties,
@@ -192,7 +194,7 @@ public:
                                const Eigen::Vector3d &t_initial_position,
                                const ::LieAlgebra::Vector6d &t_initial_twist,
                                const ::LieAlgebra::Vector6d &t_initial_acceleration,
-                               const Eigen::Vector3d &t_wrench_at_tip);
+                               const LieAlgebra::Vector6d &t_wrench_at_tip);
 
 
 
