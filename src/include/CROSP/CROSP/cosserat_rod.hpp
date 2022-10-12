@@ -88,7 +88,7 @@ public:
 
     /*!
      * \brief forwardKinematics computes the forward kinematics of the rod starting from the given states
-     * \param t_initial_quaternion the initial state for the quaternion
+     * \param t_initial_quaternion the initial state for the quaternion as a vector [w, x, y, z]
      * \param t_initial_position the initial state for the position
      * \param t_initial_angular_velocity the initial state for the angular velocities
      * \param t_initial_linear_velocity the initial state for the linear velocities
@@ -171,6 +171,30 @@ public:
                                const Eigen::VectorXd &t_ddot_qe,
                                const Eigen::Vector3d &t_couple_at_tip,
                                const Eigen::Vector3d &t_force_at_tip);
+
+
+    /*!
+     * \brief IDM computes the inverse dynamic model for the Cosserat rod
+     * \param t_qe is the set of generalised coordinates
+     * \param t_dot_qe is the set of the first derivative for the generalised coordinates
+     * \param t_ddot_qe is the set of the second derivative for the generalised coordinates
+     * \param t_initial_quaternion the initial state for the quaternion as a vector [w, x, y, z]
+     * \param t_initial_position the initial position of the rod
+     * \param t_initial_twist the twist at the rod base, with first the angular part followed by linear part
+     * \param t_initial_acceleration the acceleration of the rod base, with first the angular part followed by linear part
+     * \param t_wrench_at_tip the wrench at the rod tip, with the couple first and then the forces
+     * \return Lambda, the vector of internal wrenches expressed in the rod local frame
+     */
+    ::LieAlgebra::Vector6d IDM(const Eigen::VectorXd &t_qe,
+                               const Eigen::VectorXd &t_dot_qe,
+                               const Eigen::VectorXd &t_ddot_qe,
+                               const Eigen::Vector4d &t_initial_quaternion,
+                               const Eigen::Vector3d &t_initial_position,
+                               const ::LieAlgebra::Vector6d &t_initial_twist,
+                               const ::LieAlgebra::Vector6d &t_initial_acceleration,
+                               const Eigen::Vector3d &t_wrench_at_tip);
+
+
 
     ::LieAlgebra::Vector6d TIDM(const Eigen::VectorXd &t_Delta_qe,
                                 const Eigen::VectorXd &t_Delta_dot_qe,

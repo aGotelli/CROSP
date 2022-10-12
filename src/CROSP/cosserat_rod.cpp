@@ -224,6 +224,32 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
     return getLambdaAtBase();
 }
 
+
+
+::LieAlgebra::Vector6d CosseratRod::IDM(const Eigen::VectorXd &t_qe,
+                                        const Eigen::VectorXd &t_dot_qe,
+                                        const Eigen::VectorXd &t_ddot_qe,
+                                        const Eigen::Vector4d &t_initial_quaternion,
+                                        const Eigen::Vector3d &t_initial_position,
+                                        const ::LieAlgebra::Vector6d &t_initial_twist,
+                                        const ::LieAlgebra::Vector6d &t_initial_acceleration,
+                                        const Eigen::Vector3d &t_wrench_at_tip)
+{
+    updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
+
+    forwardKinematics(t_initial_quaternion,
+                      t_initial_position,
+                      t_initial_twist.block<3, 1>(0, 0),
+                      t_initial_twist.block<3, 1>(3, 0),
+                      t_initial_acceleration.block<3, 1>(0, 0),
+                      t_initial_acceleration.block<3, 1>(3, 0));
+
+    backwardDynamics(t_wrench_at_tip.block<3,1>(0, 0),
+                     t_wrench_at_tip.block<3,1>(3, 0));
+
+    return getLambdaAtBase();
+}
+
 ::LieAlgebra::Vector6d CosseratRod::TIDM(const Eigen::VectorXd &t_Delta_qe,
                                          const Eigen::VectorXd &t_Delta_dot_qe,
                                          const Eigen::VectorXd &t_Delta_ddot_qe,
