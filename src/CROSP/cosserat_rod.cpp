@@ -108,6 +108,8 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
     //  Integrate Positions
     m_idm_integrators->m_position->integrate(t_initial_position);
 
+    //std::cout << "Positions : \n" << m_idm_integrators->m_position->getStackAsMatrix() << std::endl;
+
     //  Integrate twist
     m_idm_integrators->m_angular_velocity->integrate(t_initial_angular_velocity);
     m_idm_integrators->m_linear_velocity->integrate(t_initial_linear_velocity);
@@ -299,9 +301,9 @@ unsigned int CosseratRod::getCoordinatesDimension()const
 
 Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) const
 {
-
     const Eigen::VectorXd Qe = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
-    return m_rod_properties->m_Kee*t_qe - Qe;
+    const Eigen::VectorXd elastic_internal_effort = m_rod_properties->m_Kee*t_qe;
+    return elastic_internal_effort - Qe;
 }
 
 Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const

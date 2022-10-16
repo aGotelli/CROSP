@@ -487,8 +487,8 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
     Lambda << C,
               N;
 
-    const auto Phi = m_strain_parameterisation->m_Phi_stack.at(t_point);
-    return -Phi.transpose()*m_B.transpose()*Lambda;
+    const Eigen::VectorXd b_at_point = -m_strain_parameterisation->m_map_to_strain_stack.at(t_point).transpose()*Lambda;
+    return b_at_point;
 }
 
 

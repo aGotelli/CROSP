@@ -113,6 +113,22 @@ public:
     const std::vector<Eigen::MatrixXd> m_Phi_stack { polynomial_representation::generatePhiStack(m_polynomial_representation,
                                                                                                  ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
 
+
+    //  The vector stack of B Phi used to map the generalised coordinates into the strain field
+    const std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
+            std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
+
+            const std::vector<Eigen::MatrixXd> Phi_stack =
+                    polynomial_representation::generatePhiStack(m_polynomial_representation,
+                                                                ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
+
+
+            std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
+               return m_polynomial_representation.m_B*Phi_stack[index++];
+            });
+
+            return map_to_strain_stack;
+        }() };
 private:
 
     /*!
@@ -140,23 +156,6 @@ private:
                                  0;
 
             return defineConstrainedStrain(constant_strain);
-        }() };
-
-
-    //  The vector stack of B Phi used to map the generalised coordinates into the strain field
-    const std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
-            std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
-
-            const std::vector<Eigen::MatrixXd> Phi_stack =
-                    polynomial_representation::generatePhiStack(m_polynomial_representation,
-                                                                ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
-
-
-            std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
-               return m_polynomial_representation.m_B*Phi_stack[index++];
-            });
-
-            return map_to_strain_stack;
         }() };
 
 
