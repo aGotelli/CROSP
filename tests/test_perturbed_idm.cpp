@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     std::cout << "Internal forces : \n" << idm_integrators->m_internal_forces->getStackAsMatrix() << "\n\n\n" << std::endl;
     std::cout << "Generalised forces : \n" << idm_integrators->m_generalised_forces->getStackAsMatrix() << "\n\n\n" << std::endl;
 
-    Eigen::VectorXd Qe = idm_integrators->m_generalised_forces->getStateAtPoint(OSNI::ROD_POSITION::BASE);
+    Eigen::VectorXd Qe = idm_integrators->m_generalised_forces->getStateAtPoint(OSNI::INTEGRATION_DOMAIN::BEGIN);
     std::cout << "Origianl Qe : \n" << Qe << "\n\n\n" << std::endl;
 
     Eigen::VectorXd elastic_energy = rod_properties->m_Kee * qe;
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 
         std::cout << "Origianl Qe : \n" << Qe << "\n" << std::endl;
 
-        Eigen::VectorXd delta_Qe = idm_integrators->m_generalised_forces->getStateAtPoint(OSNI::ROD_POSITION::BASE);
+        Eigen::VectorXd delta_Qe = idm_integrators->m_generalised_forces->getStateAtPoint(OSNI::INTEGRATION_DOMAIN::BEGIN);
 
         Eigen::VectorXd delta_elastic_energy = rod_properties->m_Kee * delta_qe;
         std::cout << "delta elastic energy : \n" << delta_elastic_energy << "\n" << std::endl;

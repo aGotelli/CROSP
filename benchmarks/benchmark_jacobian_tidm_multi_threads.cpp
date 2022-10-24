@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 
                     Jacobian.col(i) = rod_properties->m_Kee*Delta_q
                                         + rod_properties->m_Dee*Delta_dot_q
-                                        - tidm_integrators[i]->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+                                        - tidm_integrators[i]->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 
                 });
             }
@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 
                     Jacobian.col(i) = rod_properties->m_Kee*Delta_q
                                         + rod_properties->m_Dee*Delta_dot_q
-                                        - tidm_integrators[i]->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+                                        - tidm_integrators[i]->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 
                 }
             });

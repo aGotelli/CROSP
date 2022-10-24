@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     ::Chebyshev::ChebyshevReconstructor Chebyshev_reconstructor;
 
 
-    const auto stack_of_points = Chebyshev_reconstructor.ReconstructRodShape(
+    const auto stack_of_points = Chebyshev_reconstructor.reconstructRodShape(
                                         rod.getRodPositionsAtChebyshevPoints());
 
     ::utilities::qt_helper::plot2D(a,

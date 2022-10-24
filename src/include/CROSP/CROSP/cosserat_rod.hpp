@@ -151,6 +151,14 @@ public:
 
 
     /*!
+     * \brief getTangentKinematicsAtTip gives the tangent kinematics at the rod tip
+     *
+     * \return the tangent kinematics state of the rod tip
+     */
+    ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const;
+
+
+    /*!
      * \brief backwardDynamics computes the backward dynamics starting from the given state at the rod tip
      * \param t_couple_at_tip The couple expressed in reference coordinates that acts on the rod tip
      * \param t_force_at_tip The force expressed in reference coordinates that acts on the rod tip
@@ -237,7 +245,7 @@ public:
     {
         return m_rod_properties->m_Kee*t_qe
                 + m_rod_properties->m_Dee*t_dot_qe
-                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     }
 
 
@@ -247,7 +255,7 @@ public:
     {
         return m_rod_properties->m_Kee*t_Delta_qe
                 + m_rod_properties->m_Dee*t_Delta_dot_qe
-                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     }
 
 
