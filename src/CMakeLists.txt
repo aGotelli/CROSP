@@ -108,8 +108,8 @@ add_library(${PROJECT_NAME} SHARED
                             tidm_integrators/tidm_integrators.cpp
 )
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        math_tools
+    PUBLIC
+        math_tools::math_tools
         Eigen3::Eigen
         OSNI
         ${CERES_LIBRARIES}
