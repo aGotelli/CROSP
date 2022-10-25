@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Eigen3 3.4 NO_MODULE REQUIRED)
 
-find_package(utilities REQUIRED)
+#find_package(utilities REQUIRED)
 
 find_package(math_tools REQUIRED)
 
@@ -37,13 +37,13 @@ set(CMAKE_DEBUG_POSTFIX "-debug")
 add_subdirectory(src)
 
 # testing
-if(GTest_FOUND)
-  message(STATUS "Building tests")
-  enable_testing()
+#if(GTest_FOUND)
+#  message(STATUS "Building tests")
+#  enable_testing()
 
-  add_subdirectory(tests)
+#  add_subdirectory(tests)
 
-endif(GTest_FOUND)
+#endif(GTest_FOUND)
 
 
 # benchmark

@@ -109,11 +109,10 @@ add_library(${PROJECT_NAME} SHARED
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        math_tools::math_tools
+        math_tools
         Eigen3::Eigen
         OSNI
         ${CERES_LIBRARIES}
-        utilities
 #    PUBLIC
 #        StrainParameterisation
 #        RodProperties
