@@ -96,6 +96,7 @@ add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
                             static_initialiser/static_initialiser.cpp
 
+
                             include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
                             polynomial_representation/polynomial_representation.cpp
                             include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
