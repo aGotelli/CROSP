@@ -107,9 +107,9 @@ public:
 
     RodProperties()=default;
 
-    RodProperties(const unsigned int t_mu);
+    RodProperties(const double t_mu);
 
-    RodProperties(const unsigned int t_mu,
+    RodProperties(const double t_mu,
                   const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
     RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
@@ -202,7 +202,7 @@ public:
     //  The generalised elasticity matrix
     const Eigen::MatrixXd m_Kee { defineKee( polynomial_representation::PolynomialRepresentation() ) };
 
-    const double m_mu { 1e-2 };
+    const double m_mu { 1e-3 };
 
     const Eigen::MatrixXd m_Dee { m_mu*m_Kee };
 

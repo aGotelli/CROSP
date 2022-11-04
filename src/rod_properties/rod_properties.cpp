@@ -4,12 +4,12 @@
 
 namespace CROSP::rod_properties {
 
-RodProperties::RodProperties(const unsigned int t_mu)
+RodProperties::RodProperties(const double t_mu)
     : m_mu( t_mu )
 {}
 
 
-RodProperties::RodProperties(const unsigned int t_mu,
+RodProperties::RodProperties(const double t_mu,
                              const polynomial_representation::PolynomialRepresentation t_polynomial_representation)
     : m_Kee( defineKee(t_polynomial_representation) ),
       m_mu( t_mu )
