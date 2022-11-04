@@ -331,6 +331,18 @@ Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &
 
 
 
+Eigen::MatrixXd CosseratRod::getRodShape(const Eigen::VectorXd &t_qe)const
+{
+    auto rod = *this;
+
+    rod.updateParameterisation(t_qe, 0*t_qe, 0*t_qe);
+
+    rod.forwardKinematics();
+
+    return rod.getRodPositionsAtChebyshevPoints();
+}
+
+
 
 
 }   //  namespace CROSP
