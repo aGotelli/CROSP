@@ -243,9 +243,18 @@ public:
     Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe,
                                          const Eigen::VectorXd &t_dot_qe) const
     {
-        return m_rod_properties->m_Kee*t_qe
-                + m_rod_properties->m_Dee*t_dot_qe
-                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+        Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
+        Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+
+
+        Eigen::VectorXd Qe = Kee * t_qe;
+        Eigen::VectorXd Ce = Dee * t_dot_qe;
+        Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+        return Qe + Ce - Qa;
+
+//        return m_rod_properties->m_Kee*t_qe
+//                + m_rod_properties->m_Dee*t_dot_qe
+//                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     }
 
 
@@ -253,9 +262,18 @@ public:
     Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
                                                 const Eigen::VectorXd &t_Delta_dot_qe)const
     {
-        return m_rod_properties->m_Kee*t_Delta_qe
-                + m_rod_properties->m_Dee*t_Delta_dot_qe
-                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+        Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
+        Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+
+
+        Eigen::VectorXd Delta_Qe = Kee * t_Delta_qe;
+        Eigen::VectorXd Delta_Ce = Dee * t_Delta_dot_qe;
+        Eigen::VectorXd Delta_Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+        return Delta_Qe + Delta_Ce - Delta_Qa;
+
+//        return m_rod_properties->m_Kee*t_Delta_qe
+//                + m_rod_properties->m_Dee*t_Delta_dot_qe
+//                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     }
 
 
@@ -264,6 +282,9 @@ public:
 
 
     inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
+
+
+    Eigen::MatrixXd getRodShape(const Eigen::VectorXd &t_qe)const;
 
 #ifndef DEVELOPER
 private:
