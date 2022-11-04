@@ -268,7 +268,7 @@ public:
 
         Eigen::VectorXd Delta_Qe = Kee * t_Delta_qe;
         Eigen::VectorXd Delta_Ce = Dee * t_Delta_dot_qe;
-        Eigen::VectorXd Delta_Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+        Eigen::VectorXd Delta_Qa = m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
         return Delta_Qe + Delta_Ce - Delta_Qa;
 
 //        return m_rod_properties->m_Kee*t_Delta_qe
