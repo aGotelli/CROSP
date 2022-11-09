@@ -6,3 +6,5 @@ build/
 *.bkp
 
 *.dtmp
+
+docs/api/
