@@ -26,13 +26,17 @@
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
-
+/// \brief CROSP::idm_integrators is the namespace containing the integrators for the IDM
 namespace CROSP::idm_integrators {
 
 
 
 
-
+/*!
+ * \brief The QuaternionIntegrator struct implements the spectral numerical integration for the quaternion
+ *
+ * This class implemnts the integration for the quaternions forllowing the formula \f$ Q' = \frac{1}{2}  A_{(K)} Q
+ */
 struct QuaternionIntegrator : public OSNI::ODEA {
 
     QuaternionIntegrator(const unsigned int t_number_of_Chebyshev_points,

@@ -1,5 +1,5 @@
 /**
- * \file material_properties.hpp
+ * \file rod_properties.hpp
  * \author Andrea Gotelli (Andrea.Gotelli@ls2n.fr)
  * \brief This files contains the structure defining the material properties of the rod
  * \date 1-08-2022
@@ -21,6 +21,7 @@
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
+/// \brief CROSP::rod_properties namespace contains the definition of the rod properties
 namespace CROSP::rod_properties {
 
 
@@ -47,13 +48,13 @@ struct MaterialProperties {
                                                                                     m_rho(t_rho)
     {}
 
-    //  Young modulus [Pa]
+    ///  \brief m_E Young modulus [Pa]
     const double m_E { 210e9 };
 
-    //  Shear modulus [Pa]
+    ///  \brief m_G Shear modulus [Pa]
     const double m_G {  80e9 };
 
-    //  Specific weight [kg/m^3]
+    ///  \brief m_rho Specific weight [kg/m^3]
     const double m_rho { 7800 };
 
 };
@@ -80,18 +81,21 @@ struct RodDimensions {
     {}
 
 
-    //  Radius of the section [m]
+    /// \brief m_r  Radius of the section [m]
     const double m_r { 0.001 };
 
-    //  Area of the section [m^2]
+    /// \brief m_A  Area of the section [m^2]
     const double m_A { M_PI*m_r*m_r };
 
-    //  Length of the rod [m]
+    /// \brief m_L  Length of the rod [m]
     const double m_L { 1.0 };
 
     //  Moment of inertia [m^4]
+    /// \brief m_Jx pricipal moment of inertia on the x axis
     const double m_Jx { M_PI*pow(m_r,4)/2 };
+    /// \brief m_Jy pricipal moment of inertia on the y axis
     const double m_Jy { M_PI*pow(m_r,4)/4 };
+    /// \brief m_Jz pricipal moment of inertia on the z axis
     const double m_Jz { M_PI*pow(m_r,4)/4 };
 };
 
@@ -132,9 +136,10 @@ public:
                   const RodDimensions &t_rod_dimensions);
 
 
-
+    /// \brief m_material_properties instance of the rod material properties
     const MaterialProperties m_material_properties { MaterialProperties() };
 
+    /// \brief m_rod_dimensions instance of the rod geometrical properties and dimensions
     const RodDimensions m_rod_dimensions { RodDimensions() };
 
 
@@ -173,7 +178,7 @@ public:
 
 
 
-    //  The Hookean matrix default initialised
+    /// \brief m_H The Hookean matrix default initialised using the members m_material_properties and m_rod_dimensions
     const Eigen::Matrix<double, 6, 6> m_H { [&](){
             Eigen::Matrix<double, 6, 6> H;
             H.setZero();
@@ -186,7 +191,7 @@ public:
 
             return H;}() };
 
-    //  The inertia matrix default initialised
+    /// \brief m_M The inertia matrix default initialised using the members m_material_properties and m_rod_dimensions
     const  Eigen::Matrix<double, 6, 6>  m_M{ [&](){
             Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
 
@@ -199,9 +204,10 @@ public:
             return M;}() };
 
 
-    //  The generalised elasticity matrix
+    /// \brief m_Kee The generalised elasticity matrix
     const Eigen::MatrixXd m_Kee { defineKee( polynomial_representation::PolynomialRepresentation() ) };
 
+    /// \brief m_mu is the dumping coefficient of the rod (material)
     const double m_mu { 1e-3 };
 
     const Eigen::MatrixXd m_Dee { m_mu*m_Kee };
