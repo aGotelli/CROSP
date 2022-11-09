@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 
-project(CROSP LANGUAGES CXX VERSION 2.2.2)
+project(CROSP LANGUAGES CXX VERSION 2.3.1)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -37,13 +37,13 @@ set(CMAKE_DEBUG_POSTFIX "-debug")
 add_subdirectory(src)
 
 # testing
-#if(GTest_FOUND)
-#  message(STATUS "Building tests")
-#  enable_testing()
+if(GTest_FOUND)
+  message(STATUS "Building tests")
+  enable_testing()
 
-#  add_subdirectory(tests)
+  add_subdirectory(tests)
 
-#endif(GTest_FOUND)
+endif(GTest_FOUND)
 
 
 # benchmark
@@ -55,7 +55,8 @@ if(benchmark_FOUND)
 
 endif(benchmark_FOUND)
 
-
+#   Build documentation with Doxygen (if possible)
+include(cmake/documentation_module.cmake)
 
 #   Install the library using the default routine
 include(cmake/installation_module.cmake)

@@ -108,8 +108,6 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
     //  Integrate Positions
     m_idm_integrators->m_position->integrate(t_initial_position);
 
-    //std::cout << "Positions : \n" << m_idm_integrators->m_position->getStackAsMatrix() << std::endl;
-
     //  Integrate twist
     m_idm_integrators->m_angular_velocity->integrate(t_initial_angular_velocity);
     m_idm_integrators->m_linear_velocity->integrate(t_initial_linear_velocity);
@@ -118,6 +116,29 @@ void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
     m_idm_integrators->m_angular_acceleration->integrate(t_initial_angular_acceleration);
     m_idm_integrators->m_linear_acceleration->integrate(t_initial_linear_acceleration);
 }
+
+
+void CosseratRod::forwardKinematics(const Eigen::Quaterniond &t_initial_quaternion,
+                                    const Eigen::Vector3d &t_initial_position,
+                                    const Eigen::Vector3d &t_initial_angular_velocity,
+                                    const Eigen::Vector3d &t_initial_linear_velocity,
+                                    const Eigen::Vector3d &t_initial_angular_acceleration,
+                                    const Eigen::Vector3d &t_initial_linear_acceleration)
+{
+    const Eigen::Vector4d Q(t_initial_quaternion.w(),
+                            t_initial_quaternion.x(),
+                            t_initial_quaternion.y(),
+                            t_initial_quaternion.z());
+
+    forwardKinematics(Q, t_initial_position,
+                      t_initial_angular_velocity, t_initial_linear_velocity,
+                      t_initial_angular_acceleration, t_initial_linear_acceleration);
+}
+
+
+
+
+
 
 void CosseratRod::updateParameterisationVariation(const Eigen::VectorXd &t_Delta_qe,
                                                   const Eigen::VectorXd &t_Delta_dot_qe,
@@ -161,6 +182,11 @@ void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delt
     m_tidm_integrators->m_Delta_angular_acceleration->integrate( t_initial_Delta_angular_acceleration );
     m_tidm_integrators->m_Delta_linear_acceleration->integrate( t_initial_Delta_linear_acceleration );
 }
+
+
+
+
+
 
 ::LieAlgebra::Kinematics CosseratRod::getKinematicsAtTip()const
 {
@@ -214,6 +240,21 @@ void CosseratRod::backwardDynamics(const Eigen::Vector3d &t_couple_at_tip,
 
 }
 
+void CosseratRod::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
+{
+
+    //  Map force and couple into local coordinates
+    Eigen::Vector3d couple_at_tip = t_Lambda_X1.block<3, 1>(0, 0);
+    Eigen::Vector3d force_at_tip  = t_Lambda_X1.block<3, 1>(3, 0);
+
+    m_idm_integrators->m_internal_forces->integrate(force_at_tip);
+    m_idm_integrators->m_internal_couples->integrate(couple_at_tip);
+
+
+    m_idm_integrators->m_generalised_forces->integrate(Eigen::VectorXd::Zero(getCoordinatesDimension()));
+
+}
+
 
 void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_at_tip,
                                           const Eigen::Vector3d &t_Delta_force_at_tip)
@@ -227,6 +268,20 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
 
     m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip_local_coord);
     m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip_local_coord);
+
+    m_tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension()));
+}
+
+
+void CosseratRod::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
+{
+
+    Eigen::Vector3d Delta_couple_at_tip = t_Delta_Lambda_X1.block<3, 1>(0, 0);
+    Eigen::Vector3d Delta_force_at_tip  = t_Delta_Lambda_X1.block<3, 1>(3, 0);
+
+
+    m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip);
+    m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip);
 
     m_tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension()));
 }
@@ -254,6 +309,31 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
                                         const Eigen::VectorXd &t_dot_qe,
                                         const Eigen::VectorXd &t_ddot_qe,
                                         const Eigen::Vector4d &t_initial_quaternion,
+                                        const Eigen::Vector3d &t_initial_position,
+                                        const ::LieAlgebra::Vector6d &t_initial_twist,
+                                        const ::LieAlgebra::Vector6d &t_initial_acceleration,
+                                        const ::LieAlgebra::Vector6d &t_wrench_at_tip)
+{
+    updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
+
+    forwardKinematics(t_initial_quaternion,
+                      t_initial_position,
+                      t_initial_twist.block<3, 1>(0, 0),
+                      t_initial_twist.block<3, 1>(3, 0),
+                      t_initial_acceleration.block<3, 1>(0, 0),
+                      t_initial_acceleration.block<3, 1>(3, 0));
+
+    backwardDynamics(t_wrench_at_tip.block<3,1>(0, 0),
+                     t_wrench_at_tip.block<3,1>(3, 0));
+
+    return getLambdaAtBase();
+}
+
+
+::LieAlgebra::Vector6d CosseratRod::IDM(const Eigen::VectorXd &t_qe,
+                                        const Eigen::VectorXd &t_dot_qe,
+                                        const Eigen::VectorXd &t_ddot_qe,
+                                        const Eigen::Quaterniond &t_initial_quaternion,
                                         const Eigen::Vector3d &t_initial_position,
                                         const ::LieAlgebra::Vector6d &t_initial_twist,
                                         const ::LieAlgebra::Vector6d &t_initial_acceleration,
