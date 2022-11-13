@@ -9,9 +9,9 @@
 
 
 static constexpr std::array<bool, 6> admitted_deformations = {
+    false,
     true,
-    true,
-    true,
+    false,
 
     false,
     false,

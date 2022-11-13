@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
 {
 
 
-    const unsigned int repetitions = 5;
+    const unsigned int repetitions = 20;
 
     std::array<bool, 6> admitted_deformations = {
-        true,
+        false,
         true,
         false,
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         }
 
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
             rod.m_idm_integrators->m_position->solveSystem();
 
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         while(t_state.KeepRunning())
             rod.m_idm_integrators->m_angular_velocity->solveSystem();
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
         while(t_state.KeepRunning())
             rod.m_idm_integrators->m_linear_velocity->solveSystem();
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
             rod.m_idm_integrators->m_angular_acceleration->solveSystem();
 
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
             rod.m_idm_integrators->m_linear_acceleration->solveSystem();
 
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
             rod.m_idm_integrators->m_internal_forces->solveSystem();
 
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 
 
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
 
 
 
-    })->Repetitions(repetitions);
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
