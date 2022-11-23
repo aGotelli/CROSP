@@ -422,9 +422,7 @@ Eigen::Vector3d DeltaInternalForcesIntegrator::computeLocalExternalForces(unsign
 
     Eigen::Vector3d Delta_N_bar = -::LieAlgebra::skew( Delta_rotation ).transpose()
                                     *R.transpose()
-                                    *m_rod_properties->m_material_properties.m_rho
-                                    *m_rod_properties->m_rod_dimensions.m_A
-                                    *Eigen::Vector3d(0, 0, 9.81);
+                                    *m_rod_properties->distributedGravitationalForce();
 
 
     return Delta_N_bar;

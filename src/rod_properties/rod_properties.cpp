@@ -66,6 +66,14 @@ double RodProperties::distributedDensity()const
     return m_material_properties.m_rho * m_rod_dimensions.m_A;
 }
 
+
+Eigen::Vector3d RodProperties::distributedGravitationalForce()const
+{
+    return m_material_properties.m_rho * m_rod_dimensions.m_A*m_gravity;
+}
+
+
+
 Eigen::Matrix3d RodProperties::getMAngular()const
 {
     return m_M.block<3, 3>(0, 0);

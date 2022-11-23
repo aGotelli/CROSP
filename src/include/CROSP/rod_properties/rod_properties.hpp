@@ -149,6 +149,14 @@ public:
      */
     double distributedDensity()const;
 
+
+    /*!
+     * \brief distributedGravitationalForce returns the distributed force due to the weight of the rod
+     * \return the distributed force due to the weight of the rod
+     */
+    Eigen::Vector3d distributedGravitationalForce()const;
+
+
     /*!
      * \brief getMAngular returns the angular subset of the inertia matrix
      * \return the angular subset of the inertia matrix
@@ -223,6 +231,9 @@ private:
      * \return
      */
     Eigen::MatrixXd defineKee(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)const;
+
+    const double gamma = 9.81;
+    Eigen::Vector3d m_gravity { Eigen::Vector3d(0, 0, -gamma) };
 
 };
 
