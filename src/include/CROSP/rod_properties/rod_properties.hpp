@@ -113,6 +113,10 @@ public:
 
     RodProperties(const double t_mu);
 
+
+    RodProperties(const double t_mu,
+                  Eigen::Vector3d t_gravity);
+
     RodProperties(const double t_mu,
                   const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
@@ -232,8 +236,9 @@ private:
      */
     Eigen::MatrixXd defineKee(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)const;
 
+
     const double gamma = 9.81;
-    Eigen::Vector3d m_gravity { Eigen::Vector3d(0, 0, -gamma) };
+public : Eigen::Vector3d m_gravity { Eigen::Vector3d(0, 0, -gamma) };
 
 };
 
