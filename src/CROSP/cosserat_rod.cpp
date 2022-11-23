@@ -370,9 +370,9 @@ void CosseratRod::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_
     return getDeltaLambdaAtBase();
 }
 
-Vector6d CosseratRod::getLambdaAtBase()const
+::LieAlgebra::Vector6d CosseratRod::getLambdaAtBase()const
 {
-    Vector6d Lambda;
+    ::LieAlgebra::Vector6d Lambda;
     Lambda <<   m_idm_integrators->m_internal_couples->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN),
                 m_idm_integrators->m_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 
@@ -381,9 +381,9 @@ Vector6d CosseratRod::getLambdaAtBase()const
 
 
 
-Vector6d CosseratRod::getDeltaLambdaAtBase()const
+LieAlgebra::Vector6d CosseratRod::getDeltaLambdaAtBase()const
 {
-    Vector6d Delta_Lambda;
+    ::LieAlgebra::Vector6d Delta_Lambda;
     Delta_Lambda <<   m_tidm_integrators->m_Delta_internal_couples->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN),
                       m_tidm_integrators->m_Delta_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 

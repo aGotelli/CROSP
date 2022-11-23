@@ -32,7 +32,6 @@
 
 namespace CROSP {
 
-typedef Eigen::Matrix<double, 6, 1> Vector6d ;
 
 /*!
  * \brief The CosseratRod class implements the functionalities needed to simulate a Cosserat rod
@@ -309,14 +308,14 @@ public:
      * \brief getLambdaAtBase give Lambda at the rod base, expressed in local coordinates of the rod base frame
      * \return Lambda at the rod base, expressed in local coordinates of the rod base frame
      */
-    Vector6d getLambdaAtBase()const;
+    ::LieAlgebra::Vector6d getLambdaAtBase()const;
 
 
     /*!
      * \brief getDeltaLambdaAtBase give Delta Lambda at the rod base, expressed in local coordinates of the rod base frame
      * \return Delta Lambda at the rod base, expressed in local coordinates of the rod base frame
      */
-    Vector6d getDeltaLambdaAtBase()const;
+    ::LieAlgebra::Vector6d getDeltaLambdaAtBase()const;
 
     /*!
      * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
