@@ -392,18 +392,21 @@ private:
     std::shared_ptr<rod_properties::RodProperties> m_rod_properties { std::make_shared<rod_properties::RodProperties>(m_polynomial_representation) };
 
     //  All the strain releted variables
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { [this](){
+//    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { [this](){
 
-        auto strain_parameterisation = std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
-                                                                                                         m_number_of_Chebyshev_points);
+//        auto strain_parameterisation = std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
+//                                                                                                         m_number_of_Chebyshev_points);
 
-        const unsigned int ne = m_polynomial_representation.getCoordinatesDimension();
-        strain_parameterisation->updateStacks(Eigen::VectorXd::Zero(ne),
-                                              Eigen::VectorXd::Zero(ne),
-                                              Eigen::VectorXd::Zero(ne));
+//        const unsigned int ne = m_polynomial_representation.getCoordinatesDimension();
+//        strain_parameterisation->updateStacks(Eigen::VectorXd::Zero(ne),
+//                                              Eigen::VectorXd::Zero(ne),
+//                                              Eigen::VectorXd::Zero(ne));
 
-        return strain_parameterisation;
-    }() };
+//        return strain_parameterisation;
+//    }() };
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
+        std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
+                                                                          m_number_of_Chebyshev_points)};
 
     //  Variables related the perturbation of the strain parameterisation
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta { std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
