@@ -16,6 +16,16 @@ RodProperties::RodProperties(const double t_mu,
       m_gravity(t_gravity)
 {}
 
+
+RodProperties::RodProperties(const double t_mu,
+                             Eigen::Vector3d t_gravity,
+                             const MaterialProperties &t_material_properties)
+    : m_material_properties(t_material_properties),
+      m_mu( t_mu ),
+      m_gravity(t_gravity)
+{}
+
+
 RodProperties::RodProperties(const double t_mu,
                              const polynomial_representation::PolynomialRepresentation t_polynomial_representation)
     : m_Kee( defineKee(t_polynomial_representation) ),
