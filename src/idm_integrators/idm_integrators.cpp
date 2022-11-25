@@ -502,9 +502,7 @@ IDMIntegrators::IDMIntegrators(const unsigned int t_number_of_Chebyshev_points,
       m_polynomial_representation(t_polynomial_representation),
       m_strain_parameterisation(t_strain_parameterisation),
       m_rod_properties(t_rod_properties)
-{
-
-}
+{}
 
 
 
