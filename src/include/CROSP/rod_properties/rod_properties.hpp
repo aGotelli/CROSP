@@ -118,6 +118,9 @@ public:
                   Eigen::Vector3d t_gravity);
 
     RodProperties(const double t_mu,
+                  const RodDimensions &t_rod_dimensions);
+
+    RodProperties(const double t_mu,
                   Eigen::Vector3d t_gravity,
                   const MaterialProperties &t_material_properties);
 

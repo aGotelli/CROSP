@@ -18,6 +18,13 @@ RodProperties::RodProperties(const double t_mu,
 
 
 RodProperties::RodProperties(const double t_mu,
+                             const RodDimensions &t_rod_dimensions)
+    : m_rod_dimensions(t_rod_dimensions),
+      m_mu( t_mu )
+{}
+
+
+RodProperties::RodProperties(const double t_mu,
                              Eigen::Vector3d t_gravity,
                              const MaterialProperties &t_material_properties)
     : m_material_properties(t_material_properties),
