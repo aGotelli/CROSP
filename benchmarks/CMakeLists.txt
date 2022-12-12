@@ -101,3 +101,12 @@ target_link_libraries(benchmark_jacobian_tidm_multi_threads
 )
 target_compile_definitions(benchmark_jacobian_tidm_multi_threads PRIVATE DEVELOPER)
 
+
+add_executable(magnus magnus.cpp)
+target_link_libraries(magnus
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+        benchmark::benchmark
+)
+target_compile_definitions(magnus PRIVATE DEVELOPER)
