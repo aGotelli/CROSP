@@ -47,22 +47,35 @@ int main(int argc, char *argv[])
 {
 
 
+    BS::thread_pool pool( std::thread::hardware_concurrency() );
+
+    ::benchmark::RegisterBenchmark("Push tasks", [&](::benchmark::State &t_state){
+        while(t_state.KeepRunning()){
+            for(unsigned int i=0; i<coordinates_dimension; i++){
+                pool.push_task([&, i](){
+                    int a = 0;
+                    a++;
+                });
+            }
+
+            pool.wait_for_tasks();
+        }
+    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond)->UseRealTime();
 
 
-//    ::benchmark::RegisterBenchmark("4 loops of wait 1000 us", [&](::benchmark::State &t_state){
+    ::benchmark::RegisterBenchmark("4 loops of wait 1000 us", [&](::benchmark::State &t_state){
 
-//        BS::thread_pool pool( t_state.range(0) );
-//        while(t_state.KeepRunning()){
-//            for(unsigned int i=0; i<4; i++){
-//                pool.push_task([](){
-//                    std::this_thread::sleep_for( std::chrono::microseconds(1000) );
+        while(t_state.KeepRunning()){
+            for(unsigned int i=0; i<4; i++){
+                pool.push_task([](){
+                    std::this_thread::sleep_for( std::chrono::microseconds(1000) );
 
-//                });
-//            }
+                });
+            }
 
-//            pool.wait_for_tasks();
-//        }
-//    })->Arg(3)->Arg(4)->Arg(5)->Arg(6)->Arg(8)->Arg(10)->Arg(12)->Arg(14)->Arg(16)->Arg(20)->Repetitions(20)->Unit(::benchmark::kMicrosecond)->UseRealTime();
+            pool.wait_for_tasks();
+        }
+    })->Repetitions(20)->Unit(::benchmark::kMicrosecond)->UseRealTime();
 
 
 
@@ -215,20 +228,6 @@ int main(int argc, char *argv[])
     })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond)->UseRealTime();
 
 
-    BS::thread_pool pool( std::thread::hardware_concurrency() );
-
-    ::benchmark::RegisterBenchmark("Push tasks", [&](::benchmark::State &t_state){
-        while(t_state.KeepRunning()){
-            for(unsigned int i=0; i<coordinates_dimension; i++){
-                pool.push_task([&, i](){
-                    int a = 0;
-                    a++;
-                });
-            }
-
-            pool.wait_for_tasks();
-        }
-    })->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond)->UseRealTime();
 
 
 
