@@ -144,7 +144,7 @@ Eigen::MatrixXd solutionMagnus(const ::CROSP::CosseratRod &rod,
         end = Chebyshev_points[ (number_of_Chebyshev_points-1) - (i + 1)];
 
         h = end - begin;
-        step = h*sqrt(15.0)/10.0;
+        step = sqrt(15.0)/10.0;
 
         x1 = begin + (0.5 - step)*h;
         x2 = begin + 0.5*h;
@@ -175,7 +175,7 @@ Eigen::MatrixXd solutionMagnus(const ::CROSP::CosseratRod &rod,
                     - (alpha2 + C2)*(-20*alpha1 - alpha3 + C1) )/240.0;
 
 
-        R = ::LieAlgebra::expRodigues(Omega) * R;
+        R = R * ::LieAlgebra::expRodigues(Omega);
 
     }
 
@@ -230,7 +230,7 @@ Eigen::MatrixXd solutionCayley(const ::CROSP::CosseratRod &rod,
         end = Chebyshev_points[ (number_of_Chebyshev_points-1) - (i + 1)];
 
         h = end - begin;
-        step = h*sqrt(15.0)/10.0;
+        step = sqrt(15.0)/10.0;
 
         x1 = begin + (0.5 - step)*h;
         x2 = begin + 0.5*h;
@@ -263,7 +263,7 @@ Eigen::MatrixXd solutionCayley(const ::CROSP::CosseratRod &rod,
         Omega_square = Omega*Omega;
         C = Omega*(I - Omega_square*(I - Omega_square/10.0)/12.0);
 
-        R = (I - C/2.0).inverse() * (I + C/2.0) * R;
+        R = R * (I - C/2.0).inverse() * (I + C/2.0);
 
     }
 
@@ -296,6 +296,9 @@ void compareSolutions()
     const auto R_Cayley = solutionCayley(rod, q);
 
 
+    std::cout << "With q = [" << q.transpose() << "]\n\n";
+
+
     std::cout << "Solutions :\n" <<
                  "  OSNI\n" <<
                  "      R : \n" << R_OSNI << "\n\n" <<
@@ -307,6 +310,9 @@ void compareSolutions()
                  "      R : \n" << R_Cayley << "\n\n";
 
     std::cout << "\n\n\n";
+
+
+    Eigen::Matrix3d RTR_Magnus = R_Magnus.transpose()*R_Magnus;
 
     std::cout << "R^T R :\n"<<
                  "  OSNI\n" <<
@@ -490,7 +496,7 @@ int main(int argc, char *argv[])
                             - (alpha2 + C2)*(-20*alpha1 - alpha3 + C1) )/240.0;
 
 
-                R = ::LieAlgebra::expRodigues(Omega) * R;
+                R = R * ::LieAlgebra::expRodigues(Omega);
 
             }
         }
@@ -586,7 +592,7 @@ int main(int argc, char *argv[])
                 Omega_square = Omega*Omega;
                 C = Omega*(I - Omega_square*(I - Omega_square/10.0)/12.0);
 
-                R = (I - C/2.0).inverse() * (I + C/2.0) * R;
+                R = R * (I - C/2.0).inverse() * (I + C/2.0);
 
             }
         }
