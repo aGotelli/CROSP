@@ -243,8 +243,8 @@ void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_
 Vector6d CosseratRod::getLambdaAtBase()const
 {
     Vector6d Lambda;
-    Lambda <<   m_idm_integrators->m_internal_couples->getStateAtPoint(::OSNI::ROD_POSITION::BASE),
-                m_idm_integrators->m_internal_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+    Lambda <<   m_idm_integrators->m_internal_couples->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN),
+                m_idm_integrators->m_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 
     return Lambda;
 }
@@ -254,8 +254,8 @@ Vector6d CosseratRod::getLambdaAtBase()const
 Vector6d CosseratRod::getDeltaLambdaAtBase()const
 {
     Vector6d Delta_Lambda;
-    Delta_Lambda <<   m_tidm_integrators->m_Delta_internal_couples->getStateAtPoint(::OSNI::ROD_POSITION::BASE),
-                      m_tidm_integrators->m_Delta_internal_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+    Delta_Lambda <<   m_tidm_integrators->m_Delta_internal_couples->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN),
+                      m_tidm_integrators->m_Delta_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 
     return Delta_Lambda;
 }
@@ -269,14 +269,14 @@ unsigned int CosseratRod::getCoordinatesDimension()const
 Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) const
 {
 
-    const Eigen::VectorXd Qe = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+    const Eigen::VectorXd Qe = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     return m_rod_properties->m_Kee*t_qe - Qe;
 }
 
 Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const
 {
     return m_rod_properties->m_Kee*t_Delta_qe
-            - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+            - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 }
 
 

@@ -411,6 +411,17 @@ struct TIDMIntegrators{
                     std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                     std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
+    TIDMIntegrators(const unsigned int t_index,
+                    const unsigned int t_number_of_Chebyshev_points,
+                    const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+                    std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
+                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+
+
+    const unsigned int m_index {0};
+
     //  Instance of the number of points to be used in the integration
     const unsigned int m_number_of_Chebyshev_points;
 

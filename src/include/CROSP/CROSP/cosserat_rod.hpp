@@ -211,7 +211,7 @@ public:
     {
         return m_rod_properties->m_Kee*t_qe
                 + m_rod_properties->m_Dee*t_dot_qe
-                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     }
 
 
@@ -221,7 +221,7 @@ public:
     {
         return m_rod_properties->m_Kee*t_Delta_qe
                 + m_rod_properties->m_Dee*t_Delta_dot_qe
-                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::ROD_POSITION::BASE);
+                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     }
 
 
