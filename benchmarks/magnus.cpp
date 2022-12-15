@@ -12,6 +12,7 @@
 
 
 
+
 constexpr unsigned int repetitions = 20;
 
 constexpr std::array<bool, 6> admitted_deformations = {
@@ -25,6 +26,8 @@ constexpr std::array<bool, 6> admitted_deformations = {
 };
 
 constexpr unsigned int ne = 4;
+
+constexpr unsigned int Nc = 31;
 
 
 
@@ -276,7 +279,7 @@ void compareSolutions()
 {
 
 
-    const unsigned int Nc = 31;
+
 
     ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
@@ -312,7 +315,6 @@ void compareSolutions()
     std::cout << "\n\n\n";
 
 
-    Eigen::Matrix3d RTR_Magnus = R_Magnus.transpose()*R_Magnus;
 
     std::cout << "R^T R :\n"<<
                  "  OSNI\n" <<
@@ -356,7 +358,7 @@ int main(int argc, char *argv[])
 
         ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        ::CROSP::CosseratRod rod(polynomial_representation, Nc);
 
         rod.updateParameterisation(q, 0*q, 0*q);
 
@@ -403,7 +405,7 @@ int main(int argc, char *argv[])
 
         ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        ::CROSP::CosseratRod rod(polynomial_representation, Nc);
 
         rod.updateParameterisation(q, 0*q, 0*q);
 
@@ -423,7 +425,7 @@ int main(int argc, char *argv[])
 
         ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        ::CROSP::CosseratRod rod(polynomial_representation, Nc);
 
         rod.updateParameterisation(q, 0*q, 0*q);
 
@@ -512,7 +514,7 @@ int main(int argc, char *argv[])
 
         ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        ::CROSP::CosseratRod rod(polynomial_representation, Nc);
 
         rod.updateParameterisation(q, 0*q, 0*q);
 
