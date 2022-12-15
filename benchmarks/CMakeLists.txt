@@ -120,3 +120,13 @@ target_link_libraries(magnus_non_homogeneous
 )
 target_compile_definitions(magnus_non_homogeneous PRIVATE DEVELOPER)
 
+
+add_executable(magnus_non_homogeneous_V magnus_non_homogeneous_V.cpp)
+target_link_libraries(magnus_non_homogeneous_V
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+        benchmark::benchmark
+)
+target_compile_definitions(magnus_non_homogeneous_V PRIVATE DEVELOPER)
+
