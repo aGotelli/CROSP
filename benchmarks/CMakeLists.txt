@@ -130,3 +130,14 @@ target_link_libraries(magnus_non_homogeneous_V
 )
 target_compile_definitions(magnus_non_homogeneous_V PRIVATE DEVELOPER)
 
+
+add_executable(reconstruct_Omega reconstruct_Omega.cpp
+    chebyshev_reconstructor.hpp)
+target_link_libraries(reconstruct_Omega
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+        benchmark::benchmark
+)
+target_compile_definitions(reconstruct_Omega PRIVATE DEVELOPER)
+
