@@ -28,7 +28,7 @@ public:
         //  Perform the cosine transform
         m_CN = m_DDCT * t_vector_on_Chebyshev_grid.transpose();
 
-        std::cout << "CN : \n" << m_CN << "\n\n";
+        //std::cout << "CN : \n" << m_CN << "\n\n";
 
         double T0 = 1.0/sqrt(2.0);  //  First Chebyshev polynomial (Normalized)
         double Th;                  //  Other Chebyshev polynomial (Normalized)
