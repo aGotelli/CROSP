@@ -21,17 +21,18 @@ constexpr std::array<bool, 6> admitted_deformations = {
     false
 };
 
-constexpr unsigned int ne = 12;
+constexpr unsigned int ne = 8;
 
-constexpr unsigned int Nc = 31;
+constexpr unsigned int Nc = 21;
 
 
 
 QApplication* app;
 ::Chebyshev::ChebyshevReconstructor rod_shape_reconstructor(Nc);
 
-const double t_end = 1.0;
-::NewmarkIntegrator newmark_integrator(t_end);
+const double t_end = 0.2;
+const double dt = 0.005;
+::NewmarkIntegrator newmark_integrator(dt, t_end);
 
 
 
@@ -301,10 +302,28 @@ int main(int argc, char *argv[])
             K_stack.col(i) = rod.m_strain_parameterisation->m_K_stack->at((Nc-1)-i);
 
 
+        const auto M_ang = rod.m_rod_properties->getMAngular();
+        const auto dot_Omega_stack = rod.m_idm_integrators->m_angular_acceleration->getStackAsMatrix();
+
+
+        const auto M_lin = rod.m_rod_properties->getMAngular();
+        const auto V_stack = rod.m_idm_integrators->m_linear_velocity->getStackAsMatrix();
+
+
+        Eigen::MatrixXd linear_acceleration_term(3, Nc);
+        for(unsigned int j=0; j<Nc; j++){
+            const auto V = V_stack.col(j);
+
+            linear_acceleration_term.col(j) = ::LieAlgebra::skew( V ) * M_lin * V;
+        }
+
+
+        const Eigen::VectorXd inertial_term = (M_ang * dot_Omega_stack + linear_acceleration_term)(1, Eigen::all);
+
         const auto deformation = EI * K_stack.row(1);
 
 
-        const auto error = Cy_stack - deformation;
+        const auto error = Cy_stack - deformation - inertial_term;
 
         error_norm_stack.push_back( error.norm() );
 
