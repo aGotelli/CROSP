@@ -135,6 +135,16 @@ target_compile_definitions(test_internal_elastic_equilibrium
 )
 
 
+add_executable(test_DDCT test_DDCT.cpp
+    chebyshev_reconstructor.hpp)
+target_link_libraries(test_DDCT
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+)
+target_compile_definitions(test_DDCT PRIVATE DEVELOPER)
+
+
 
 
 
