@@ -8,6 +8,9 @@
 
 #include "StaticInitialiser/static_initialiser.hpp"
 
+
+#include "NEMI/newmark_integrator.hpp"
+
 constexpr std::array<bool, 6> admitted_deformations = {
     false,
     true,
@@ -18,20 +21,32 @@ constexpr std::array<bool, 6> admitted_deformations = {
     false
 };
 
-constexpr unsigned int ne = 10;
+constexpr unsigned int ne = 12;
 
-constexpr unsigned int Nc = 21;
+constexpr unsigned int Nc = 31;
 
 
 
 QApplication* app;
 ::Chebyshev::ChebyshevReconstructor rod_shape_reconstructor(Nc);
 
+const double t_end = 1.0;
+::NewmarkIntegrator newmark_integrator(t_end);
 
 
 
 
 
+void printVector(const std::vector<double> &t_v,
+                 const std::string &t_name)
+{
+    std::cout << t_name << " : ";
+    for(const auto &e : t_v)
+        std::cout << e << ", ";
+
+
+    std::cout << "\n\n";
+}
 
 
 void findStaticSolution(::CROSP::CosseratRod &t_rod,
@@ -153,6 +168,8 @@ int main(int argc, char *argv[])
             0.5;
 
     Eigen::VectorXd q = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd dot_q = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
 
 
     findStaticSolution(rod, q, F1);
@@ -193,6 +210,110 @@ int main(int argc, char *argv[])
     const auto error = Cy_stack - deformation;
 
     std::cout << "error : \n" << error << "\n\n";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //  Starting dynamic simulation
+
+    std::vector<double> error_norm_stack;
+
+    Eigen::VectorXd Delta_q = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_dot_q = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
+
+    Eigen::MatrixXd Jacobian = Eigen::MatrixXd::Zero(ne, ne);
+
+    Eigen::VectorXd q_update = Eigen::VectorXd::Zero(ne);
+
+    for(const auto simulation_time : newmark_integrator.getSimulationTimeSequence()){
+
+        std::cout << "simulation time : " << simulation_time << std::endl;
+
+        newmark_integrator.computeBallisticPrection(q, dot_q, ddot_q);
+
+        rod.updateParameterisation(q, dot_q, ddot_q);
+
+        rod.forwardKinematics();
+
+        rod.backwardDynamics(::LieAlgebra::Vector6d::Zero());
+
+
+        auto residual = rod.getStaticEquilibrium(q, dot_q);
+
+
+
+
+        while(residual.norm() > 1e-6){
+
+            for(unsigned int i=0; i<ne; i++){
+                Delta_q.setZero();
+                Delta_q[i] = 1;
+
+                newmark_integrator.computeTangentCorrection(Delta_q, Delta_dot_q, Delta_ddot_q);
+
+                rod.updateParameterisationVariation(Delta_q, Delta_dot_q, Delta_ddot_q);
+
+                rod.forwardTangentKinematics();
+
+                rod.backwardTangentDynamics(::LieAlgebra::Vector6d::Zero());
+
+
+                Jacobian.col(i) = rod.getTangentStaticEquilibrium(Delta_q, Delta_dot_q);
+
+            }
+
+            q_update = -Jacobian.inverse() * residual;
+
+            newmark_integrator.computeCorrection(q_update, q, dot_q, ddot_q);
+
+            rod.updateParameterisation(q, dot_q, ddot_q);
+            rod.forwardKinematics();
+            rod.backwardDynamics(::LieAlgebra::Vector6d::Zero());
+
+
+            residual = rod.getStaticEquilibrium(q, dot_q);
+
+        }
+
+
+        //  Solution found !!!
+
+
+        const auto Lambda_stack = rod.m_idm_integrators->m_internal_couples->getStackAsMatrix();
+        const auto Cy_stack = Lambda_stack(1, Eigen::all);
+
+
+        Eigen::MatrixXd K_stack(3, Nc);
+        for(unsigned int i=0; i<Nc; i++)
+            K_stack.col(i) = rod.m_strain_parameterisation->m_K_stack->at((Nc-1)-i);
+
+
+        const auto deformation = EI * K_stack.row(1);
+
+
+        const auto error = Cy_stack - deformation;
+
+        error_norm_stack.push_back( error.norm() );
+
+
+    }
+
+
+
+    printVector(error_norm_stack, "error_norm_stack");
 
 
     return 0;

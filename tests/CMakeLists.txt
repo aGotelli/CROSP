@@ -115,6 +115,10 @@ target_compile_definitions(test_perturbed_idm
 )
 
 
+
+
+find_package(NEMI)
+
 add_executable(test_internal_elastic_equilibrium test_internal_elastic_equilibrium.cpp)
 target_link_libraries(test_internal_elastic_equilibrium
     PRIVATE
@@ -123,6 +127,7 @@ target_link_libraries(test_internal_elastic_equilibrium
         ${CERES_LIBRARIES}
         Qt5::Widgets
         Qt5::Charts
+        NEMI
 )
 target_compile_definitions(test_internal_elastic_equilibrium
     PRIVATE
