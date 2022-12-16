@@ -85,10 +85,20 @@ public:
 
             for(unsigned int h=0; h<=m_number_of_Chebyshev_points-1;h++) {
                 for(unsigned int j=0; j<=m_number_of_Chebyshev_points-1;j++){
+//                    DDCT(h, j) = (2.0/m_number_of_Chebyshev_points)
+//                                * k(h)*cos( (2.0*j + 1.0)*h*M_PI/(2.0*m_number_of_Chebyshev_points) );
+
+                    const auto pm = [this](const unsigned int m){
+                        if(m == 0 || m == m_number_of_Chebyshev_points)
+                            return 1.0;
+
+                        return 2.0;
+                    };
                     DDCT(h, j) = (2.0/m_number_of_Chebyshev_points)
                                 * k(h)*cos( (2.0*j + 1.0)*h*M_PI/(2.0*m_number_of_Chebyshev_points) );
                 }
             }
+
 
             //  Return the matrix
             return DDCT;
