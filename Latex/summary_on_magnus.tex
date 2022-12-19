@@ -8,6 +8,15 @@
 \usepackage[makeroom]{cancel} % use this to cross out things
 
 
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{width=10cm,compat=1.9}
+\usepackage{tikzscale}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc,shapes.geometric}
+
+
 %	This is to create multirows sections in tables
 \usepackage{multirow}
 
@@ -27,6 +36,130 @@
 We want to write a summary on the avancements we made on the integration with Magnus expansions.
 
 In this document, we will start presenting the advantages of the numerical integration using the Magnus expansion for the orientation of the rod cross sections. We will then describe how we can extend the numerical integration in the case of linear, non-homogenous ODEs.
+
+Suppose we want to integrate an equation of form
+
+\begin{equation}
+	y_{(X)}^\prime = y_{(X)} A_{(X)}
+\end{equation}
+
+The integration domain is divided into the $N_c$ Chebyshev points $t_i, i \in [0, N_c -1]$. During the integration, we obtain the value of the integration variable on these points.
+
+
+\begin{figure}
+		\centering
+		\begin{tikzpicture}
+		
+			\pgfmathsetmacro\r{3}
+			\draw (\r cm,0) arc
+    			[
+        			start angle=0,
+        			end angle=180,
+        			x radius=\r cm,
+        			y radius =\r cm
+    			] coordinate[pos=0.0] (0)
+    			coordinate[pos=0.1] (1)
+    			coordinate[pos=0.2] (2)
+    			coordinate[pos=0.3] (3)
+    			coordinate[pos=0.4] (4)
+    			coordinate[pos=0.5] (5)
+    			coordinate[pos=0.6] (6)
+    			coordinate[pos=0.7] (7)
+    			coordinate[pos=0.8] (8)
+    			coordinate[pos=0.9] (9)
+    			coordinate[pos=1.0] (10);
+    			
+    			
+    			
+    			%\node[draw, circle, fill=black, minimum size=0.1cm, inner sep=0p] at (p0) {};
+    			
+    			
+    			\foreach \it in {0,1,...,10}{
+    				\node[draw, circle, fill=black, minimum size=0.1cm, inner sep=0pt] (point) at (\it) {};
+    				
+    				\pgfmathparse{\r*cos(\it*180.0/10.0)}
+					\draw (\it) -- (\pgfmathresult cm, 0) node[at end] (e\it) {};    				
+    				
+    				%\draw (\it) |- (0) {};
+    			}
+    			
+    			\draw[->] (-1.2*\r cm, 0cm) --  (1.2*\r cm, 0cm);
+    			
+    			\node[anchor=north west] at (e0) {$t_0$};
+    			\node[anchor=south west] at (e0) {$X=1$};
+    			\node[anchor=north east] at (e10) {$t_{10}$};
+    			\node[anchor=south east] at (e10) {$X=0$};
+    			
+    			\foreach \it in {1,2,...,9}{
+    				\node[anchor=north] at (e\it) {$t_{\it}$};
+    			}
+    			
+		\end{tikzpicture}
+		\caption{Chebyshev points on the unit circle.}
+		\label{fig:cheb points}
+		\end{figure}
+
+In figure \ref{fig:cheb points} we recall that the Chebyshev points goes from the end to the beginning of the integration domain. 
+
+Our goal is then to compute the values of $y$ at every Chebyshev point. Starting from some known initial conditions, we obtain the value at every integration points with the exponential mapping.
+
+\begin{equation}
+	y_{i} = y_{i+i} e^{\Omega_{i/i+1}}, \quad i \in [N_c -1, 0]
+\end{equation}
+
+This exponential mapping allow us to jump from one Chebyshev point to the previous one perfoming the numerical integration from point to point. The matrix in the exponential, namely $\Omega_{i/i+1}$, is obtained by quadrature and lies in the Lie group. Details of its computation are given in \cite{blanes2009magnus}.
+
+In figure \ref{fig:points} we show the concept of this integration method. In the following, we will detail an efficient algorithm for computing the numerical integration via Magnus expansions.
+
+\begin{figure}
+		\centering
+		\begin{tikzpicture}
+		
+			\pgfmathsetmacro\r{12}
+			\pgfmathsetmacro\N{4}
+    			
+    			\foreach \it in {0, 1, ..., \N}{    				
+    				%\pgfmathparse{\r*cos(\it*180.0/\N)}
+    				\pgfmathparse{(\r/2.0)*(1 + cos(\it*180.0/\N))}
+    				\node[draw, circle, fill=black, minimum size=0.1cm, inner sep=0pt] at (\pgfmathresult cm, 0) (\it) {};
+    				\node[anchor=south] at(\it) {$t_\it$};
+    			}
+    			
+    			\pgfmathsetmacro{\step}{sqrt(15.0)/10.0}
+    			
+    			\foreach \it [evaluate={\pr=int(\it-1)}] in {1, ..., \N}{  
+    				%\pgfmathsetmacro{\y}{1/\X}  
+    				\pgfmathsetmacro{\begin}{(\r/2.0)*(1 - cos(\pr*180.0/\N))}
+    				\pgfmathsetmacro{\end}{(\r/2.0)*(1 - cos(\it*180.0/\N))} 
+    				\pgfmathsetmacro{\h}{\end - \begin}
+    				
+    				\pgfmathsetmacro\xu{\begin + (0.5 - \step)*\h}
+    				\pgfmathsetmacro{\xd}{\begin + 0.5*\h} 
+    				\pgfmathsetmacro\xt{\begin + (0.5 + \step)*\h}  
+    				
+    				\node[draw, circle, fill=green, minimum size=0.05cm, inner sep=0pt] at (\xu cm, 0) (node 1) {};
+    				\node[anchor=north] at(node 1) {\tiny{$x_1$}};
+        			\node[draw, circle, fill=green, minimum size=0.05cm, inner sep=0pt] at (\xd cm, 0) (node 2) {}; 
+        			\node[anchor=north] at(node 2) {\tiny{$x_2$}};
+        			\node[draw, circle, fill=green, minimum size=0.05cm, inner sep=0pt] at (\xt cm, 0) (node 3) {}; 
+        			\node[anchor=north] at(node 3) {\tiny{$x_3$}};
+            }
+            
+            
+            \foreach \it [evaluate={\pr=int(\it-1)}] in {1, ..., \N}{    				
+    				\draw[->, line width=1pt] (\it) to[in=135, out=45] node[pos=.5,anchor=south]{$e^{\Omega_{\pr/\it}}$} (\pr) ;
+    			}
+    			
+    			
+    			
+		\end{tikzpicture}
+		\caption{Chebyshev points with quadrature points in the integration domain.}
+		\label{fig:points}
+		\end{figure}
+		
+		
+
+ 
 
 
 \section{Consideration on performances}
@@ -275,9 +408,28 @@ Following the procedure explained in \cite{blanes2012time}, it suffices to perfo
 This allows us to implement the same formulation as before. It is worth noting that errors may occour when $\vert \vert A \vert \vert  \ll   \vert \vert b \vert \vert$. The occurence of this situation should be tested; but a formulation exists to handle this case.
 
 
-To prove the benefits of this new formulation, we performed the integration of the angular velocities $\Omega_{(X)}$ using the spectral integration and the oder 6 Magnus expansion.
+To prove the benefits of this new formulation, we performed the integration of the angular velocities $\Omega_{(X)}$ using the spectral integration and the oder 6 Magnus expansion, the results are shown in table \ref{computational time omega}.
 
 
+
+\begin{table}[!ht]
+	\begin{tabular}{c|c|c|c}
+		Integration mode &	\multicolumn{3}{c}{Time} \\
+		&	$N_c = 11$	&	$N_c = 21$	&	$N_c = 31 $	\\
+		\hline
+		Spectral $[\mu s]$&	$12.5$	& $60.4$	&	$209$ \\
+		Magnus $[\mu s]$&	$2.79$	& $5.32$	&	$8.28$ 
+	\end{tabular}
+	\caption{Computational time for reconstructing the rod angular velocities using the spectral integration and the order 6 Magnus expansions.} \label{computational time omega}
+\end{table}
+
+
+\section{Conclusions}
+
+It is clear that the numerical integration using the Magnus expansions is a valid solution to speedup the solution of the IDM, and TIDM, of a Cosserat rod. In fact, all this gain in performances is obtained without sacrificing precision; meaning that the solution found with the Magnus expansion corresponds to the solution found with other methods up to an error of order $\propto 10^{-16}$.
+
+
+In order to implemnt this new formulation we will then need to reconstruct the values of linear and angular velocities, accelerations and internal stresses at the quadrature point. These values are known at the Chebyshev points so we can interpolate them using the Chebyshev polynomials. For this purpose, the approached threated in \cite{ahmed1974discrete} \cite{neagoe1990chebyshev} and \cite{Orekhov2020} can be useful to develop our computations.
 
 \bibliography{bibliography}
 
