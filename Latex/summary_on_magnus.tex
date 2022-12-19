@@ -103,7 +103,7 @@ In figure \ref{fig:cheb points} we recall that the Chebyshev points goes from th
 
 Our goal is then to compute the values of $y$ at every Chebyshev point. Starting from some known initial conditions, we obtain the value at every integration points with the exponential mapping.
 
-\begin{equation}
+\begin{equation}\label{eq:recursion}
 	y_{i} = y_{i+i} e^{\Omega_{i/i+1}}, \quad i \in [N_c -1, 0]
 \end{equation}
 
@@ -191,7 +191,7 @@ In this context, we first observe that, knowing the Chebyshev point we can defin
 
 
 $B\Phi\_stack = []$\;
-$h_stack = []$\;\;
+$h\_stack = []$\;\;
 
 $Compute \; the \; N_c \; Chebyshev \; points$\;
 $Chebyshev\_points \leftarrow computeChebyshevPoints\left( N_c \right)$\;\;
@@ -199,13 +199,13 @@ $Chebyshev\_points \leftarrow computeChebyshevPoints\left( N_c \right)$\;\;
 \For{$i \in \left[0, N_c - 1 \right)$}{\;
 
 	$begin = Chebyshev\_points \left[ (N_c-1) - i \right]$\;
-    	$end = Chebyshev_points \left[ (N_c-1) - (i + 1) \right]$\;\;
+    	$end = Chebyshev\_points \left[ (N_c-1) - (i + 1) \right]$\;\;
     	
     	$h = end - begin$\;
     	$step = \sqrt{15}/10$\;\;
     	
     	
-    	$h_stack[i] = h$\;\;
+    	$h\_stack[i] = h$\;\;
 
     	$x_1 = begin + (0.5 - step)*h$\;
     	$x_2 = begin + 0.5*h$\;
@@ -298,8 +298,8 @@ $stack\_e^{\Omega^{[6]}} = []$\;\;
 
 
 \For{$i \in \left[0, N_c - 1 \right)$}{
-
-	$\begin{bmatrix}K_1 & K_2 & K_3 \end{bmatrix} \leftarrow \textit{Get curvature at quadrature point}$\;\;
+	$\textit{Get curvature from strain field at quadrature point}$\;
+	$\begin{bmatrix}K_1 & K_2 & K_3 \end{bmatrix} \leftarrow \begin{bmatrix}\xi_1 & \xi_2 & \xi_3 \end{bmatrix}$\;\;
 
 	$A_1 = \hat{K}_1$ \;
 	$A_2 = \hat{K}_2$ \;
@@ -342,6 +342,7 @@ $R_stack[0] = \begin{bmatrix}
 
 \end{algorithm}
 
+Note that at the end of the algorithm \ref{algo:magnus} we use a different formulation from the one shown in \eqref{eq:recursion}, as in this case we directly move from the beginning of the integration domain to its end.
 
 
 The table \ref{computational time} shows the differences, in computational time, of this optimised method with respect to \textit{ode45} and the spectral integration.

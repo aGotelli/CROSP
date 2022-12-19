@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2022.11.14)  19 DEC 2022 19:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2022.11.14)  19 DEC 2022 19:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -874,10 +874,10 @@ Package rerunfilecheck Info: File `summary_on_magnus.out' has not changed.
 (rerunfilecheck)             Checksum: 3AD4ECBEDC834B8380360F5E0146CBD5;1020.
  ) 
 Here is how much of TeX's memory you used:
- 33590 strings out of 480129
- 788459 string characters out of 5893408
- 1176791 words of memory out of 5000000
- 50976 multiletter control sequences out of 15000+600000
+ 33591 strings out of 480129
+ 788473 string characters out of 5893408
+ 1176817 words of memory out of 5000000
+ 50977 multiletter control sequences out of 15000+600000
  481907 words of font info for 76 fonts, out of 8000000 for 9000
  81 hyphenation exceptions out of 8191
  84i,16n,89p,739b,941s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -895,10 +895,10 @@ ts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 r8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
 ></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on summary_on_magnus.pdf (8 pages, 183984 bytes).
+Output written on summary_on_magnus.pdf (8 pages, 184492 bytes).
 PDF statistics:
- 190 PDF objects out of 1000 (max. 8388607)
- 149 compressed objects within 2 object streams
+ 192 PDF objects out of 1000 (max. 8388607)
+ 151 compressed objects within 2 object streams
  36 named destinations out of 1000 (max. 500000)
  53 words of extra memory for PDF output out of 10000 (max. 10000000)
 
