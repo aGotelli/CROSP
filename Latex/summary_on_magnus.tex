@@ -115,7 +115,7 @@ In figure \ref{fig:points} we show the concept of this integration method. In th
 		\centering
 		\begin{tikzpicture}
 		
-			\pgfmathsetmacro\r{12}
+			\pgfmathsetmacro\r{11}
 			\pgfmathsetmacro\N{4}
     			
     			\foreach \it in {0, 1, ..., \N}{    				
@@ -149,6 +149,10 @@ In figure \ref{fig:points} we show the concept of this integration method. In th
             \foreach \it [evaluate={\pr=int(\it-1)}] in {1, ..., \N}{    				
     				\draw[->, line width=1pt] (\it) to[in=135, out=45] node[pos=.5,anchor=south]{$e^{\Omega_{\pr/\it}}$} (\pr) ;
     			}
+    			
+    			
+    			\node[anchor=west] at (0) {\small{$X=1$}};
+    			\node[anchor=east] at (\N) {\small{$X=0$}};
     			
     			
     			
