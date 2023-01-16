@@ -247,12 +247,12 @@ $\ddot{\xi}\_stack = []$\;\;
 	$\dot{\xi} _1 = B\Phi\_stack[i]_{(x_1)} \dot{q} $	\;
 	$\dot{\xi} _1 = B\Phi\_stack[i]_{(x_2)} \dot{q} $	\;
 	$\dot{\xi} _1 = B\Phi\_stack[i]_{(x_3)} \dot{q} $	\;
-	$\dot{\xi}\_stack[i] = \{\begin{matrix}\xi_1 & \xi_2 & \xi_3 \end{matrix} \}$\;\;
+	$\dot{\xi}\_stack[i] = \{\begin{matrix} \dot{\xi}_1 & \dot{\xi}_2 & \dot{\xi}_3 \end{matrix} \}$\;\;
 	
 	$\ddot{\xi} _1 = B\Phi\_stack[i]_{(x_1)} \ddot{q} $	\;
 	$\ddot{\xi} _1 = B\Phi\_stack[i]_{(x_2)} \ddot{q} $	\;
 	$\ddot{\xi} _1 = B\Phi\_stack[i]_{(x_3)} \ddot{q} $	\;
-	$\ddot{\xi}\_stack[i] = \{\begin{matrix}\xi_1 & \xi_2 & \xi_3 \end{matrix} \}$\;\;
+	$\ddot{\xi}\_stack[i] = \{\begin{matrix} \ddot{\xi}_1 & \ddot{\xi}_2 & \ddot{\xi}_3 \end{matrix} \}$\;\;
 		
 	
 }\;
@@ -334,7 +334,7 @@ $R_stack[0] = \begin{bmatrix}
 
 \For{$i \in \left[0, N_c - 1 \right)$}{
 	
-	$R_stack[i+1] = R_stack[i] * stack\_e^{\Omega^{[6]}}[i]$\;
+	$R\_stack[i+1] = R\_stack[i] \cdot  stack\_e^{\Omega^{[6]}}[i]$\;
 		
 	
 }\;

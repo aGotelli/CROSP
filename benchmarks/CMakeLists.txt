@@ -111,6 +111,15 @@ target_link_libraries(magnus
 )
 target_compile_definitions(magnus PRIVATE DEVELOPER)
 
+add_executable(magnus_comparison magnus_comparison.cpp)
+target_link_libraries(magnus_comparison
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+)
+target_compile_definitions(magnus_comparison PRIVATE DEVELOPER)
+
+
 add_executable(magnus_non_homogeneous magnus_non_homogeneous.cpp)
 target_link_libraries(magnus_non_homogeneous
     PRIVATE
