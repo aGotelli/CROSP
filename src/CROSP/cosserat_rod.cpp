@@ -192,15 +192,15 @@ void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delt
 {
     ::LieAlgebra::Kinematics rod_tip_kinematics;
 
-    rod_tip_kinematics.m_pose = ::LieAlgebra::SE3Pose( m_idm_integrators->m_quaternion->getStateAtPoint(0),
-                                                       m_idm_integrators->m_position->getStateAtPoint(0) );
+    rod_tip_kinematics.m_pose = ::LieAlgebra::SE3Pose( m_idm_integrators->m_quaternion->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
+                                                       m_idm_integrators->m_position->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END) );
 
 
-    rod_tip_kinematics.m_twist << m_idm_integrators->m_angular_velocity->getStateAtPoint(0),
-                                    m_idm_integrators->m_linear_velocity->getStateAtPoint(0);
+    rod_tip_kinematics.m_twist << m_idm_integrators->m_angular_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
+                                    m_idm_integrators->m_linear_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
 
-    rod_tip_kinematics.m_accelerations << m_idm_integrators->m_angular_acceleration->getStateAtPoint(0),
-                                            m_idm_integrators->m_linear_acceleration->getStateAtPoint(0);
+    rod_tip_kinematics.m_accelerations << m_idm_integrators->m_angular_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
+                                            m_idm_integrators->m_linear_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
     return rod_tip_kinematics;
 }
 
