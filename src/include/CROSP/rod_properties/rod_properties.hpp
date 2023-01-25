@@ -150,6 +150,11 @@ public:
                   const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
 
+    RodProperties(const double t_mu,
+                  const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                  const MaterialProperties &t_material_properties,
+                  const RodDimensions &t_rod_dimensions);
+
 
     /// \brief m_material_properties instance of the rod material properties
     const MaterialProperties m_material_properties { MaterialProperties() };
