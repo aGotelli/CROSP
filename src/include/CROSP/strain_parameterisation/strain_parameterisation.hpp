@@ -60,11 +60,11 @@ public:
                            const unsigned int t_number_of_Chebyshev_points);
 
     StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                           const Eigen::VectorXd &t_constant_strain);
+                           const ::LieAlgebra::Vector6d &t_constant_strain);
 
 
     StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                           const Eigen::VectorXd &t_constant_strain,
+                           const ::LieAlgebra::Vector6d &t_constant_strain,
                            const unsigned int t_number_of_Chebyshev_points);
 
 
@@ -155,7 +155,18 @@ private:
                                  0,
                                  0;
 
-            return defineConstrainedStrain(constant_strain);
+            //  Get the matrix B bar
+            const auto B_bar = m_polynomial_representation.m_Bbar;
+
+            //  Define the constrained strain from the rod DoFs
+            Eigen::VectorXd xi_c = B_bar * defineConstrainedStrain(constant_strain);
+
+            //  Always check that Gamma x is 1
+            if(xi_c(3) != 1)
+                xi_c(3) = 1.0;
+
+
+            return xi_c;
         }() };
 
 
