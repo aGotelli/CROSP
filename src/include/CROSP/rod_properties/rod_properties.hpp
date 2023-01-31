@@ -213,7 +213,7 @@ public:
             H.diagonal() << m_material_properties.m_G * m_rod_dimensions.m_Jx,
                             m_material_properties.m_E * m_rod_dimensions.m_Jy,
                             m_material_properties.m_E * m_rod_dimensions.m_Jz,
-                            m_material_properties.m_E * m_rod_dimensions.m_A*1e-6,
+                            m_material_properties.m_E * m_rod_dimensions.m_A,
                             m_material_properties.m_G * m_rod_dimensions.m_A,
                             m_material_properties.m_G * m_rod_dimensions.m_A;
 
