@@ -41,6 +41,8 @@ for it_x = 1:N_noeuds
     Xi_dot_dot(:,it_x) = Const.B*Xi_dot_dot_a;
 end
 
+
+
 % Calcul de Quaternion
 
 CI = q_0;

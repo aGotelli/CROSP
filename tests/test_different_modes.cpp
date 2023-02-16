@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     std::vector<unsigned int> number_of_modes_stack {
         2,
-        4,
+        3,
         5
     };
 
@@ -69,7 +69,11 @@ int main(int argc, char *argv[])
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
 
 
-    q.setRandom();
+    for(unsigned int i=0; i<ne; i++){
+        q(i) = i;
+        dot_q(i) = i;
+        ddot_q(i) = i;
+    }
 
 
 
