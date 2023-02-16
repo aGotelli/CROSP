@@ -48,12 +48,6 @@ PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_a
 
 
 
-PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                                                   const std::vector<unsigned int> t_number_of_modes_stack)
-    : m_admitted_deformations(t_admitted_deformations),
-      m_number_of_modes_stack(t_number_of_modes_stack)
-{}
-
 
 PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
                                                    const std::vector<unsigned int> t_number_of_modes_stack,
@@ -61,7 +55,17 @@ PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_a
     : m_admitted_deformations(t_admitted_deformations),
       m_number_of_modes_stack(t_number_of_modes_stack),
       m_polynomial_base(t_polynomial_base)
-{}
+{
+    if(m_number_of_modes_stack.size() != m_na){
+        std::string help_message = "The array containing the number of modes must have as many"
+                                   " elements as the allowed deformations. Here you passed : " + std::to_string( m_number_of_modes_stack.size() ) +
+                                   " entries for the number of modes stack while you activated : " + std::to_string( m_na ) +
+                                   " deformations";
+
+
+            throw std::runtime_error{help_message};
+    }
+}
 
 
 

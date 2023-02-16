@@ -64,11 +64,8 @@ struct PolynomialRepresentation {
 
 
     PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                             const std::vector<unsigned int> t_number_of_modes_stack);
-
-    PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
                              const std::vector<unsigned int> t_number_of_modes_stack,
-                             const PolynomialBase t_polynomial_base);
+                             const PolynomialBase t_polynomial_base=legendre_polynomial_base);
 
     unsigned int getCoordinatesDimension()const{return m_total_number_of_modes*m_na;}
 
