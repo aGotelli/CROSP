@@ -70,9 +70,9 @@ int main(int argc, char *argv[])
 
 
     for(unsigned int i=0; i<ne; i++){
-        q(i) = i;
-        dot_q(i) = i;
-        ddot_q(i) = i;
+        q(i)      = ne - i;
+        dot_q(i)  = ne - i;
+        ddot_q(i) = ne - i;
     }
 
 
