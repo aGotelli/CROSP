@@ -70,14 +70,17 @@ int main(int argc, char *argv[])
 
 
     for(unsigned int i=0; i<ne; i++){
-        q(i)      = ne - i;
-        dot_q(i)  = ne - i;
-        ddot_q(i) = ne - i;
+        q(i)      = 1.0*(ne - i);
+        dot_q(i)  = 0.2*(ne - i);
+        ddot_q(i) = 0.0*(ne - i);
     }
 
+//    q.setRandom();
+//    dot_q.setRandom();
+//    ddot_q.setRandom();
 
 
-
+    std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
 
 
 
@@ -89,7 +92,15 @@ int main(int argc, char *argv[])
 
     rod.updateParameterisation(q, dot_q, ddot_q);
 
-    rod.forwardKinematics();
+    Eigen::Vector4d init_Q(1, 0, 0, 0);
+    Eigen::Vector3d zeros_3 = Eigen::Vector3d::Zero();
+
+    rod.forwardKinematics(init_Q,
+                          zeros_3,
+                          zeros_3,
+                          zeros_3,
+                          zeros_3,
+                          zeros_3);
 
     auto zeros = ::LieAlgebra::Vector6d::Zero();
     rod.backwardDynamics(zeros);

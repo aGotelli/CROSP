@@ -57,8 +57,9 @@ void StrainParameterisation::updateStacks(const Eigen::VectorXd &t_qe,
     ::LieAlgebra::Vector6d ddot_xi;
 
 
-//    Eigen::MatrixXd xi_stack(6, m_number_of_Chebyshev_points);
-//    Eigen::MatrixXd xi_dot_stack(6, m_number_of_Chebyshev_points);
+    Eigen::MatrixXd xi_stack(6, m_number_of_Chebyshev_points);
+    Eigen::MatrixXd xi_dot_stack(6, m_number_of_Chebyshev_points);
+    Eigen::MatrixXd xi_ddot_stack(6, m_number_of_Chebyshev_points);
 
 
     for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
@@ -67,8 +68,9 @@ void StrainParameterisation::updateStacks(const Eigen::VectorXd &t_qe,
         dot_xi = m_map_to_strain_stack[i]*t_dot_qe;
         ddot_xi = m_map_to_strain_stack[i]*t_ddot_qe;
 
-//        xi_stack.col(i) = xi;
-//        xi_dot_stack.col(i) = dot_xi;
+        xi_stack.col(i) = xi;
+        xi_dot_stack.col(i) = dot_xi;
+        xi_ddot_stack.col(i) = ddot_xi;
 
         m_K_stack->at(i) = xi.block<3,1>(0,0);
         m_dot_K_stack->at(i) = dot_xi.block<3,1>(0,0);
@@ -80,7 +82,7 @@ void StrainParameterisation::updateStacks(const Eigen::VectorXd &t_qe,
 
     }
 
-//    std::cout << "xi stack : \n" << xi_stack << "\n\n" "dot xi stack : \n" << xi_dot_stack << "\n\n";
+    std::cout << "xi stack : \n" << xi_stack << "\n\n" "dot xi stack : \n" << xi_dot_stack << "\n\n" "ddot xi stack : \n" << xi_ddot_stack << "\n\n";
 
 }
 

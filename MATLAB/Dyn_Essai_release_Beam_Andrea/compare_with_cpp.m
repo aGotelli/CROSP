@@ -104,7 +104,9 @@ Const.q = load("../test_different_modes/q.csv");
 Const.q_dot = load("../test_different_modes/dot_q.csv");
 Const.q_dot_dot = load("../test_different_modes/ddot_q.csv");
 
-
+display(Const.q)
+display(Const.q_dot)
+display(Const.q_dot_dot)
 
 
 
