@@ -63,5 +63,14 @@ int main(int argc, char *argv[])
                  "  Phi(X=0) : \n" <<
                  poly_with_admitted_def_and_modes.getPhi(0) << "\n\n";
 
+
+
+
+
+
+
+    //  Now use it in rod properties
+    ::CROSP::rod_properties::RodProperties rod_properties(poly_with_admitted_def_and_modes);
+
     return 0;
 }
