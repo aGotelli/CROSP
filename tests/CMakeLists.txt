@@ -146,5 +146,12 @@ target_compile_definitions(test_DDCT PRIVATE DEVELOPER)
 
 
 
-
-
+add_executable(test_different_modes test_different_modes.cpp)
+target_link_libraries(test_different_modes
+    PRIVATE
+        ${PROJECT_NAME}
+)
+target_compile_definitions(test_different_modes
+    PRIVATE
+        DEVELOPER
+)

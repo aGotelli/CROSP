@@ -16,7 +16,10 @@
 #include <boost/math/special_functions.hpp>
 #include <Eigen/Dense>
 
+#include <numeric>
+
 namespace CROSP::polynomial_representation {
+
 
 typedef std::function<double(const unsigned int, const double&)> PolynomialBase;
 
@@ -50,20 +53,24 @@ struct PolynomialRepresentation {
     PolynomialRepresentation()=default;
 
 
-    PolynomialRepresentation(const unsigned int t_ne);
+    PolynomialRepresentation(const unsigned int t_number_of_modes_stack);
 
 
     PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations);
 
 
     PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                             const unsigned int t_ne);
+                             const unsigned int t_number_of_modes);
+
 
     PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                             const unsigned int t_ne,
+                             const std::vector<unsigned int> t_number_of_modes_stack);
+
+    PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
+                             const std::vector<unsigned int> t_number_of_modes_stack,
                              const PolynomialBase t_polynomial_base);
 
-    unsigned int getCoordinatesDimension()const{return m_ne*m_na;}
+    unsigned int getCoordinatesDimension()const{return m_total_number_of_modes*m_na;}
 
 
 
@@ -87,13 +94,16 @@ struct PolynomialRepresentation {
 
 
     //  A vector representing the allowed deformation of the rod (default kirkhoff rod)
-    const std::array<bool, 6> m_admitted_deformations { false, true, false, false, false, false };
+    const std::array<bool, 6> m_admitted_deformations { false, false, true, false, false, false };
 
     //  The number of allowed deformation (asserted from the vector)
-    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(), m_admitted_deformations.end(), true);}() };
+    const unsigned int m_na { [&]()->unsigned int{ return std::count(m_admitted_deformations.begin(),
+                                                                     m_admitted_deformations.end(), true);}() };
 
     //  Number of elastic modes per allowed deformation
-    const unsigned int m_ne { default_number_of_modes };
+    const std::vector<unsigned int> m_number_of_modes_stack { default_number_of_modes };
+    const unsigned int m_total_number_of_modes { static_cast<unsigned int>(std::accumulate(m_number_of_modes_stack.begin(),
+                                                                                           m_number_of_modes_stack.end(), 0)) };
 
     //  The polynomial base used to discretize the strain field
     const PolynomialBase m_polynomial_base { legendre_polynomial_base };

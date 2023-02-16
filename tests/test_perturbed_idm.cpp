@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     Eigen::VectorXd q_variation = Eigen::VectorXd::Zero(coordinates_dimension);
     const double delta = 1e-6;
 
-    for(unsigned int i=0; i<polynomial_representation.m_ne; i++){
+    for(unsigned int i=0; i<polynomial_representation.m_total_number_of_modes; i++){
 
         std::cout << "\n\n\n\n\n\n\n\n\n" << "i : " << i << "\n\n\n\n\n\n";
 

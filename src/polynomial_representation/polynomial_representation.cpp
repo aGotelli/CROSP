@@ -11,8 +11,6 @@
 
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
-#include <eigen3/unsupported/Eigen/KroneckerProduct>
-
 
 namespace CROSP::polynomial_representation {
 
@@ -20,30 +18,48 @@ namespace CROSP::polynomial_representation {
 
 
 
-PolynomialRepresentation::PolynomialRepresentation(const unsigned int t_ne)
-    : m_ne(t_ne)
+PolynomialRepresentation::PolynomialRepresentation(const unsigned int t_number_of_modes_stack)
+    : m_number_of_modes_stack(t_number_of_modes_stack)
 {}
 
 
 
 PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations)
-    : m_admitted_deformations(t_admitted_deformations)
+    : PolynomialRepresentation(t_admitted_deformations, default_number_of_modes)
 {}
 
 
 
 PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                                                   const unsigned int t_ne)
+                                                   const unsigned int t_number_of_modes)
     : m_admitted_deformations(t_admitted_deformations),
-      m_ne(t_ne)
+      m_number_of_modes_stack( [&](){
+                    std::vector<unsigned int> number_of_modes_stack;
+
+                    //  Populate the vector for every true entry of the admitted deformations
+                    std::for_each(t_admitted_deformations.begin(),
+                                  t_admitted_deformations.end(),
+                                  [&](const bool dof){
+                        if(dof == true)
+                            number_of_modes_stack.push_back( t_number_of_modes );
+                    });
+                    return number_of_modes_stack;}() )
+{}
+
+
+
+PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
+                                                   const std::vector<unsigned int> t_number_of_modes_stack)
+    : m_admitted_deformations(t_admitted_deformations),
+      m_number_of_modes_stack(t_number_of_modes_stack)
 {}
 
 
 PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                                                   const unsigned int t_ne,
+                                                   const std::vector<unsigned int> t_number_of_modes_stack,
                                                    const PolynomialBase t_polynomial_base)
     : m_admitted_deformations(t_admitted_deformations),
-      m_ne(t_ne),
+      m_number_of_modes_stack(t_number_of_modes_stack),
       m_polynomial_base(t_polynomial_base)
 {}
 
@@ -57,14 +73,23 @@ Eigen::MatrixXd PolynomialRepresentation::getPhi(const double& t_X,
     //  The coordinate must be transposed into the Chebyshev domain [-1, 1];
     double x = ( 2 * t_X - ( t_end + t_begin) ) / ( t_end - t_begin );
 
-    //  Compute the values of the polynomial for every element of the strain field
-    Eigen::VectorXd Phi_i(m_ne, 1);
-    for(unsigned int i=0; i<m_ne; i++)
-        Phi_i[i] = m_polynomial_base(i, x);
 
+    //  Define the Phi matrix beforehand
+    Eigen::MatrixXd Phi = Eigen::MatrixXd::Zero(m_na, m_total_number_of_modes);
 
-    //  Define the matrix of bases
-    Eigen::MatrixXd Phi = Eigen::KroneckerProduct(Eigen::MatrixXd::Identity(m_na, m_na), Phi_i.transpose());
+    for(unsigned int col_index=0, row_index = 0; const auto &number_of_modes : m_number_of_modes_stack){
+
+        //  Create the vector
+        Eigen::VectorXd Phi_i(number_of_modes);
+        for(unsigned int i=0; i<number_of_modes; i++)
+            Phi_i[i] = m_polynomial_base(i, x);
+
+        //  Put it in the matrix
+        Phi.block(row_index, col_index, 1, number_of_modes) = Phi_i.transpose();
+
+        row_index ++;
+        col_index += number_of_modes;
+    }
 
 
     return Phi;
