@@ -65,6 +65,9 @@ public:
 
 
 
+
+
+
     /*!
      * \brief updateParameterisation updates the parameterisation of the strain describing the rod shape
      * \param t_qe the set of generalised coordinates
@@ -376,6 +379,9 @@ public:
 
 
     Eigen::MatrixXd getRodShape(const Eigen::VectorXd &t_qe)const;
+
+
+    void printProperties();
 
 #ifndef DEVELOPER
 private:
