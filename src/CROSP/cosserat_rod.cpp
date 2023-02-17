@@ -20,24 +20,33 @@
 namespace CROSP {
 
 
+CosseratRod::CosseratRod(const rod_properties::RodProperties &t_rod_properties)
+    : m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
+{}
 
 
 
-CosseratRod::CosseratRod(const strain_parameterisation::StrainParameterisation &t_strain_parameterisation,
+CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
+    : m_strain_parameterisation( t_strain_parameterisation )
+{}
+
+
+
+CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                          const rod_properties::RodProperties &t_rod_properties)
-    : m_strain_parameterisation( std::make_shared<strain_parameterisation::StrainParameterisation>( t_strain_parameterisation ) ),
+    : m_strain_parameterisation( t_strain_parameterisation ),
       m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
 {}
 
 
 
 
-//void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
-//                                         const Eigen::VectorXd &t_dot_qe,
-//                                         const Eigen::VectorXd &t_ddot_qe)
-//{
-//    m_strain_parameterisation->updateStacks(t_qe, t_dot_qe, t_ddot_qe);
-//}
+void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
+                                         const Eigen::VectorXd &t_dot_qe,
+                                         const Eigen::VectorXd &t_ddot_qe)
+{
+    m_strain_parameterisation->updateStacks(t_qe, t_dot_qe, t_ddot_qe);
+}
 
 
 //void CosseratRod::forwardKinematics()
@@ -353,10 +362,7 @@ CosseratRod::CosseratRod(const strain_parameterisation::StrainParameterisation &
 //    return Delta_Lambda;
 //}
 
-//unsigned int CosseratRod::getCoordinatesDimension()const
-//{
-//    return m_polynomial_representation.getCoordinatesDimension();
-//}
+
 
 
 //Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) const

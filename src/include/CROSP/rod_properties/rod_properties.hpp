@@ -102,6 +102,9 @@ class RodProperties {
 public:
 
 
+    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
+
+
     RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                   const RodDimensions &t_rod_dimensions,
                   const MaterialProperties &t_material_properties);

@@ -43,7 +43,13 @@ public:
     CosseratRod()=default;
 
 
-    CosseratRod(const strain_parameterisation::StrainParameterisation &t_strain_parameterisation,
+    CosseratRod(const rod_properties::RodProperties &t_rod_properties);
+
+
+    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
+
+
+    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                 const rod_properties::RodProperties &t_rod_properties);
 
 
@@ -52,18 +58,18 @@ public:
 
 
 
-//    /*!
-//     * \brief updateParameterisation updates the parameterisation of the strain describing the rod shape
-//     * \param t_qe the set of generalised coordinates
-//     * \param t_dot_qe the set of the first derivatives of the generalised coordinates
-//     * \param t_ddot_qe the set of the second derivatives of the generalised coordinates
-//     *
-//     * This function call the StrainParameterisation::updateStacks in order to compute the current values
-//     * for all the K and Gamma, the angular and linear part of the strain and their derivatives
-//     */
-//    void updateParameterisation(const Eigen::VectorXd &t_qe,
-//                                const Eigen::VectorXd &t_dot_qe,
-//                                const Eigen::VectorXd &t_ddot_qe);
+    /*!
+     * \brief updateParameterisation updates the parameterisation of the strain describing the rod shape
+     * \param t_qe the set of generalised coordinates
+     * \param t_dot_qe the set of the first derivatives of the generalised coordinates
+     * \param t_ddot_qe the set of the second derivatives of the generalised coordinates
+     *
+     * This function call the StrainParameterisation::updateStacks in order to compute the current values
+     * for all the K and Gamma, the angular and linear part of the strain and their derivatives
+     */
+    void updateParameterisation(const Eigen::VectorXd &t_qe,
+                                const Eigen::VectorXd &t_dot_qe,
+                                const Eigen::VectorXd &t_ddot_qe);
 
 //    /*!
 //     * \brief forwardKinematics computes the forward kinematics of the rod starting from the identity pose
@@ -304,11 +310,11 @@ public:
 //     */
 //    ::LieAlgebra::Vector6d getDeltaLambdaAtBase()const;
 
-//    /*!
-//     * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
-//     * \return the dimension of the rod parameterisation, namely ne*na
-//     */
-//    unsigned int getCoordinatesDimension()const;
+    /*!
+     * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
+     * \return the dimension of the rod parameterisation, namely ne*na
+     */
+    inline unsigned int getCoordinatesDimension()const {return m_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension();}
 
 //    /*!
 //     * \brief getStaticEquilibrium returns the static equilibrium of the rod Kee*qe - Q
@@ -373,12 +379,13 @@ private:
 
 
     //  Representation of the rod via strain
-    const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
 
 
 
     //  The set of rod properties
-    std::shared_ptr<rod_properties::RodProperties> m_rod_properties;
+    std::shared_ptr<rod_properties::RodProperties> m_rod_properties {
+        std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation) };
 
 //    //  All the strain releted variables
 ////    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { [this](){

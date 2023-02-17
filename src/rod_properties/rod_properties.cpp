@@ -4,6 +4,12 @@
 
 namespace CROSP::rod_properties {
 
+
+RodProperties::RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
+    : m_Kee( defineKee(t_strain_parameterisation->m_polynomial_representation) )
+{}
+
+
 RodProperties::RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                              const RodDimensions &t_rod_dimensions,
                              const MaterialProperties &t_material_properties)
