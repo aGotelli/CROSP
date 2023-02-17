@@ -55,12 +55,6 @@ struct PolynomialRepresentation {
     PolynomialRepresentation()=default;
 
 
-    PolynomialRepresentation(const unsigned int t_number_of_modes_stack);
-
-
-    PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations);
-
-
     PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
                              const unsigned int t_number_of_modes);
 
@@ -146,14 +140,14 @@ struct PolynomialRepresentation {
 };
 
 
-/*!
- * \brief generatePhiStack generates a stack of Phi matrices, one for every Chebyshev points and relative to its abscissa
- * \param t_polynomial_base the polynomial base used to define the matrix
- * \param t_Chebyshev_points the number of Chebyshev points used to discretise the rod
- * \return the stack of Phi matrices
- */
-std::vector<Eigen::MatrixXd> generatePhiStack(std::shared_ptr<const PolynomialRepresentation> t_polynomial_representation,
-                                              const std::vector<double> &t_Chebyshev_points);
+///*!
+// * \brief generatePhiStack generates a stack of Phi matrices, one for every Chebyshev points and relative to its abscissa
+// * \param t_polynomial_base the polynomial base used to define the matrix
+// * \param t_Chebyshev_points the number of Chebyshev points used to discretise the rod
+// * \return the stack of Phi matrices
+// */
+//std::vector<Eigen::MatrixXd> generatePhiStack(std::shared_ptr<const PolynomialRepresentation> t_polynomial_representation,
+//                                              const std::vector<double> &t_Chebyshev_points);
 
 
 

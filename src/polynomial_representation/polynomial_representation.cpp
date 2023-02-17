@@ -17,19 +17,6 @@ namespace CROSP::polynomial_representation {
 
 
 
-
-PolynomialRepresentation::PolynomialRepresentation(const unsigned int t_number_of_modes_stack)
-    : m_number_of_modes_stack(t_number_of_modes_stack)
-{}
-
-
-
-PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations)
-    : PolynomialRepresentation(t_admitted_deformations, default_number_of_modes)
-{}
-
-
-
 PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
                                                    const unsigned int t_number_of_modes)
     : m_admitted_deformations(t_admitted_deformations),
@@ -104,19 +91,19 @@ Eigen::MatrixXd PolynomialRepresentation::getPhi(const double& t_X,
 
 
 
-std::vector<Eigen::MatrixXd> generatePhiStack(std::shared_ptr<const PolynomialRepresentation> t_polynomial_representation,
-                                              const std::vector<double> &t_Chebyshev_points)
-{
-    std::vector<Eigen::MatrixXd> Phi_stack( t_Chebyshev_points.size() );
+//std::vector<Eigen::MatrixXd> generatePhiStack(std::shared_ptr<const PolynomialRepresentation> t_polynomial_representation,
+//                                              const std::vector<double> &t_Chebyshev_points)
+//{
+//    std::vector<Eigen::MatrixXd> Phi_stack( t_Chebyshev_points.size() );
 
-    std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
-        const auto Phi = t_polynomial_representation->getPhi(t_Chebyshev_points[index]);
-        index++;
-        return Phi;
-    });
+//    std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
+//        const auto Phi = t_polynomial_representation->getPhi(t_Chebyshev_points[index]);
+//        index++;
+//        return Phi;
+//    });
 
-    return Phi_stack;
-}
+//    return Phi_stack;
+//}
 
 
 

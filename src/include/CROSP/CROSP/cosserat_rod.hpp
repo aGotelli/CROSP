@@ -71,13 +71,13 @@ public:
                                 const Eigen::VectorXd &t_dot_qe,
                                 const Eigen::VectorXd &t_ddot_qe);
 
-//    /*!
-//     * \brief forwardKinematics computes the forward kinematics of the rod starting from the identity pose
-//     *
-//     * This function computes the forward kinematics of the rod starting from the indentity pose and with null
-//     * velocities and accelerations
-//     */
-//    void forwardKinematics();
+    /*!
+     * \brief forwardKinematics computes the forward kinematics of the rod starting from the identity pose
+     *
+     * This function computes the forward kinematics of the rod starting from the indentity pose and with null
+     * velocities and accelerations
+     */
+    void forwardKinematics();
 
 
 //    /*!
@@ -210,13 +210,13 @@ public:
 //    void backwardDynamics(const Eigen::Vector3d &t_couple_at_tip,
 //                          const Eigen::Vector3d &t_force_at_tip);
 
-//    /*!
-//     * \brief backwardDynamics computes the backward dynamics starting from the given state at the rod tip
-//     * \param t_Lambda_X1 is the wrench at the rod tip expressed in the local coordinates frame
-//     *
-//     * This function takes as parameter the Wrench Lambda at X=1 expressed in the frame attached to the cross section at X=1
-//     */
-//    void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1);
+    /*!
+     * \brief backwardDynamics computes the backward dynamics starting from the given state at the rod tip
+     * \param t_Lambda_X1 is the wrench at the rod tip expressed in the local coordinates frame
+     *
+     * This function takes as parameter the Wrench Lambda at X=1 expressed in the frame attached to the cross section at X=1
+     */
+    void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1);
 
 
 //    /*!

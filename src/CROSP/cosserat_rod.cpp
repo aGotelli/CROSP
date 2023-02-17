@@ -49,22 +49,22 @@ void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
 }
 
 
-//void CosseratRod::forwardKinematics()
-//{
-//    //  Integrate Quaternions
-//    m_idm_integrators->m_quaternion->solveSystem();
+void CosseratRod::forwardKinematics()
+{
+    //  Integrate Quaternions
+    m_idm_integrators->m_quaternion->solveSystem();
 
-//    //  Integrate Positions
-//    m_idm_integrators->m_position->solveSystem();
+    //  Integrate Positions
+    m_idm_integrators->m_position->solveSystem();
 
-//    //  Integrate twist
-//    m_idm_integrators->m_angular_velocity->solveSystem();
-//    m_idm_integrators->m_linear_velocity->solveSystem();
+    //  Integrate twist
+    m_idm_integrators->m_angular_velocity->solveSystem();
+    m_idm_integrators->m_linear_velocity->solveSystem();
 
-//    //  Integrate accelerations
-//    m_idm_integrators->m_angular_acceleration->solveSystem();
-//    m_idm_integrators->m_linear_acceleration->solveSystem();
-//}
+    //  Integrate accelerations
+    m_idm_integrators->m_angular_acceleration->solveSystem();
+    m_idm_integrators->m_linear_acceleration->solveSystem();
+}
 
 
 //void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
@@ -212,20 +212,20 @@ void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
 
 //}
 
-//void CosseratRod::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
-//{
+void CosseratRod::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
+{
 
-//    //  Map force and couple into local coordinates
-//    Eigen::Vector3d couple_at_tip = t_Lambda_X1.block<3, 1>(0, 0);
-//    Eigen::Vector3d force_at_tip  = t_Lambda_X1.block<3, 1>(3, 0);
+    //  Map force and couple into local coordinates
+    Eigen::Vector3d couple_at_tip = t_Lambda_X1.block<3, 1>(0, 0);
+    Eigen::Vector3d force_at_tip  = t_Lambda_X1.block<3, 1>(3, 0);
 
-//    m_idm_integrators->m_internal_forces->integrate(force_at_tip);
-//    m_idm_integrators->m_internal_couples->integrate(couple_at_tip);
+    m_idm_integrators->m_internal_forces->integrate(force_at_tip);
+    m_idm_integrators->m_internal_couples->integrate(couple_at_tip);
 
 
-//    m_idm_integrators->m_generalised_forces->integrate(Eigen::VectorXd::Zero(getCoordinatesDimension()));
+    m_idm_integrators->m_generalised_forces->integrate(Eigen::VectorXd::Zero(getCoordinatesDimension()));
 
-//}
+}
 
 
 //void CosseratRod::backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_at_tip,
