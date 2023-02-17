@@ -104,13 +104,13 @@ Eigen::MatrixXd PolynomialRepresentation::getPhi(const double& t_X,
 
 
 
-std::vector<Eigen::MatrixXd> generatePhiStack(const PolynomialRepresentation &t_polynomial_representation,
+std::vector<Eigen::MatrixXd> generatePhiStack(std::shared_ptr<const PolynomialRepresentation> t_polynomial_representation,
                                               const std::vector<double> &t_Chebyshev_points)
 {
     std::vector<Eigen::MatrixXd> Phi_stack( t_Chebyshev_points.size() );
 
     std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
-        const auto Phi = t_polynomial_representation.getPhi(t_Chebyshev_points[index]);
+        const auto Phi = t_polynomial_representation->getPhi(t_Chebyshev_points[index]);
         index++;
         return Phi;
     });

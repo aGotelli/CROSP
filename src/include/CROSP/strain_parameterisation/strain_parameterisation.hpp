@@ -50,23 +50,8 @@ public:
     StrainParameterisation(const unsigned int t_number_of_Chebyshev_points);
 
 
-    StrainParameterisation(const Eigen::VectorXd &t_constant_strain);
-
-
-    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
-
-
-    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+    StrainParameterisation(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation,
                            const unsigned int t_number_of_Chebyshev_points);
-
-    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                           const ::LieAlgebra::Vector6d &t_constant_strain);
-
-
-    StrainParameterisation(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                           const ::LieAlgebra::Vector6d &t_constant_strain,
-                           const unsigned int t_number_of_Chebyshev_points);
-
 
 
 
@@ -101,46 +86,37 @@ public:
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
 
-private:
+
 
     //  The polynomial representation of the field of strain
-    const polynomial_representation::PolynomialRepresentation m_polynomial_representation { polynomial_representation::PolynomialRepresentation() };
+    const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> m_polynomial_representation;
 
 
-public:
+
 
     //  The stack of Phi along the Chebyshev points
-    const std::vector<Eigen::MatrixXd> m_Phi_stack { polynomial_representation::generatePhiStack(m_polynomial_representation,
-                                                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
+    std::vector<Eigen::MatrixXd> m_Phi_stack {
+        polynomial_representation::generatePhiStack(m_polynomial_representation,
+                                                    ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points)) };
 
 
     //  The vector stack of B Phi used to map the generalised coordinates into the strain field
-    const std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
-            std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
+    std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [&](){
+        std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
 
-            const std::vector<Eigen::MatrixXd> Phi_stack =
-                    polynomial_representation::generatePhiStack(m_polynomial_representation,
+        const std::vector<Eigen::MatrixXd> Phi_stack =
+                polynomial_representation::generatePhiStack(m_polynomial_representation,
                                                                 ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points));
 
 
-            std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
-               return m_polynomial_representation.m_B*Phi_stack[index++];
-            });
+        std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
+            return m_polynomial_representation->m_B*Phi_stack[index++];
+        });
 
-            return map_to_strain_stack;
-        }() };
+        return map_to_strain_stack;
+    }() };
+
 private:
-
-    /*!
-     * \brief defineConstrainedStrain defines the constrained strains without the degrees of freedom
-     * \param t_constant_strain the constant strain along the rod with is 6 components
-     * \return the constrained strain of dimension 6-na
-     *
-     * This function takes the constant strain as a full 6x1 vector and returns the corresponding
-     * subvector of dimension (6-na)x1 that contains the components that do not belong to the
-     * rod allowed deformations.
-     */
-    Eigen::VectorXd defineConstrainedStrain(const Eigen::VectorXd &t_constant_strain)const;
 
 
     //  The constrained strain xi_c
@@ -156,10 +132,16 @@ private:
                                  0;
 
             //  Get the matrix B bar
-            const auto B_bar = m_polynomial_representation.m_Bbar;
+            const auto B_bar = m_polynomial_representation->m_Bbar;
 
             //  Define the constrained strain from the rod DoFs
-            Eigen::VectorXd xi_c = B_bar * defineConstrainedStrain(constant_strain);
+            std::vector<int> indexes;
+            std::for_each(m_polynomial_representation->m_admitted_deformations.begin(),
+                          m_polynomial_representation->m_admitted_deformations.end(),
+                          [&indexes, index=0](const bool dof)mutable{   if(dof == false)
+                                                                            indexes.push_back(index);
+                                                                        index++;});
+            Eigen::VectorXd xi_c = constant_strain(indexes);
 
             //  Always check that Gamma x is 1
             if(xi_c(3) != 1)

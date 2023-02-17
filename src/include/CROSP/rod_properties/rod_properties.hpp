@@ -18,7 +18,7 @@
 #include <math.h>
 
 
-#include "CROSP/polynomial_representation/polynomial_representation.hpp"
+#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 
 
 /// \brief CROSP::rod_properties namespace contains the definition of the rod properties
@@ -37,25 +37,17 @@ struct MaterialProperties {
     MaterialProperties()=default;
 
 
-    /*!
-     * \brief MaterialProperties construct the object with the given properties
-     * \param t_E   Young modulus [Pa]
-     * \param t_G   Shear modulus [Pa]
-     * \param t_rho Specific weight [kg/m^3]
-     */
-    MaterialProperties(const double &t_E, const double &t_G, const double &t_rho) : m_E(t_E),
-                                                                                    m_G(t_G),
-                                                                                    m_rho(t_rho)
-    {}
-
     ///  \brief m_E Young modulus [Pa]
-    const double m_E { 210e9 };
+    double m_E { 210e9 };
 
     ///  \brief m_G Shear modulus [Pa]
-    const double m_G {  80e9 };
+    double m_G {  80e9 };
 
     ///  \brief m_rho Specific weight [kg/m^3]
-    const double m_rho { 7800 };
+    double m_rho { 7800 };
+
+    /// \brief m_mu the internal dumping of the rod
+    double m_mu { 1e-4 };
 
 };
 
@@ -88,7 +80,7 @@ struct RodDimensions {
     const double m_A { M_PI*m_r*m_r };
 
     /// \brief m_L  Length of the rod [m]
-    const double m_L { 1.0 };
+    double m_L { 1.0 };
 
     //  Moment of inertia [m^4]
     /// \brief m_Jx pricipal moment of inertia on the x axis
@@ -109,58 +101,18 @@ class RodProperties {
 
 public:
 
-    RodProperties()=default;
 
-    RodProperties(const double t_mu);
-
-
-    RodProperties(const double t_mu,
-                  Eigen::Vector3d t_gravity);
-
-    RodProperties(const double t_mu,
-                  const RodDimensions &t_rod_dimensions);
-
-    RodProperties(const double t_mu,
-                  Eigen::Vector3d t_gravity,
+    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                  const RodDimensions &t_rod_dimensions,
                   const MaterialProperties &t_material_properties);
 
-    RodProperties(const double t_mu,
-                  const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
-
-    RodProperties(const double t_mu,
-                  Eigen::Vector3d t_gravity,
-                  const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
-
-    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
-
-    RodProperties(const MaterialProperties &t_material_properties);
-
-    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                  const MaterialProperties &t_material_properties);
-
-    RodProperties(const RodDimensions &t_rod_dimensions);
-
-    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                  const RodDimensions &t_rod_dimensions);
-
-    RodProperties(const MaterialProperties &t_material_properties,
-                  const RodDimensions &t_rod_dimensions);
-
-    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                  const MaterialProperties &t_material_properties,
-                  const RodDimensions &t_rod_dimensions);
-
-    RodProperties(const double t_mu,
-                  const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                  const MaterialProperties &t_material_properties,
-                  const RodDimensions &t_rod_dimensions);
 
 
     /// \brief m_material_properties instance of the rod material properties
-    const MaterialProperties m_material_properties { MaterialProperties() };
+    MaterialProperties m_material_properties;
 
     /// \brief m_rod_dimensions instance of the rod geometrical properties and dimensions
-    const RodDimensions m_rod_dimensions { RodDimensions() };
+    RodDimensions m_rod_dimensions;
 
 
     /*!
@@ -233,12 +185,10 @@ public:
 
 
     /// \brief m_Kee The generalised elasticity matrix
-    const Eigen::MatrixXd m_Kee { defineKee( polynomial_representation::PolynomialRepresentation() ) };
+    const Eigen::MatrixXd m_Kee;
 
-    /// \brief m_mu is the dumping coefficient of the rod (material)
-    const double m_mu { 1e-3 };
-
-    const Eigen::MatrixXd m_Dee { m_mu*m_Kee };
+    /// \brief m_Dee The matrix of the internal dumping
+    const Eigen::MatrixXd m_Dee { m_material_properties.m_mu*m_Kee };
 
 
 private:
@@ -250,7 +200,7 @@ private:
      * \param t_B the map matrix to map the allowed strains in the space of the full strain
      * \return
      */
-    Eigen::MatrixXd defineKee(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)const;
+    Eigen::MatrixXd defineKee(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)const;
 
 
     const double gamma = 9.81;

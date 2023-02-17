@@ -17,6 +17,7 @@
 #include <Eigen/Dense>
 
 #include <numeric>
+#include <memory>
 
 namespace CROSP::polynomial_representation {
 
@@ -151,7 +152,7 @@ struct PolynomialRepresentation {
  * \param t_Chebyshev_points the number of Chebyshev points used to discretise the rod
  * \return the stack of Phi matrices
  */
-std::vector<Eigen::MatrixXd> generatePhiStack(const PolynomialRepresentation &t_polynomial_representation,
+std::vector<Eigen::MatrixXd> generatePhiStack(std::shared_ptr<const PolynomialRepresentation> t_polynomial_representation,
                                               const std::vector<double> &t_Chebyshev_points);
 
 
