@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
     const unsigned int number_of_Chebyshev_points = 31;
 
     ::CROSP::CosseratRod rod(poly_with_admitted_def_and_modes,rod_properties, number_of_Chebyshev_points);
-
-
+    rod.printProperties();
+return -1;
 
     writeToFile("B", rod.m_polynomial_representation.m_B, path);
     writeToFile("B_bar", rod.m_polynomial_representation.m_Bbar, path);
