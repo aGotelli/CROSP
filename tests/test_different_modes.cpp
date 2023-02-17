@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     ::CROSP::CosseratRod rod(poly_with_admitted_def_and_modes,rod_properties, number_of_Chebyshev_points);
     rod.printProperties();
-return -1;
+
 
     writeToFile("B", rod.m_polynomial_representation.m_B, path);
     writeToFile("B_bar", rod.m_polynomial_representation.m_Bbar, path);
@@ -69,15 +69,15 @@ return -1;
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
 
 
-    for(unsigned int i=0; i<ne; i++){
-        q(i)      = 1.0*(ne - i);
-        dot_q(i)  = 0.2*(ne - i);
-        ddot_q(i) = 0.0*(ne - i);
-    }
+//    for(unsigned int i=0; i<ne; i++){
+//        q(i)      = 1.0*(ne - i);
+//        dot_q(i)  = 0.5*(ne - i);
+//        ddot_q(i) = 0.2*(ne - i);
+//    }
 
-//    q.setRandom();
-//    dot_q.setRandom();
-//    ddot_q.setRandom();
+    q.setRandom();
+    dot_q.setRandom();
+    ddot_q.setRandom();
 
 
     std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
@@ -129,7 +129,6 @@ return -1;
     writeToFile("N_stack", N_stack, path);
     writeToFile("C_stack", C_stack, path);
     writeToFile("Qa_stack", Qa_stack, path);
-
 
 
 

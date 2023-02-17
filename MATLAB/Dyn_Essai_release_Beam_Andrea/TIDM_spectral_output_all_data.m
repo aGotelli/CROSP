@@ -41,9 +41,9 @@ for it_x = 1:N_noeuds
     Xi_dot_dot(:,it_x) = Const.B*Xi_dot_dot_a;
 end
 
-display(Xi)
-display(Xi_dot)
-display(Xi_dot_dot)
+% display(Xi)
+% display(Xi_dot)
+% display(Xi_dot_dot)
 
 % Calcul de Quaternion
 
