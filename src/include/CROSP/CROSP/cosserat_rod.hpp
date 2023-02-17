@@ -65,6 +65,9 @@ public:
 
 
 
+
+
+
     /*!
      * \brief updateParameterisation updates the parameterisation of the strain describing the rod shape
      * \param t_qe the set of generalised coordinates
@@ -377,6 +380,9 @@ public:
 
     Eigen::MatrixXd getRodShape(const Eigen::VectorXd &t_qe)const;
 
+
+    void printProperties();
+
 #ifndef DEVELOPER
 private:
 #endif
@@ -409,22 +415,25 @@ private:
                                                                           m_number_of_Chebyshev_points)};
 
     //  Variables related the perturbation of the strain parameterisation
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta { std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
-                                                                                                                                                                         ::LieAlgebra::Vector6d::Zero(),
-                                                                                                                                                                         m_number_of_Chebyshev_points) };
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
+        std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
+                                                                          ::LieAlgebra::Vector6d::Zero(),
+                                                                          m_number_of_Chebyshev_points) };
     //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators { std::make_shared<idm_integrators::IDMIntegrators>(m_number_of_Chebyshev_points,
-                                                                                                                           m_polynomial_representation,
-                                                                                                                           m_strain_parameterisation,
-                                                                                                                           m_rod_properties )};
+    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
+        std::make_shared<idm_integrators::IDMIntegrators>(m_number_of_Chebyshev_points,
+                                                          m_polynomial_representation,
+                                                          m_strain_parameterisation,
+                                                          m_rod_properties )};
 
     //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators { std::make_shared<tidm_integrators::TIDMIntegrators>(m_number_of_Chebyshev_points,
-                                                                                                                                m_polynomial_representation,
-                                                                                                                                m_strain_parameterisation,
-                                                                                                                                m_strain_parameterisation_Delta,
-                                                                                                                                m_idm_integrators,
-                                                                                                                                m_rod_properties) };
+    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
+        std::make_shared<tidm_integrators::TIDMIntegrators>(m_number_of_Chebyshev_points,
+                                                            m_polynomial_representation,
+                                                            m_strain_parameterisation,
+                                                            m_strain_parameterisation_Delta,
+                                                            m_idm_integrators,
+                                                            m_rod_properties) };
 
 
 

@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     idm_integrators->m_internal_forces->integrate( force_at_tip_local_coord );
     idm_integrators->m_internal_couples->integrate( couple_at_tip_local_coord );
 
-    idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation.m_ne) );
+    idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation.m_total_number_of_modes) );
 
     std::cout.flush();
 
@@ -138,8 +138,8 @@ int main(int argc, char *argv[])
 
 
 
-    Eigen::MatrixXd Delta_zeta(polynomial_representation.m_ne*6, number_of_Chebyshev_points);
-    for(unsigned int i=0; i<polynomial_representation.m_ne; i++){
+    Eigen::MatrixXd Delta_zeta(polynomial_representation.m_total_number_of_modes*6, number_of_Chebyshev_points);
+    for(unsigned int i=0; i<polynomial_representation.m_total_number_of_modes; i++){
         Delta_qe.setZero();
         Delta_qe(i) = 1;
 
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
         tidm_integrators->m_Delta_internal_forces->integrate(Eigen::Vector3d::Zero());
         tidm_integrators->m_Delta_internal_couples->integrate(Eigen::Vector3d::Zero());
 
-        tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(polynomial_representation.m_ne));
+        tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(polynomial_representation.m_total_number_of_modes));
 
 
 

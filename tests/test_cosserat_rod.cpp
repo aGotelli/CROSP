@@ -36,8 +36,8 @@ int main()
 
     rod.forwardKinematics();
 
-    Eigen::Vector3d zeros = Eigen::Vector3d::Zero();
-    rod.backwardDynamics(zeros, zeros);
+    auto zeros = ::LieAlgebra::Vector6d::Zero();
+    rod.backwardDynamics(zeros);
 
 
     return 0;

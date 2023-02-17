@@ -127,6 +127,10 @@ public:
     RodProperties(const double t_mu,
                   const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
+    RodProperties(const double t_mu,
+                  Eigen::Vector3d t_gravity,
+                  const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
+
     RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
     RodProperties(const MaterialProperties &t_material_properties);
@@ -143,6 +147,11 @@ public:
                   const RodDimensions &t_rod_dimensions);
 
     RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                  const MaterialProperties &t_material_properties,
+                  const RodDimensions &t_rod_dimensions);
+
+    RodProperties(const double t_mu,
+                  const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                   const MaterialProperties &t_material_properties,
                   const RodDimensions &t_rod_dimensions);
 

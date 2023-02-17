@@ -1,0 +1,441 @@
+\documentclass[12pt,a4paper]{article}
+
+
+\usepackage{amsmath}
+\usepackage{amsfonts, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage[makeroom]{cancel} % use this to cross out things
+
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{width=10cm,compat=1.9}
+\usepackage{tikzscale}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc,shapes.geometric}
+
+
+%	This is to create multirows sections in tables
+\usepackage{multirow}
+
+\usepackage{algorithm2e}%Use this to create nice algorithms
+\DontPrintSemicolon
+
+\title{\textbf{Summary of work on the Magnus expansion}
+\author{Andrea Gotelli, Bastien Pedrosa}
+}
+
+\bibliographystyle{ieeetr}
+
+\begin{document}
+
+\maketitle
+
+We want to write a summary on the avancements we made on the integration with Magnus expansions.
+
+In this document, we will start presenting the advantages of the numerical integration using the Magnus expansion for the orientation of the rod cross sections. We will then describe how we can extend the numerical integration in the case of linear, non-homogenous ODEs.
+
+Suppose we want to integrate an equation of form
+
+\begin{equation}
+	y_{(X)}^\prime = y_{(X)} A_{(X)}
+\end{equation}
+
+The integration domain is divided into the $N_c$ Chebyshev points $t_i, i \in [0, N_c -1]$. During the integration, we obtain the value of the integration variable on these points.
+
+
+\begin{figure}
+		\centering
+		\begin{tikzpicture}
+		
+			\pgfmathsetmacro\r{3}
+			\draw (\r cm,0) arc
+    			[
+        			start angle=0,
+        			end angle=180,
+        			x radius=\r cm,
+        			y radius =\r cm
+    			] coordinate[pos=0.0] (0)
+    			coordinate[pos=0.1] (1)
+    			coordinate[pos=0.2] (2)
+    			coordinate[pos=0.3] (3)
+    			coordinate[pos=0.4] (4)
+    			coordinate[pos=0.5] (5)
+    			coordinate[pos=0.6] (6)
+    			coordinate[pos=0.7] (7)
+    			coordinate[pos=0.8] (8)
+    			coordinate[pos=0.9] (9)
+    			coordinate[pos=1.0] (10);
+    			
+    			
+    			
+    			%\node[draw, circle, fill=black, minimum size=0.1cm, inner sep=0p] at (p0) {};
+    			
+    			
+    			\foreach \it in {0,1,...,10}{
+    				\node[draw, circle, fill=black, minimum size=0.1cm, inner sep=0pt] (point) at (\it) {};
+    				
+    				\pgfmathparse{\r*cos(\it*180.0/10.0)}
+					\draw (\it) -- (\pgfmathresult cm, 0) node[at end] (e\it) {};    				
+    				
+    				%\draw (\it) |- (0) {};
+    			}
+    			
+    			\draw[->] (-1.2*\r cm, 0cm) --  (1.2*\r cm, 0cm);
+    			
+    			\node[anchor=north west] at (e0) {$t_0$};
+    			\node[anchor=south west] at (e0) {$X=1$};
+    			\node[anchor=north east] at (e10) {$t_{10}$};
+    			\node[anchor=south east] at (e10) {$X=0$};
+    			
+    			\foreach \it in {1,2,...,9}{
+    				\node[anchor=north] at (e\it) {$t_{\it}$};
+    			}
+    			
+		\end{tikzpicture}
+		\caption{Chebyshev points on the unit circle.}
+		\label{fig:cheb points}
+		\end{figure}
+
+In figure \ref{fig:cheb points} we recall that the Chebyshev points goes from the end to the beginning of the integration domain. 
+
+Our goal is then to compute the values of $y$ at every Chebyshev point. Starting from some known initial conditions, we obtain the value at every integration points with the exponential mapping.
+
+\begin{equation}\label{eq:recursion}
+	y_{i} = y_{i+i} e^{\Omega_{i/i+1}}, \quad i \in [N_c -1, 0]
+\end{equation}
+
+This exponential mapping allow us to jump from one Chebyshev point to the previous one perfoming the numerical integration from point to point. The matrix in the exponential, namely $\Omega_{i/i+1}$, is obtained by quadrature and lies in the Lie group. Details of its computation are given in \cite{blanes2009magnus}.
+
+In figure \ref{fig:points} we show the concept of this integration method. In the following, we will detail an efficient algorithm for computing the numerical integration via Magnus expansions.
+
+\begin{figure}
+		\centering
+		\begin{tikzpicture}
+		
+			\pgfmathsetmacro\r{11}
+			\pgfmathsetmacro\N{4}
+    			
+    			\foreach \it in {0, 1, ..., \N}{    				
+    				%\pgfmathparse{\r*cos(\it*180.0/\N)}
+    				\pgfmathparse{(\r/2.0)*(1 + cos(\it*180.0/\N))}
+    				\node[draw, circle, fill=black, minimum size=0.1cm, inner sep=0pt] at (\pgfmathresult cm, 0) (\it) {};
+    				\node[anchor=south] at(\it) {$t_\it$};
+    			}
+    			
+    			\pgfmathsetmacro{\step}{sqrt(15.0)/10.0}
+    			
+    			\foreach \it [evaluate={\pr=int(\it-1)}] in {1, ..., \N}{  
+    				%\pgfmathsetmacro{\y}{1/\X}  
+    				\pgfmathsetmacro{\begin}{(\r/2.0)*(1 - cos(\pr*180.0/\N))}
+    				\pgfmathsetmacro{\end}{(\r/2.0)*(1 - cos(\it*180.0/\N))} 
+    				\pgfmathsetmacro{\h}{\end - \begin}
+    				
+    				\pgfmathsetmacro\xu{\begin + (0.5 - \step)*\h}
+    				\pgfmathsetmacro{\xd}{\begin + 0.5*\h} 
+    				\pgfmathsetmacro\xt{\begin + (0.5 + \step)*\h}  
+    				
+    				\node[draw, circle, fill=green, minimum size=0.05cm, inner sep=0pt] at (\xu cm, 0) (node 1) {};
+    				\node[anchor=north] at(node 1) {\tiny{$x_1$}};
+        			\node[draw, circle, fill=green, minimum size=0.05cm, inner sep=0pt] at (\xd cm, 0) (node 2) {}; 
+        			\node[anchor=north] at(node 2) {\tiny{$x_2$}};
+        			\node[draw, circle, fill=green, minimum size=0.05cm, inner sep=0pt] at (\xt cm, 0) (node 3) {}; 
+        			\node[anchor=north] at(node 3) {\tiny{$x_3$}};
+            }
+            
+            
+            \foreach \it [evaluate={\pr=int(\it-1)}] in {1, ..., \N}{    				
+    				\draw[->, line width=1pt] (\it) to[in=135, out=45] node[pos=.5,anchor=south]{$e^{\Omega_{\pr/\it}}$} (\pr) ;
+    			}
+    			
+    			
+    			\node[anchor=west] at (0) {\small{$X=1$}};
+    			\node[anchor=east] at (\N) {\small{$X=0$}};
+    			
+    			
+    			
+		\end{tikzpicture}
+		\caption{Chebyshev points with quadrature points in the integration domain.}
+		\label{fig:points}
+		\end{figure}
+		
+		
+
+ 
+
+
+\section{Consideration on performances}
+
+When integrating the ODEs for the IDM, but for the TIDM as well, we perform an in-cascade integration. Before beginning the integration, it is practical to evaluate the strains at every point used in the integration, and store the results in some vector. 
+
+With this practice, we compute all the strain only once and then they are available for all the integrators : Quaternion (or rotation matrix), position, angular velocities, ecc.
+
+\subsection{Reconstruction of the field of strains}
+
+We begin this section with some consideration on our task: compute the field of strain at the quadrature points place in between the Chebyshev points. For this aim, we recall the equations describing the field of strain of the rod.
+
+\begin{equation}
+\begin{aligned}
+	\xi_{(X)} 		&= B \Phi _{(X)} q_{(t)} + \bar{B} \xi_c \\
+	\dot{\xi}_{(X)} 	&= B \Phi _{(X)} \dot{q}_{(t)}  \\
+	\ddot{\xi}_{(X)}	&= B \Phi _{(X)} \ddot{q}_{(t)} 
+\end{aligned}
+\end{equation}
+
+In this context, we first observe that, knowing the Chebyshev point we can define the quadrature points in the rod domain. This means that the map $B \Phi _{(X)}$ can be precomputed at all the points in initialisation and the stored into an appropriate vector. The algorithm \ref{algo:BPhi} resumes the procedure, using a six order quadrature with Gauss-Legendre points as in \cite{blanes2009magnus}.
+
+\begin{algorithm}
+\caption{The algorithm for computing the strains at every quadrature point}\label{algo:BPhi}
+
+
+$B\Phi\_stack = []$\;
+$h\_stack = []$\;\;
+
+$Compute \; the \; N_c \; Chebyshev \; points$\;
+$Chebyshev\_points \leftarrow computeChebyshevPoints\left( N_c \right)$\;\;
+
+\For{$i \in \left[0, N_c - 1 \right)$}{\;
+
+	$begin = Chebyshev\_points \left[ (N_c-1) - i \right]$\;
+    	$end = Chebyshev\_points \left[ (N_c-1) - (i + 1) \right]$\;\;
+    	
+    	$h = end - begin$\;
+    	$step = \sqrt{15}/10$\;\;
+    	
+    	
+    	$h\_stack[i] = h$\;\;
+
+    	$x_1 = begin + (0.5 - step)*h$\;
+    	$x_2 = begin + 0.5*h$\;
+	$x_3 = begin + (0.5 + step)*h$\;\;
+	
+	
+	$B\Phi_{(x_1)} = B \Phi_{(x_1)}$	\;
+	$B\Phi_{(x_2)} = B \Phi_{(x_2)}$	\;
+	$B\Phi_{(x_3)} = B \Phi_{(x_3)}$	\;
+	$B\Phi\_stack[i] = \{\begin{matrix}B\Phi_{(x_1)} & B\Phi_{(x_2)} & B\Phi_{(x_3)} \end{matrix} \}$\;\;
+	
+	
+		
+	
+}\;
+
+\end{algorithm}
+
+The $B\Phi\_stack$ vector will then be used, from now on in the integration, to reconstruct the field of strain along the rod.
+We can now compute $\xi, \; \dot{\xi}, \; \ddot{\xi}$ at every quadrature point. Algorithm \ref{algo:strain} shows the procedure.
+
+\begin{algorithm}[ht]
+\caption{The algorithm for computing the strains at every quadrature point}\label{algo:strain}
+
+
+$\xi\_stack = []$\;
+$\dot{\xi}\_stack = []$\;
+$\ddot{\xi}\_stack = []$\;\;
+
+\For{$i \in \left[0, N_c - 1 \right)$}{\;
+
+	
+	$\xi_1 = B\Phi\_stack[i]_{(x_1)} q + \bar{B} \xi_c$	\;
+	$\xi_2 = B\Phi\_stack[i]_{(x_2)} q + \bar{B} \xi_c$	\;
+	$\xi_3 = B\Phi\_stack[i]_{(x_3)} q + \bar{B} \xi_c$	\;
+	$\xi\_stack[i] = \{\begin{matrix}\xi_1 & \xi_2 & \xi_3 \end{matrix} \}$\;\;
+	
+	
+	$\dot{\xi} _1 = B\Phi\_stack[i]_{(x_1)} \dot{q} $	\;
+	$\dot{\xi} _1 = B\Phi\_stack[i]_{(x_2)} \dot{q} $	\;
+	$\dot{\xi} _1 = B\Phi\_stack[i]_{(x_3)} \dot{q} $	\;
+	$\dot{\xi}\_stack[i] = \{\begin{matrix} \dot{\xi}_1 & \dot{\xi}_2 & \dot{\xi}_3 \end{matrix} \}$\;\;
+	
+	$\ddot{\xi} _1 = B\Phi\_stack[i]_{(x_1)} \ddot{q} $	\;
+	$\ddot{\xi} _1 = B\Phi\_stack[i]_{(x_2)} \ddot{q} $	\;
+	$\ddot{\xi} _1 = B\Phi\_stack[i]_{(x_3)} \ddot{q} $	\;
+	$\ddot{\xi}\_stack[i] = \{\begin{matrix} \ddot{\xi}_1 & \ddot{\xi}_2 & \ddot{\xi}_3 \end{matrix} \}$\;\;
+		
+	
+}\;
+
+\end{algorithm}
+
+
+
+
+The cost of algorithm \ref{algo:strain} is shown in table \ref{computational time strain}, where we compare the time for computing all the strain variables $\xi, \; \dot{\xi}, \; \ddot{\xi}$ at the chebyshev points and at all the quadrature points.
+
+
+\begin{table}[ht]
+	\begin{tabular}{c|c|c|c}
+		$\xi, \; \dot{\xi}, \; \ddot{\xi}$ &	\multicolumn{3}{c}{Time} \\
+		&	$N_c = 11$	&	$N_c = 21$	&	$N_c = 31 $	\\
+		\hline
+		Chebyshev $[\mu s]$&	 $0.857$	& $1.69$	&	$2.68$	\\
+		Gauss-Legendre $[\mu s]$&	$3.61$	& $7.22$	&	$10.6$ \\
+		\hline
+		Ratio & $4.21$	&	$2.13$	&	$4.27$
+	\end{tabular}
+	\caption{Computational time need to compute $\xi$ and derivatives on the Chebyshev and Gauss-Legendre points.}\label{computational time strain}
+\end{table}
+	
+	
+From table \ref{computational time strain}, we see that reconstruct the strains, and their derivatives, at every quadrature point is more expensive than computing them at the Chebyshev points only. This drawback was expected as we need to perform 3 times more computations per Chebyshev point (using a quadrature of order 6). However, this part can be parallelised easily : we can create a thread pool and give at each thread some quadrature points where to compute the strains. This is possible as the computation of $\xi, \; \dot{\xi}, \; \ddot{\xi}$ depends only on $X$.
+
+\subsection{Integration with the Magnus expansions}
+
+Once the field of strains is reconstructed we can integrate using the Magnus expansion. We will show that, even in this part, we can take advantages of the shape of our problem. In the following, we consider the integration of the orientation of the rod cross section.
+
+Once we compute all the strain field at all the quadrature points using the procedure explained in algorithm \ref{algo:strain}, we only need to compute $\Omega^{[6]}$ between every Chebyshev points. The algorithm \ref{algo:magnus} shows the integration using the Magnus expansion for the rotation matrix
+
+
+
+\begin{algorithm}
+\caption{The algorithm for the Magnus integrator}\label{algo:magnus}
+
+
+$stack\_e^{\Omega^{[6]}} = []$\;\;
+
+
+
+\For{$i \in \left[0, N_c - 1 \right)$}{
+	$\textit{Get curvature from strain field at quadrature point}$\;
+	$\begin{bmatrix}K_1 & K_2 & K_3 \end{bmatrix} \leftarrow \begin{bmatrix}\xi_1 & \xi_2 & \xi_3 \end{bmatrix}$\;\;
+
+	$A_1 = \hat{K}_1$ \;
+	$A_2 = \hat{K}_2$ \;
+	$A_3 = \hat{K}_3$ \;\;
+	
+	
+	$\alpha_1 = h_stack[i]*A_2$\;
+   	$\alpha_2 = \frac{\sqrt{15}}{3}(A_3 - A_1)h\_stack[i]$\;
+	$\alpha_3 = \frac{10}{3}(A_3 - 2A_2 + A_1)h\_stack[i]$\;\;
+	
+	
+	$C_1 = \left[ \alpha_1, \; \alpha_2\right]$\;
+	$C_1 = - \frac{1}{60}\left[ \alpha_1, \; 2\alpha_3 + C_1\right]$\;\;
+	
+	$\Omega^{[6]} = \alpha_1 + \frac{1}{12} \alpha_3 + \frac{1}{240}\left[-20\alpha_1 - \alpha_3 + C_1, \; \alpha_2 + C_2 \right]$\;\;
+	
+	
+	$\textit{Stack the exponential into a vector}$\;
+	$stack\_e^{\Omega^{[6]}}[i] = e^{\Omega^{[6]}}$
+		
+	
+}\;
+
+$R_stack = []$\;
+$R_stack[0] = \begin{bmatrix}
+1	&	0	&	0	\\
+0	&	1	&	0	\\
+0	&	0	&	1
+\end{bmatrix}$ \;\;
+
+
+
+\For{$i \in \left[0, N_c - 1 \right)$}{
+	
+	$R\_stack[i+1] = R\_stack[i] \cdot  stack\_e^{\Omega^{[6]}}[i]$\;
+		
+	
+}\;
+
+
+\end{algorithm}
+
+Note that at the end of the algorithm \ref{algo:magnus} we use a different formulation from the one shown in \eqref{eq:recursion}, as in this case we directly move from the beginning of the integration domain to its end.
+
+
+The table \ref{computational time} shows the differences, in computational time, of this optimised method with respect to \textit{ode45} and the spectral integration.
+
+
+
+\begin{table}[!ht]
+	\begin{tabular}{c|c|c|c}
+		Integration mode &	\multicolumn{3}{c}{Time} \\
+		&	$N_c = 11$	&	$N_c = 21$	&	$N_c = 31 $	\\
+		\hline
+		\textit{ode45} $[\mu s]$&	 $148$	& $141$	&	$139$	\\
+		Spectral $[\mu s]$&	$21.2$	& $144$	&	$449$ \\
+		Magnus $[\mu s]$&	$1.65$	& $3.42$	&	$5.01$ 
+	\end{tabular}
+	\caption{Computational time for reconstructing the rod orientation using \textit{ode45}, spectral integration and the Magnus expansions.} \label{computational time}
+\end{table}
+	
+	
+From the table \ref{computational time} we can make the following considerations
+\begin{itemize}
+	\item The integration using \textit{ode45} takes the same amount of time no matter of the number of points as it not in the Chebyshev grid. It seems that this is a valid option as its computational time remains stable. However, when we extend it to the full integration of variables in the IDM, its benefetis vanish.
+	
+	\item The spectral numerical integration suffers from the fact the number of Chebyshev points determines the dimension of the matrices. Having to perform a matrix inversion, the computational time grows exponentially with the number of points. The computational complexity is then $\mathcal{O}(N_c^3)$.
+	
+	\item The integration with Magnus expansion is incredibly efficient as it is composed of a series of multiplication of matrices of small dimension. Moreover, the number of points influences the total number of multiplications. For this reason the computational time grows linearly with the number of points. The computational complexity is then $\mathcal{O}(N_c)$.
+\end{itemize}
+
+It is then clear that the integration using the Magnus expasion is a valuable solution to speedup the IDM computations. 
+
+Moreover, if we consider the algorithm \ref{algo:magnus}, we observe that the computation of $e^{\Omega^{[6]}}$ are completely indepent so we could as well parallelise the loop with a thread pool in oder to further reduce the computational time required to perform the integration.
+
+
+\section{Extension to non-homogenous ODE}
+
+
+We then discoved that the Magnus integrator can be extended to the case of an non-homogeneous ODE of type
+
+\begin{equation}
+	y^\prime = A_{(X)} y + b_{(X)}
+\end{equation}
+
+Following the procedure explained in \cite{blanes2012time}, it suffices to perform a change of variable to have 
+
+\begin{equation}
+\begin{aligned}
+	z^\prime &= H_{(X)} z, \quad
+	z = 
+	\begin{bmatrix}
+		y	\\
+		1
+	\end{bmatrix}	\\	
+	\begin{bmatrix}
+		y	\\
+		1
+	\end{bmatrix}^\prime &=
+	\begin{bmatrix}
+		A_{(X)}	&	b_{(X)}	\\
+			0	&	0
+	\end{bmatrix}
+	\begin{bmatrix}
+		y	\\
+		1
+	\end{bmatrix}
+\end{aligned}
+\end{equation}
+
+This allows us to implement the same formulation as before. It is worth noting that errors may occour when $\vert \vert A \vert \vert  \ll   \vert \vert b \vert \vert$. The occurence of this situation should be tested; but a formulation exists to handle this case.
+
+
+To prove the benefits of this new formulation, we performed the integration of the angular velocities $\Omega_{(X)}$ using the spectral integration and the oder 6 Magnus expansion, the results are shown in table \ref{computational time omega}.
+
+
+
+\begin{table}[!ht]
+	\begin{tabular}{c|c|c|c}
+		Integration mode &	\multicolumn{3}{c}{Time} \\
+		&	$N_c = 11$	&	$N_c = 21$	&	$N_c = 31 $	\\
+		\hline
+		Spectral $[\mu s]$&	$12.5$	& $60.4$	&	$209$ \\
+		Magnus $[\mu s]$&	$2.79$	& $5.32$	&	$8.28$ 
+	\end{tabular}
+	\caption{Computational time for reconstructing the rod angular velocities using the spectral integration and the order 6 Magnus expansions.} \label{computational time omega}
+\end{table}
+
+
+\section{Conclusions}
+
+It is clear that the numerical integration using the Magnus expansions is a valid solution to speedup the solution of the IDM, and TIDM, of a Cosserat rod. In fact, all this gain in performances is obtained without sacrificing precision; meaning that the solution found with the Magnus expansion corresponds to the solution found with other methods up to an error of order $\propto 10^{-16}$.
+
+
+In order to implemnt this new formulation we will then need to reconstruct the values of linear and angular velocities, accelerations and internal stresses at the quadrature point. These values are known at the Chebyshev points so we can interpolate them using the Chebyshev polynomials. For this purpose, the approached threated in \cite{ahmed1974discrete} \cite{neagoe1990chebyshev} and \cite{Orekhov2020} can be useful to develop our computations.
+
+\bibliography{bibliography}
+
+\end{document}

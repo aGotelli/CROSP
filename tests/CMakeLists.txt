@@ -117,3 +117,42 @@ target_compile_definitions(test_perturbed_idm
 
 
 
+find_package(NEMI)
+
+add_executable(test_internal_elastic_equilibrium test_internal_elastic_equilibrium.cpp)
+target_link_libraries(test_internal_elastic_equilibrium
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+        ${CERES_LIBRARIES}
+        Qt5::Widgets
+        Qt5::Charts
+        NEMI
+)
+target_compile_definitions(test_internal_elastic_equilibrium
+    PRIVATE
+        DEVELOPER
+)
+
+
+add_executable(test_DDCT test_DDCT.cpp
+    chebyshev_reconstructor.hpp)
+target_link_libraries(test_DDCT
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+)
+target_compile_definitions(test_DDCT PRIVATE DEVELOPER)
+
+
+
+add_executable(test_different_modes test_different_modes.cpp)
+target_link_libraries(test_different_modes
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+)
+target_compile_definitions(test_different_modes
+    PRIVATE
+        DEVELOPER
+)
