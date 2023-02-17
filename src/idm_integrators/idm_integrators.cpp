@@ -97,7 +97,7 @@ AngularVelocityIntegrator::AngularVelocityIntegrator(const unsigned int t_number
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                   t_number_of_Chebyshev_points),
-      m_K_stack(t_strain_parameterisation->m_dot_K_stack),
+      m_K_stack(t_strain_parameterisation->m_K_stack),
       m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack)
 {}
 
@@ -107,7 +107,7 @@ AngularVelocityIntegrator::AngularVelocityIntegrator(const unsigned int t_number
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                   t_number_of_Chebyshev_points),
-      m_K_stack(t_strain_parameterisation->m_dot_K_stack),
+      m_K_stack(t_strain_parameterisation->m_K_stack),
       m_dot_K_stack(t_strain_parameterisation->m_dot_K_stack)
 {
     this->setInitialConditions(t_initial_condition);
