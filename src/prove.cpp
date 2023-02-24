@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 {
 
 
-    std::shared_ptr<::CROSP::strain_parameterisation::StrainParameterisation> strain_par;
+    const auto strain_par = std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>();
 
 
     ::CROSP::rod_properties::MaterialProperties mat_prop;
@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Random(ne);
 
     rod.updateParameterisation(q, dot_q, ddot_q);
+
+    rod.forwardKinematics();
 
 
     return 0;
