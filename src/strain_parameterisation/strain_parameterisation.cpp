@@ -34,16 +34,16 @@ void StrainParameterisation::updateStacks(const Eigen::VectorXd &t_qe,
 
     for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
 
-        xi = m_map_to_strain_stack[i]*t_qe + m_constrained_strain;
-        dot_xi = m_map_to_strain_stack[i]*t_dot_qe;
+        xi      = m_map_to_strain_stack[i]*t_qe + m_constant_strain;
+        dot_xi  = m_map_to_strain_stack[i]*t_dot_qe;
         ddot_xi = m_map_to_strain_stack[i]*t_ddot_qe;
 
-        m_K_stack->at(i) = xi.block<3,1>(0,0);
-        m_dot_K_stack->at(i) = dot_xi.block<3,1>(0,0);
+        m_K_stack->at(i)      = xi.block<3,1>(0,0);
+        m_dot_K_stack->at(i)  = dot_xi.block<3,1>(0,0);
         m_ddot_K_stack->at(i) = ddot_xi.block<3,1>(0,0);
 
-        m_Lambda_stack->at(i) = xi.block<3,1>(3,0);
-        m_dot_Lambda_stack->at(i) = dot_xi.block<3,1>(3,0);
+        m_Lambda_stack->at(i)      = xi.block<3,1>(3,0);
+        m_dot_Lambda_stack->at(i)  = dot_xi.block<3,1>(3,0);
         m_ddot_Lambda_stack->at(i) = ddot_xi.block<3,1>(3,0);
 
     }

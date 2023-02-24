@@ -74,22 +74,42 @@ public:
     const unsigned int m_number_of_Chebyshev_points { 17 };
 
 
+    const Eigen::VectorXd m_constant_strain {
+        (Eigen::VectorXd(6) << 0, 0, 0, 1, 0, 0 ).finished()
+    };
+
+
+
     //  The stacks for the strain, decomposed in angular and linear part
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
 
     //  The stacks for the first derivative of the strain, decomposed in angular and linear part
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack{ std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack{
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
 
     //  The stacks for the first derivative of the strain, decomposed in angular and linear part
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack { std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points) };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
 
 
 
     //  The polynomial representation of the field of strain
-    const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> m_polynomial_representation;
+    const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> m_polynomial_representation {
+        std::make_shared<const polynomial_representation::PolynomialRepresentation>()
+    };
 
 
 
@@ -136,36 +156,36 @@ private:
 
 
     //  The constrained strain xi_c
-    const Eigen::VectorXd m_constrained_strain { [&](){
+//    const Eigen::VectorXd constant_strain { [&](){
 
-            //  constrain only the evolution along x
-            Eigen::VectorXd constant_strain(6);
-            constant_strain <<   0,
-                                 0,
-                                 0,
-                                 1.0,
-                                 0,
-                                 0;
+//            //  constrain only the evolution along x
+//            Eigen::VectorXd constant_strain(6);
+//            constant_strain <<   0,
+//                                 0,
+//                                 0,
+//                                 1.0,
+//                                 0,
+//                                 0;
 
-            //  Get the matrix B bar
-            const auto B_bar = m_polynomial_representation->m_Bbar;
+//            //  Get the matrix B bar
+//            const auto B_bar = m_polynomial_representation->m_Bbar;
 
-            //  Define the constrained strain from the rod DoFs
-            std::vector<int> indexes;
-            std::for_each(m_polynomial_representation->m_admitted_deformations.begin(),
-                          m_polynomial_representation->m_admitted_deformations.end(),
-                          [&indexes, index=0](const bool dof)mutable{   if(dof == false)
-                                                                            indexes.push_back(index);
-                                                                        index++;});
-            Eigen::VectorXd xi_c = constant_strain(indexes);
+//            //  Define the constrained strain from the rod DoFs
+//            std::vector<int> indexes;
+//            std::for_each(m_polynomial_representation->m_admitted_deformations.begin(),
+//                          m_polynomial_representation->m_admitted_deformations.end(),
+//                          [&indexes, index=0](const bool dof)mutable{   if(dof == false)
+//                                                                            indexes.push_back(index);
+//                                                                        index++;});
+//            Eigen::VectorXd xi_c = constant_strain(indexes);
 
-            //  Always check that Gamma x is 1
-            if(xi_c(3) != 1)
-                xi_c(3) = 1.0;
+//            //  Always check that Gamma x is 1
+//            if(xi_c(3) != 1)
+//                xi_c(3) = 1.0;
 
 
-            return xi_c;
-        }() };
+//            return xi_c;
+//        }() };
 
 
 };
