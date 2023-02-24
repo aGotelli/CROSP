@@ -105,8 +105,8 @@ add_library(${PROJECT_NAME} SHARED
                             strain_parameterisation/strain_parameterisation.cpp
                             include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
                             idm_integrators/idm_integrators.cpp
-#                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
-#                            tidm_integrators/tidm_integrators.cpp
+                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
+                            tidm_integrators/tidm_integrators.cpp
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -132,13 +132,13 @@ add_executable(prove prove.cpp)
 target_link_libraries(prove ${PROJECT_NAME})
 
 
-install(
-    TARGETS
-        ${PROJECT_NAME}
-    DESTINATION
-        ${CMAKE_INSTALL_LIBDIR}
-)
-install(DIRECTORY include/${PROJECT_NAME}
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+#install(
+#    TARGETS
+#        ${PROJECT_NAME}
+#    DESTINATION
+#        ${CMAKE_INSTALL_LIBDIR}
+#)
+#install(DIRECTORY include/${PROJECT_NAME}
+#    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+#)
 
