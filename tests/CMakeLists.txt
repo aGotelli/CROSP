@@ -156,3 +156,18 @@ target_compile_definitions(test_different_modes
     PRIVATE
         DEVELOPER
 )
+
+
+add_executable(rod_shape rod_shape.cpp)
+target_link_libraries(rod_shape
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+        Qt5::Widgets
+        Qt5::Charts
+)
+target_compile_definitions(rod_shape
+    PRIVATE
+        DEVELOPER
+)
+
