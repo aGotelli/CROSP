@@ -379,13 +379,16 @@ private:
 
 
     //  Representation of the rod via strain
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
+        std::make_shared<strain_parameterisation::StrainParameterisation>()
+    };
 
 
 
     //  The set of rod properties
     std::shared_ptr<rod_properties::RodProperties> m_rod_properties {
-        std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation) };
+        std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation)
+    };
 
 
 
@@ -397,7 +400,8 @@ private:
     //  The set of integrators needed for the IDM
     std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
         std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
-                                                          m_rod_properties )};
+                                                          m_rod_properties )
+    };
 
 //    //  The set of integrators needed for the TIDM
 //    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
