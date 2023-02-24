@@ -54,6 +54,10 @@ public:
                            const unsigned int t_number_of_Chebyshev_points);
 
 
+    StrainParameterisation(const Eigen::VectorXd t_constant_strain,
+                           const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
+
+
 
     ~StrainParameterisation()=default;
 
