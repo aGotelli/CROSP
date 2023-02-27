@@ -132,13 +132,13 @@ add_executable(prove prove.cpp)
 target_link_libraries(prove ${PROJECT_NAME})
 
 
-#install(
-#    TARGETS
-#        ${PROJECT_NAME}
-#    DESTINATION
-#        ${CMAKE_INSTALL_LIBDIR}
-#)
-#install(DIRECTORY include/${PROJECT_NAME}
-#    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-#)
+install(
+    TARGETS
+        ${PROJECT_NAME}
+    DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}
+)
+install(DIRECTORY include/${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
