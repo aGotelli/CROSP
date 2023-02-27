@@ -33,53 +33,55 @@ int main(int argc, char *argv[])
     };
 
 
-    ::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations,
-                                                                                    ne);
+    auto polynomial_representation =
+            std::make_shared<::polynomial_representation::PolynomialRepresentation>(admitted_deformations,
+                                                                                   ne);
 
 
     ::CROSP::rod_properties::RodDimensions rod_dimensions(0.01, 1.0);
-    ::CROSP::rod_properties::MaterialProperties material_properties(210e9, 80e9, 0);
+
+
+    auto strain_param =
+            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
 
     std::shared_ptr<::rod_properties::RodProperties> rod_properties =
-            std::make_shared<::rod_properties::RodProperties>(polynomial_representation,
-//                                                              material_properties,
-                                                              rod_dimensions);
+            std::make_shared<::rod_properties::RodProperties>(strain_param,
+                                                              rod_dimensions,
+                                                              ::CROSP::rod_properties::MaterialProperties());
 
 
 
-    std::shared_ptr<::strain_parameterisation::StrainParameterisation> strain_parameterisation =
+    const std::shared_ptr<::strain_parameterisation::StrainParameterisation> strain_parameterisation =
             std::make_shared<::strain_parameterisation::StrainParameterisation>(polynomial_representation,
                                                                                 number_of_Chebyshev_points);
 
     std::shared_ptr<::strain_parameterisation::StrainParameterisation> strain_parameterisation_Delta =
-            std::make_shared<::strain_parameterisation::StrainParameterisation>(polynomial_representation,
-                                                                                ::LieAlgebra::Vector6d::Zero(),
-                                                                                number_of_Chebyshev_points);
+            std::make_shared<::strain_parameterisation::StrainParameterisation>(strain_parameterisation,
+                                                                                ::LieAlgebra::Vector6d::Zero());
 
 
 
     std::shared_ptr<::idm_integrators::IDMIntegrators> idm_integrators =
-            std::make_shared<::idm_integrators::IDMIntegrators>(number_of_Chebyshev_points,
-                                                                polynomial_representation,
-                                                                strain_parameterisation,
+            std::make_shared<::idm_integrators::IDMIntegrators>(strain_parameterisation,
                                                                 rod_properties);
 
+
+
     std::shared_ptr<::tidm_integrators::TIDMIntegrators> tidm_integrators =
-            std::make_shared<::tidm_integrators::TIDMIntegrators>(number_of_Chebyshev_points,
-                                                                  polynomial_representation,
-                                                                  strain_parameterisation,
+            std::make_shared<::tidm_integrators::TIDMIntegrators>(strain_parameterisation,
                                                                   strain_parameterisation_Delta,
                                                                   idm_integrators,
                                                                   rod_properties);
 
-    Eigen::VectorXd qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
+    Eigen::VectorXd qe = Eigen::VectorXd::Zero(polynomial_representation->getCoordinatesDimension());
     qe << -0.2,
            0.2,
           -0.2;
 
-    Eigen::VectorXd dot_qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
+    Eigen::VectorXd dot_qe = Eigen::VectorXd::Zero(polynomial_representation->getCoordinatesDimension());
     dot_qe = 0.4 * qe;
-    Eigen::VectorXd ddot_qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
+    Eigen::VectorXd ddot_qe = Eigen::VectorXd::Zero(polynomial_representation->getCoordinatesDimension());
     ddot_qe = -0.15*qe;
 
 
@@ -110,7 +112,7 @@ int main(int argc, char *argv[])
 
     idm_integrators->m_internal_couples->integrate( couple_at_tip_local_coord );
 
-    idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation.m_total_number_of_modes) );
+    idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation->m_total_number_of_modes) );
 
     std::cout.flush();
 
@@ -137,9 +139,9 @@ int main(int argc, char *argv[])
     std::cout << "Internal forces : \n" << idm_integrators->m_internal_forces->getStackAsMatrix() << "\n\n\n" << std::endl;
 
 
-    Eigen::VectorXd Delta_qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
-    Eigen::VectorXd Delta_dot_qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
-    Eigen::VectorXd Delta_ddot_qe = Eigen::VectorXd::Zero(polynomial_representation.getCoordinatesDimension());
+    Eigen::VectorXd Delta_qe = Eigen::VectorXd::Zero(polynomial_representation->getCoordinatesDimension());
+    Eigen::VectorXd Delta_dot_qe = Eigen::VectorXd::Zero(polynomial_representation->getCoordinatesDimension());
+    Eigen::VectorXd Delta_ddot_qe = Eigen::VectorXd::Zero(polynomial_representation->getCoordinatesDimension());
 
 
     const unsigned int a = 400;
@@ -148,8 +150,8 @@ int main(int argc, char *argv[])
 
 
 
-    Eigen::MatrixXd Delta_zeta(polynomial_representation.m_total_number_of_modes*6, number_of_Chebyshev_points);
-    for(unsigned int i=0; i<polynomial_representation.m_total_number_of_modes; i++){
+    Eigen::MatrixXd Delta_zeta(polynomial_representation->m_total_number_of_modes*6, number_of_Chebyshev_points);
+    for(unsigned int i=0; i<polynomial_representation->m_total_number_of_modes; i++){
         Delta_qe.setZero();
         Delta_qe(i) = 1;
 
@@ -201,7 +203,7 @@ int main(int argc, char *argv[])
         writeToFile("Delta_C"+std::to_string(i+1), tidm_integrators->m_Delta_internal_couples->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
 
-        tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(polynomial_representation.m_total_number_of_modes));
+        tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(polynomial_representation->m_total_number_of_modes));
         writeToFile("Delta_Q"+std::to_string(i+1), tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix(), "/home/andrea/Desktop/PhD/PhD_development/strain_approach/MATLAB/Dyn_Essai_release_Beam_Andrea/data_from_cpp");
 
         std::cout << "\n\n\n\n\n\n";
@@ -232,10 +234,10 @@ int main(int argc, char *argv[])
 
             idm_integrators->m_internal_couples->integrate( Eigen::Vector3d::Zero() );
 
-            idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation.m_total_number_of_modes) );
+            idm_integrators->m_generalised_forces->integrate( Eigen::VectorXd::Zero(polynomial_representation->m_total_number_of_modes) );
 
 
-            for(unsigned int i=0; i<polynomial_representation.m_total_number_of_modes; i++){
+            for(unsigned int i=0; i<polynomial_representation->m_total_number_of_modes; i++){
                 Delta_qe.setZero();
                 Delta_qe(i) = 1;
 

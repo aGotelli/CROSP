@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Eigen3 3.4 NO_MODULE REQUIRED)
 
-#find_package(utilities REQUIRED)
+find_package(utilities REQUIRED)
 
 find_package(math_tools REQUIRED)
 
