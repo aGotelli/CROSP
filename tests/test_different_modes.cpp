@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
             std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(poly_with_admitted_def_and_modes, number_of_Chebyshev_points);
 
     //  Now use it in rod properties
-    ::CROSP::rod_properties::RodProperties rod_properties(strain_par);
+    auto rod_properties =
+            std::make_shared<::CROSP::rod_properties::RodProperties>(strain_par);
 
 
 
@@ -129,54 +130,54 @@ int main(int argc, char *argv[])
 
 
 
-//    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
-//    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
-//    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
 
 
-//    const unsigned int a = 400;
-//    const unsigned int b = 160000;
+    const unsigned int a = 400;
+    const unsigned int b = 160000;
 
-//    for(unsigned int i=0; i<ne; i++){
+    for(unsigned int i=0; i<ne; i++){
 
-//        Delta_q.setZero();
-//        Delta_q[i] = 1;
+        Delta_q.setZero();
+        Delta_q[i] = 1;
 
-//        Delta_dot_q  = a * Delta_q;
-//        Delta_ddot_q = b * Delta_q;
-
-
-//        rod.updateParameterisationVariation(Delta_q, Delta_dot_q, Delta_ddot_q);
-
-//        rod.forwardTangentKinematics();
-
-//        rod.backwardTangentDynamics(zeros);
+        Delta_dot_q  = a * Delta_q;
+        Delta_ddot_q = b * Delta_q;
 
 
+        rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
-//        const auto Delta_rotation_stack = rod.m_tidm_integrators->m_Delta_rotation->getStackAsMatrix();
-//        const auto Delta_position_stack = rod.m_tidm_integrators->m_Delta_position->getStackAsMatrix();
-//        const auto Delta_Omega_stack = rod.m_tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix();
-//        const auto Delta_V_stack     = rod.m_tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix();
-//        const auto Delta_dot_Omega_stack = rod.m_tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix();
-//        const auto Delta_dot_V_stack     = rod.m_tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix();
+        rod.forwardTangentKinematics();
 
-//        const auto Delta_N_stack = rod.m_tidm_integrators->m_Delta_internal_forces->getStackAsMatrix();
-//        const auto Delta_C_stack = rod.m_tidm_integrators->m_Delta_internal_couples->getStackAsMatrix();
-//        const auto Delta_Qa_stack = rod.m_tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix();
+        rod.backwardTangentDynamics(zeros);
 
 
-//        writeToFile("Delta_rotation_stack" "_Delta" + std::to_string(i), Delta_rotation_stack, path);
-//        writeToFile("Delta_position_stack" "_Delta" + std::to_string(i), Delta_position_stack, path);
-//        writeToFile("Delta_Omega_stack" "_Delta" + std::to_string(i), Delta_Omega_stack, path);
-//        writeToFile("Delta_V_stack" "_Delta" + std::to_string(i), Delta_V_stack, path);
-//        writeToFile("Delta_dot_Omega_stack" "_Delta" + std::to_string(i), Delta_dot_Omega_stack, path);
-//        writeToFile("Delta_dot_V_stack" "_Delta" + std::to_string(i), Delta_dot_V_stack, path);
-//        writeToFile("Delta_N_stack" "_Delta" + std::to_string(i), Delta_N_stack, path);
-//        writeToFile("Delta_C_stack" "_Delta" + std::to_string(i), Delta_C_stack, path);
-//        writeToFile("Delta_Qa_stack" "_Delta" + std::to_string(i), Delta_Qa_stack, path);
 
-//    }
+        const auto Delta_rotation_stack = rod.m_tidm_integrators->m_Delta_rotation->getStackAsMatrix();
+        const auto Delta_position_stack = rod.m_tidm_integrators->m_Delta_position->getStackAsMatrix();
+        const auto Delta_Omega_stack = rod.m_tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix();
+        const auto Delta_V_stack     = rod.m_tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix();
+        const auto Delta_dot_Omega_stack = rod.m_tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix();
+        const auto Delta_dot_V_stack     = rod.m_tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix();
+
+        const auto Delta_N_stack = rod.m_tidm_integrators->m_Delta_internal_forces->getStackAsMatrix();
+        const auto Delta_C_stack = rod.m_tidm_integrators->m_Delta_internal_couples->getStackAsMatrix();
+        const auto Delta_Qa_stack = rod.m_tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix();
+
+
+        writeToFile("Delta_rotation_stack" "_Delta" + std::to_string(i), Delta_rotation_stack, path);
+        writeToFile("Delta_position_stack" "_Delta" + std::to_string(i), Delta_position_stack, path);
+        writeToFile("Delta_Omega_stack" "_Delta" + std::to_string(i), Delta_Omega_stack, path);
+        writeToFile("Delta_V_stack" "_Delta" + std::to_string(i), Delta_V_stack, path);
+        writeToFile("Delta_dot_Omega_stack" "_Delta" + std::to_string(i), Delta_dot_Omega_stack, path);
+        writeToFile("Delta_dot_V_stack" "_Delta" + std::to_string(i), Delta_dot_V_stack, path);
+        writeToFile("Delta_N_stack" "_Delta" + std::to_string(i), Delta_N_stack, path);
+        writeToFile("Delta_C_stack" "_Delta" + std::to_string(i), Delta_C_stack, path);
+        writeToFile("Delta_Qa_stack" "_Delta" + std::to_string(i), Delta_Qa_stack, path);
+
+    }
 
 
 

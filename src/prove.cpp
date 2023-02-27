@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
 
     ::CROSP::rod_properties::MaterialProperties mat_prop;
     ::CROSP::rod_properties::RodDimensions rod_dim;
-    ::CROSP::rod_properties::RodProperties rod_properties(strain_par, rod_dim, mat_prop);
+    auto rod_properties =
+            std::make_shared<::CROSP::rod_properties::RodProperties>(strain_par, rod_dim, mat_prop);
 
 
     ::CROSP::CosseratRod rod(strain_par, rod_properties);
