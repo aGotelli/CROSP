@@ -20,8 +20,8 @@
 namespace CROSP {
 
 
-CosseratRod::CosseratRod(const rod_properties::RodProperties &t_rod_properties)
-    : m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
+CosseratRod::CosseratRod(const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+    : m_rod_properties( t_rod_properties )
 {}
 
 
@@ -33,9 +33,9 @@ CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainPa
 
 
 CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                         const rod_properties::RodProperties &t_rod_properties)
+                         const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
     : m_strain_parameterisation( t_strain_parameterisation ),
-      m_rod_properties( std::make_shared<rod_properties::RodProperties>(t_rod_properties) )
+      m_rod_properties( t_rod_properties )
 {}
 
 
@@ -112,27 +112,27 @@ void CosseratRod::forwardKinematics()
 
 
 
-//void CosseratRod::updateParameterisationVariation(const Eigen::VectorXd &t_Delta_qe,
-//                                                  const Eigen::VectorXd &t_Delta_dot_qe,
-//                                                  const Eigen::VectorXd &t_Delta_ddot_qe)
-//{
-//    m_strain_parameterisation_Delta->updateStacks(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
-//}
+void CosseratRod::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+                                              const Eigen::VectorXd &t_Delta_dot_qe,
+                                              const Eigen::VectorXd &t_Delta_ddot_qe)
+{
+    m_strain_parameterisation_Delta->updateStacks(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
+}
 
-//void CosseratRod::forwardTangentKinematics()
-//{
-//    //  Integrate Delta zeta
-//    m_tidm_integrators->m_Delta_rotation->solveSystem();
-//    m_tidm_integrators->m_Delta_position->solveSystem();
+void CosseratRod::forwardTangentKinematics()
+{
+    //  Integrate Delta zeta
+    m_tidm_integrators->m_Delta_rotation->solveSystem();
+    m_tidm_integrators->m_Delta_position->solveSystem();
 
-//    //  Integrate Delta eta
-//    m_tidm_integrators->m_Delta_angular_velocity->solveSystem();
-//    m_tidm_integrators->m_Delta_linear_velocity->solveSystem();
+    //  Integrate Delta eta
+    m_tidm_integrators->m_Delta_angular_velocity->solveSystem();
+    m_tidm_integrators->m_Delta_linear_velocity->solveSystem();
 
-//    //  Integrate Delta dot eta
-//    m_tidm_integrators->m_Delta_angular_acceleration->solveSystem();
-//    m_tidm_integrators->m_Delta_linear_acceleration->solveSystem();
-//}
+    //  Integrate Delta dot eta
+    m_tidm_integrators->m_Delta_angular_acceleration->solveSystem();
+    m_tidm_integrators->m_Delta_linear_acceleration->solveSystem();
+}
 
 
 //void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
@@ -245,18 +245,18 @@ void CosseratRod::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
 //}
 
 
-//void CosseratRod::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
-//{
+void CosseratRod::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
+{
 
-//    Eigen::Vector3d Delta_couple_at_tip = t_Delta_Lambda_X1.block<3, 1>(0, 0);
-//    Eigen::Vector3d Delta_force_at_tip  = t_Delta_Lambda_X1.block<3, 1>(3, 0);
+    Eigen::Vector3d Delta_couple_at_tip = t_Delta_Lambda_X1.block<3, 1>(0, 0);
+    Eigen::Vector3d Delta_force_at_tip  = t_Delta_Lambda_X1.block<3, 1>(3, 0);
 
 
-//    m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip);
-//    m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip);
+    m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip);
+    m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip);
 
-//    m_tidm_integrators->m_Delta_generalised_forces->integrate(Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension()));
-//}
+    m_tidm_integrators->m_Delta_generalised_forces->solveSystem();
+}
 
 
 

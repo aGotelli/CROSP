@@ -43,14 +43,14 @@ public:
     CosseratRod()=default;
 
 
-    CosseratRod(const rod_properties::RodProperties &t_rod_properties);
+    CosseratRod(const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
     CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
 
 
     CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                const rod_properties::RodProperties &t_rod_properties);
+                const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
 
@@ -132,24 +132,24 @@ public:
 //    }
 
 
-//    /*!
-//     * \brief updateParameterisationVariation updates the variation of the strain due to the delta
-//     * \param t_Delta_qe the variation on the generalised coordinates
-//     * \param t_Delta_dot_qe the variation on the first derivative of the generalised coordinates
-//     * \param t_Delta_ddot_qe the variation on the second derivative of the  generalised coordinates
-//     */
-//    void updateParameterisationVariation(const Eigen::VectorXd &t_Delta_qe,
-//                                         const Eigen::VectorXd &t_Delta_dot_qe,
-//                                         const Eigen::VectorXd &t_Delta_ddot_qe);
+    /*!
+     * \brief updateDeltaParameterisation updates the variation of the strain due to the delta
+     * \param t_Delta_qe the variation on the generalised coordinates
+     * \param t_Delta_dot_qe the variation on the first derivative of the generalised coordinates
+     * \param t_Delta_ddot_qe the variation on the second derivative of the  generalised coordinates
+     */
+    void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+                                     const Eigen::VectorXd &t_Delta_dot_qe,
+                                     const Eigen::VectorXd &t_Delta_ddot_qe);
 
 
-//    /*!
-//     * \brief forwardTangentKinematics computes the forward tangent kinematics of the rod starting from the null tangent state
-//     *
-//     * This function computes the forward kinematics of the rod starting from the null tangent state with null
-//     * delta rotation, delta position as well as velocities and accelerations
-//     */
-//    void forwardTangentKinematics();
+    /*!
+     * \brief forwardTangentKinematics computes the forward tangent kinematics of the rod starting from the null tangent state
+     *
+     * This function computes the forward kinematics of the rod starting from the null tangent state with null
+     * delta rotation, delta position as well as velocities and accelerations
+     */
+    void forwardTangentKinematics();
 
 
 //    /*!
@@ -228,13 +228,13 @@ public:
 //    void backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_at_tip,
 //                                 const Eigen::Vector3d &t_Delta_force_at_tip);
 
-//    /*!
-//     * \brief backwardTangentDynamics computes the tangent backward dynamics starting from the given state at the rod tip
-//     * \param t_Delta_Lambda_X1 is the tangent wrench at the rod tip expressed in the local coordinates frame
-//     *
-//     * This function takes as parameter the tangent Wrench Delta_Lambda at X=1 expressed in the frame attached to the cross section at X=1
-//     */
-//    void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1);
+    /*!
+     * \brief backwardTangentDynamics computes the tangent backward dynamics starting from the given state at the rod tip
+     * \param t_Delta_Lambda_X1 is the tangent wrench at the rod tip expressed in the local coordinates frame
+     *
+     * This function takes as parameter the tangent Wrench Delta_Lambda at X=1 expressed in the frame attached to the cross section at X=1
+     */
+    void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1);
 
 
 //    ::LieAlgebra::Vector6d IDM(const Eigen::VectorXd &t_qe,
@@ -379,33 +379,33 @@ private:
 
 
     //  Representation of the rod via strain
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
+    const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
         std::make_shared<strain_parameterisation::StrainParameterisation>()
     };
 
 
 
     //  The set of rod properties
-    std::shared_ptr<rod_properties::RodProperties> m_rod_properties {
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties {
         std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation)
     };
 
 
 
     //  Variables related the perturbation of the strain parameterisation
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
+    const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
         std::make_shared<strain_parameterisation::StrainParameterisation>(::LieAlgebra::Vector6d::Zero(),
                                                                           m_strain_parameterisation) };
 
 
     //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
+    const std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
         std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
                                                           m_rod_properties )
     };
 
     //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
+    const std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
         std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
                                                             m_strain_parameterisation_Delta,
                                                             m_idm_integrators,
