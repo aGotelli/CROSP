@@ -17,9 +17,15 @@ static constexpr std::array<bool, 6> admitted_deformations = {
     false
 };
 
+
+
 static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
+
+
+constexpr unsigned int number_of_Chebyshev_points = 17;
+
 
 
 void benchmarkTIDM(::benchmark::State &t_state)
@@ -31,10 +37,13 @@ void benchmarkTIDM(::benchmark::State &t_state)
 
 
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
 
-    ::CROSP::CosseratRod rod(polynomial_representation);
+    auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
+    ::CROSP::CosseratRod rod(strain_param);
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
 
@@ -45,12 +54,13 @@ void benchmarkTIDM(::benchmark::State &t_state)
     rod.updateParameterisation(q, dot_q, ddot_q);
 
     rod.forwardKinematics();
-    rod.backwardDynamics(F1.block<3,1>(0, 0),
-                         F1.block<3,1>(3, 0));
+    rod.backwardDynamics(F1);
 
     Eigen::VectorXd Delta_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
+
+    ::LieAlgebra::Vector6d Delta_F1 = ::LieAlgebra::Vector6d::Zero();
 
     Eigen::MatrixXd J(coordinated_dimension, coordinated_dimension);
 
@@ -63,11 +73,10 @@ void benchmarkTIDM(::benchmark::State &t_state)
             Delta_dot_q = 400*Delta_q;
             Delta_ddot_q = 16000*Delta_q;
 
-            rod.updateParameterisationVariation(Delta_q, Delta_dot_q, Delta_ddot_q);
+            rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
             rod.forwardTangentKinematics();
-            rod.backwardTangentDynamics(F1.block<3,1>(0, 0),
-                                        F1.block<3,1>(3, 0));
+            rod.backwardTangentDynamics(Delta_F1);
 
             J.col(i) = rod.getTangentStaticEquilibrium(Delta_q);
         }

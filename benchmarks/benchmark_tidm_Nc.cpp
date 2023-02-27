@@ -30,12 +30,16 @@ static constexpr unsigned int coordinated_dimension = na * ne;
 void benchmarkIDM(::benchmark::State &t_state)
 {
 
-    const unsigned int Nc = t_state.range(0);
+    const unsigned int number_of_Chebyshev_points = t_state.range(0);
 
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    auto polynomial_representation =
+            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
 
-    ::CROSP::CosseratRod rod(polynomial_representation, Nc);
+    auto strain_param =
+            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+    ::CROSP::CosseratRod rod(strain_param);
 
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -47,12 +51,13 @@ void benchmarkIDM(::benchmark::State &t_state)
     rod.updateParameterisation(q, dot_q, ddot_q);
 
     rod.forwardKinematics();
-    rod.backwardDynamics(F1.block<3,1>(0, 0),
-                         F1.block<3,1>(3, 0));
+    rod.backwardDynamics(F1);
 
     Eigen::VectorXd Delta_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
+
+    ::LieAlgebra::Vector6d Delta_F1 = ::LieAlgebra::Vector6d::Zero();
 
     Delta_q.setZero();
     Delta_q[0] = 1;
@@ -63,11 +68,10 @@ void benchmarkIDM(::benchmark::State &t_state)
 
     while(t_state.KeepRunning()){
 
-            rod.updateParameterisationVariation(Delta_q, Delta_dot_q, Delta_ddot_q);
+            rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
             rod.forwardTangentKinematics();
-            rod.backwardTangentDynamics(F1.block<3,1>(0, 0),
-                                        F1.block<3,1>(3, 0));
+            rod.backwardTangentDynamics(Delta_F1);
 
     }
 };
@@ -87,7 +91,7 @@ int main(int argc, char *argv[])
     std::vector<unsigned int> Nc_stack = {10, 15, 20, 25, 30, 35};
 
 
-    const std::string benchmark_name = "IDM_na" + std::to_string(na) + "_ne" + std::to_string(ne) + "_Nc";
+    const std::string benchmark_name = "TIDM_na" + std::to_string(na) + "_ne" + std::to_string(ne) + "_Nc";
 
     for(const auto Nc : Nc_stack)
         ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(Nc)->Repetitions(repetitions);

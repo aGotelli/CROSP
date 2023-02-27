@@ -30,12 +30,16 @@ static constexpr unsigned int coordinated_dimension = na * ne;
 void benchmarkIDM(::benchmark::State &t_state)
 {
 
-    const unsigned int Nc = t_state.range(0);
+    const unsigned int number_of_Chebyshev_points = t_state.range(0);
 
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    auto polynomial_representation =
+            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
 
-    ::CROSP::CosseratRod rod(polynomial_representation, Nc);
+    auto strain_param =
+            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+    ::CROSP::CosseratRod rod(strain_param);
 
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -50,8 +54,7 @@ void benchmarkIDM(::benchmark::State &t_state)
         rod.updateParameterisation(q, dot_q, ddot_q);
 
         rod.forwardKinematics();
-        rod.backwardDynamics(F1.block<3,1>(0, 0),
-                             F1.block<3,1>(3, 0));
+        rod.backwardDynamics(F1);
 
         const Eigen::Vector3d r = rod.getKinematicsAtTip().m_pose.m_position;
 
