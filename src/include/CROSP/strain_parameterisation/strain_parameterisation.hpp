@@ -40,9 +40,8 @@ namespace CROSP::strain_parameterisation {
  * As a result, all the strain and their derivatives are evaluated at these Chebyshev points and stored in
  * a std::vector.
  */
-class StrainParameterisation {
+struct StrainParameterisation {
 
-public:
 
     StrainParameterisation()=default;
 
@@ -88,7 +87,7 @@ public:
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack {
         std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
     };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Lambda_stack {
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Gamma_stack {
         std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
     };
 
@@ -96,7 +95,7 @@ public:
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack {
         std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
     };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Lambda_stack{
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Gamma_stack{
         std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
     };
 
@@ -104,7 +103,7 @@ public:
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack {
         std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
     };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack {
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack {
         std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
     };
 
@@ -115,23 +114,6 @@ public:
         std::make_shared<const polynomial_representation::PolynomialRepresentation>()
     };
 
-
-
-
-//    //  The stack of Phi along the Chebyshev points
-//    std::vector<Eigen::MatrixXd> m_Phi_stack {[this](){
-//            std::vector<Eigen::MatrixXd> Phi_stack( m_number_of_Chebyshev_points );
-
-//            const auto Chebyshev_points = ::Chebyshev::ComputeChebyshevPoints( m_number_of_Chebyshev_points );
-
-//            std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
-//                const auto Phi = m_polynomial_representation->getPhi( Chebyshev_points[index] );
-//                index++;
-//                return Phi;
-//            });
-
-//            return Phi_stack;
-//        }() };
 
 
     //  The vector stack of B Phi used to map the generalised coordinates into the strain field
@@ -155,41 +137,6 @@ public:
 
         return map_to_strain_stack;
     }() };
-
-private:
-
-
-    //  The constrained strain xi_c
-//    const Eigen::VectorXd constant_strain { [&](){
-
-//            //  constrain only the evolution along x
-//            Eigen::VectorXd constant_strain(6);
-//            constant_strain <<   0,
-//                                 0,
-//                                 0,
-//                                 1.0,
-//                                 0,
-//                                 0;
-
-//            //  Get the matrix B bar
-//            const auto B_bar = m_polynomial_representation->m_Bbar;
-
-//            //  Define the constrained strain from the rod DoFs
-//            std::vector<int> indexes;
-//            std::for_each(m_polynomial_representation->m_admitted_deformations.begin(),
-//                          m_polynomial_representation->m_admitted_deformations.end(),
-//                          [&indexes, index=0](const bool dof)mutable{   if(dof == false)
-//                                                                            indexes.push_back(index);
-//                                                                        index++;});
-//            Eigen::VectorXd xi_c = constant_strain(indexes);
-
-//            //  Always check that Gamma x is 1
-//            if(xi_c(3) != 1)
-//                xi_c(3) = 1.0;
-
-
-//            return xi_c;
-//        }() };
 
 
 };

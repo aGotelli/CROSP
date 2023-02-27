@@ -66,7 +66,7 @@ Eigen::VectorXd PositionIntegrator::computerParametersVectorAtPoint(const unsign
                             m_quaternion->getStateAtPoint(t_point)(2),
                             m_quaternion->getStateAtPoint(t_point)(3)};
 
-    return m_quaternion_at_point.toRotationMatrix() * m_Lambda_stack->at(t_point);
+    return m_quaternion_at_point.toRotationMatrix() * m_Gamma_stack->at(t_point);
 }
 
 
@@ -122,11 +122,11 @@ Eigen::MatrixXd LinearVelocityIntegrator::computeMatrixAtChebyshevPoint(const un
 
 Eigen::VectorXd LinearVelocityIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    Eigen::Vector3d dot_Lambda = m_dot_Lambda_stack->at(t_point);
-    Eigen::Matrix3d skew_Lambda = ::LieAlgebra::skew( m_Lambda_stack->at(t_point) );
+    Eigen::Vector3d dot_Gamma = m_dot_Gamma_stack->at(t_point);
+    Eigen::Matrix3d skew_Gamma = ::LieAlgebra::skew( m_Gamma_stack->at(t_point) );
     Eigen::Vector3d Omega = m_angular_velocity->getStateAtPoint(t_point);
 
-    return dot_Lambda - skew_Lambda*Omega;
+    return dot_Gamma - skew_Gamma*Omega;
 }
 
 
@@ -193,9 +193,9 @@ Eigen::MatrixXd LinearAccelerationIntegrator::computeMatrixAtChebyshevPoint(cons
 
 Eigen::VectorXd LinearAccelerationIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    return m_ddot_Lambda_stack->at(t_point)
-            - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_angular_acceleration->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew( m_dot_Lambda_stack->at(t_point) ) * m_angular_velocity->getStateAtPoint(t_point)
+    return m_ddot_Gamma_stack->at(t_point)
+            - ::LieAlgebra::skew( m_Gamma_stack->at(t_point) ) * m_angular_acceleration->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew( m_dot_Gamma_stack->at(t_point) ) * m_angular_velocity->getStateAtPoint(t_point)
             - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_linear_velocity->getStateAtPoint(t_point);
 }
 
@@ -307,7 +307,7 @@ Eigen::MatrixXd InternalCouplesIntegrator::computeMatrixAtChebyshevPoint(const u
 Eigen::VectorXd InternalCouplesIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
 
-    return ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point)
+    return ::LieAlgebra::skew( m_Gamma_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point)
             + m_M_angular*m_angular_acceleration->getStateAtPoint(t_point)
             - ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * m_M_angular * m_angular_velocity->getStateAtPoint(t_point)
             - ::LieAlgebra::skew( m_linear_velocity->getStateAtPoint(t_point) ).transpose()* m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
@@ -341,11 +341,11 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
     Eigen::Vector3d C = m_internal_couples_integrator->getStateAtPoint(t_point);
     Eigen::Vector3d N = m_internal_forces_integrator->getStateAtPoint(t_point);
 
-    Eigen::Matrix<double, 6, 1> Lambda;
-    Lambda << C,
+    Eigen::Matrix<double, 6, 1> Gamma;
+    Gamma << C,
               N;
 
-    const Eigen::VectorXd b_at_point = -m_strain_parameterisation->m_map_to_strain_stack.at(t_point).transpose()*Lambda;
+    const Eigen::VectorXd b_at_point = -m_strain_parameterisation->m_map_to_strain_stack.at(t_point).transpose()*Gamma;
     return b_at_point;
 }
 

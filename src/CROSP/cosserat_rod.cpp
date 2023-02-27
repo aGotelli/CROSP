@@ -116,6 +116,26 @@ void CosseratRod::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
                                               const Eigen::VectorXd &t_Delta_dot_qe,
                                               const Eigen::VectorXd &t_Delta_ddot_qe)
 {
+
+//    if( std::find(t_Delta_qe.begin(), t_Delta_qe.end(), 1.0) == t_Delta_qe.end() or
+//        std::accumulate(t_Delta_qe.begin(), t_Delta_qe.end(), 0) != 1.0){
+//        std::stringstream help_message;
+//        help_message << "You passed an invalid variation of the strain parameterisation. \n"
+//                                "The function argument t_Delta_qe must contain only unitary entries and zeros. Here some examples : \n";
+//        Eigen::VectorXd Delta_qe = Eigen::VectorXd::Zero(t_Delta_qe.size());
+//        Delta_qe[0] = 1.0;
+//        help_message << Delta_qe.transpose();
+//        help_message << "\n" << "Or, again : \n";
+
+//        Delta_qe.setZero();
+//        Delta_qe[static_cast<unsigned int>(Delta_qe.size()/2.0)] = 1.0;
+//        help_message << Delta_qe.transpose();
+
+//        throw std::runtime_error{help_message.str()};
+
+//    }
+
+
     m_strain_parameterisation_Delta->updateStacks(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
 }
 

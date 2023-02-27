@@ -68,8 +68,8 @@ struct PositionIntegrator : public OSNI::ODEb {
 
     const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
 
     const std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
@@ -126,12 +126,12 @@ struct LinearVelocityIntegrator : public OSNI::ODEAb {
         m_strain_parameterisation->m_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Lambda_stack {
-        m_strain_parameterisation->m_dot_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
+        m_strain_parameterisation->m_dot_Gamma_stack
     };
 
     const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
@@ -207,16 +207,16 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
         m_strain_parameterisation->m_dot_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Lambda_stack{
-        m_strain_parameterisation->m_dot_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack{
+        m_strain_parameterisation->m_dot_Gamma_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_Lambda_stack{
-        m_strain_parameterisation->m_ddot_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack{
+        m_strain_parameterisation->m_ddot_Gamma_stack
     };
 
     const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
@@ -309,8 +309,8 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
         m_strain_parameterisation->m_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
 
     const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;

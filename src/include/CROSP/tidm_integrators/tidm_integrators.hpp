@@ -84,11 +84,11 @@ struct DeltaPosition : public OSNI::ODEAb {
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_strain_parameterisation->m_K_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack {
-        m_strain_parameterisation_Delta->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
+        m_strain_parameterisation_Delta->m_Gamma_stack
     };
 
     //  Pointers to the needed previous integrator(s)
@@ -169,14 +169,14 @@ struct DeltaLinearVelocity : public OSNI::ODEAb {
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
         m_strain_parameterisation_Delta->m_K_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack {
-        m_strain_parameterisation_Delta->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
+        m_strain_parameterisation_Delta->m_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Lambda_stack {
-        m_strain_parameterisation_Delta->m_dot_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Gamma_stack {
+        m_strain_parameterisation_Delta->m_dot_Gamma_stack
     };
 
 
@@ -290,20 +290,20 @@ struct DeltaLinearAccelerations : public OSNI::ODEAb {
         m_strain_parameterisation_Delta->m_dot_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Lambda_stack {
-        m_strain_parameterisation->m_dot_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
+        m_strain_parameterisation->m_dot_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack {
-        m_strain_parameterisation_Delta->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
+        m_strain_parameterisation_Delta->m_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Lambda_stack {
-        m_strain_parameterisation_Delta->m_dot_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Gamma_stack {
+        m_strain_parameterisation_Delta->m_dot_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_ddot_Lambda_stack {
-        m_strain_parameterisation_Delta->m_ddot_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_ddot_Gamma_stack {
+        m_strain_parameterisation_Delta->m_ddot_Gamma_stack
     };
 
 
@@ -452,11 +452,11 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
         m_strain_parameterisation_Delta->m_K_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Lambda_stack {
-        m_strain_parameterisation->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation->m_Gamma_stack
     };
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Lambda_stack {
-        m_strain_parameterisation_Delta->m_Lambda_stack
+    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
+        m_strain_parameterisation_Delta->m_Gamma_stack
     };
 
 

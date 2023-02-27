@@ -66,8 +66,8 @@ Eigen::MatrixXd DeltaPosition::computeMatrixAtChebyshevPoint(const unsigned int 
 
 Eigen::VectorXd DeltaPosition::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    return -::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_delta_rotation->getStateAtPoint(t_point)
-            + m_Delta_Lambda_stack->at(t_point);
+    return -::LieAlgebra::skew( m_Gamma_stack->at(t_point) ) * m_delta_rotation->getStateAtPoint(t_point)
+            + m_Delta_Gamma_stack->at(t_point);
 }
 
 
@@ -125,10 +125,10 @@ Eigen::MatrixXd DeltaLinearVelocity::computeMatrixAtChebyshevPoint(const unsigne
 
 Eigen::VectorXd DeltaLinearVelocity::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    return m_Delta_dot_Lambda_stack->at(t_point)
-            - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
+    return m_Delta_dot_Gamma_stack->at(t_point)
+            - ::LieAlgebra::skew( m_Gamma_stack->at(t_point) ) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
             - ::LieAlgebra::skew( m_Delta_K_stack->at(t_point) ) * m_linear_velocity_integrator->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew( m_Delta_Lambda_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point);
+            - ::LieAlgebra::skew( m_Delta_Gamma_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point);
 }
 
 
@@ -195,13 +195,13 @@ Eigen::MatrixXd DeltaLinearAccelerations::computeMatrixAtChebyshevPoint(const un
 
 Eigen::VectorXd DeltaLinearAccelerations::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    return m_Delta_ddot_Lambda_stack->at(t_point)
-            - ::LieAlgebra::skew( m_Lambda_stack->at(t_point) ) * m_Delta_angular_acceleration_integrator->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew( m_Delta_Lambda_stack->at(t_point) ) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
+    return m_Delta_ddot_Gamma_stack->at(t_point)
+            - ::LieAlgebra::skew( m_Gamma_stack->at(t_point) ) * m_Delta_angular_acceleration_integrator->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew( m_Delta_Gamma_stack->at(t_point) ) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
             - ::LieAlgebra::skew( m_Delta_K_stack->at(t_point) ) * m_linear_acceleration_integrator->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew( m_dot_Lambda_stack->at(t_point) ) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew( m_dot_Gamma_stack->at(t_point) ) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
             - ::LieAlgebra::skew( m_dot_K_stack->at(t_point) ) * m_Delta_linear_velocity_integrator->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew( m_Delta_dot_Lambda_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew( m_Delta_dot_Gamma_stack->at(t_point) ) * m_angular_velocity_integrator->getStateAtPoint(t_point)
             - ::LieAlgebra::skew( m_Delta_dot_K_stack->at(t_point) ) * m_linear_velocity_integrator->getStateAtPoint(t_point);
 }
 
@@ -314,9 +314,9 @@ Eigen::MatrixXd DeltaInternalCouplesIntegrator::computeMatrixAtChebyshevPoint(co
 Eigen::VectorXd DeltaInternalCouplesIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
 
-    return ::LieAlgebra::skew(m_Lambda_stack->at(t_point)).transpose() * m_Delta_internal_forces_integrator->getStateAtPoint(t_point)
+    return ::LieAlgebra::skew(m_Gamma_stack->at(t_point)).transpose() * m_Delta_internal_forces_integrator->getStateAtPoint(t_point)
             + ::LieAlgebra::skew(m_Delta_K_stack->at(t_point)).transpose() * m_internal_couples_integrator->getStateAtPoint(t_point)
-            + ::LieAlgebra::skew(m_Delta_Lambda_stack->at(t_point)).transpose() * m_internal_forces_integrator->getStateAtPoint(t_point)
+            + ::LieAlgebra::skew(m_Delta_Gamma_stack->at(t_point)).transpose() * m_internal_forces_integrator->getStateAtPoint(t_point)
             + m_M_angular * m_Delta_angular_acceleration_integrator->getStateAtPoint(t_point)
             - ::LieAlgebra::skew(m_angular_velocity_integrator->getStateAtPoint(t_point)).transpose() * m_M_angular * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
             - ::LieAlgebra::skew(m_linear_velocity_integrator->getStateAtPoint(t_point)).transpose() * m_M_linear * m_Delta_linear_velocity_integrator->getStateAtPoint(t_point)
