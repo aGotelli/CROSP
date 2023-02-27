@@ -29,8 +29,8 @@ StrainParameterisation::StrainParameterisation(const std::shared_ptr<const polyn
 
 
 
-StrainParameterisation::StrainParameterisation(const Eigen::VectorXd t_constant_strain,
-                                               const std::shared_ptr<const StrainParameterisation> t_strain_parameterisation)
+StrainParameterisation::StrainParameterisation(const std::shared_ptr<const StrainParameterisation> t_strain_parameterisation,
+                                               const Eigen::VectorXd t_constant_strain)
     : m_number_of_Chebyshev_points(t_strain_parameterisation->m_number_of_Chebyshev_points),
       m_constant_strain(t_constant_strain),
       m_polynomial_representation(t_strain_parameterisation->m_polynomial_representation)

@@ -395,8 +395,9 @@ private:
 
     //  Variables related the perturbation of the strain parameterisation
     const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
-        std::make_shared<strain_parameterisation::StrainParameterisation>(::LieAlgebra::Vector6d::Zero(),
-                                                                          m_strain_parameterisation) };
+        std::make_shared<strain_parameterisation::StrainParameterisation>(m_strain_parameterisation,
+                                                                          ::LieAlgebra::Vector6d::Zero())
+    };
 
 
     //  The set of integrators needed for the IDM
