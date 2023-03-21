@@ -8,3 +8,5 @@ build/
 *.dtmp
 
 docs/api/
+
+MATLAB/test_different_modes/
