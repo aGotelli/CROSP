@@ -40,16 +40,24 @@ int main(int argc, char *argv[])
                                  admitted_deformations.end(),
                                  true);
 
+
+    unsigned int number_of_Chebyshev_points = 17;
+
     std::string benchmark_name;
-    const std::string benchmark_name_base = "IDM_na" + std::to_string(na) + "_ne" + std::to_string(ne);
+    const std::string benchmark_name_base = "IDM_na" + std::to_string(na) + "_ne" + std::to_string(ne) + "_Nc" + std::to_string(number_of_Chebyshev_points);
 
 
 
     benchmark_name = benchmark_name_base + "_quaternion";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -77,10 +85,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "_position";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -103,10 +116,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "angular_velocities";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -128,10 +146,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "linear_velocities";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -154,10 +177,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "angular_accelerations";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -182,10 +210,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "linear_accelerations";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -211,10 +244,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "internal_forces";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -240,10 +278,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "internal_couples";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -270,10 +313,15 @@ int main(int argc, char *argv[])
 
 
     benchmark_name = benchmark_name_base + "generalised_forces";
-    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&ne, &admitted_deformations](::benchmark::State &t_state) {
-        ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::benchmark::RegisterBenchmark(benchmark_name.c_str(), [&](::benchmark::State &t_state) {
 
-        ::CROSP::CosseratRod rod(polynomial_representation);
+        auto polynomial_representation =
+                std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+
+        auto strain_param =
+                std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+        ::CROSP::CosseratRod rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 

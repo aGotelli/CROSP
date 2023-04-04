@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 
-project(CROSP LANGUAGES CXX VERSION 2.5)
+project(CROSP LANGUAGES CXX VERSION 3.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Eigen3 3.4 NO_MODULE REQUIRED)
 
-#find_package(utilities REQUIRED)
+find_package(utilities REQUIRED)
 
 find_package(math_tools REQUIRED)
 

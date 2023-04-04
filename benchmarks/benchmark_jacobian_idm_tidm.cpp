@@ -22,6 +22,9 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               true);
 
 
+constexpr unsigned int number_of_Chebyshev_points = 17;
+
+
 void benchmarkJacobianTIDM(::benchmark::State &t_state)
 {
 
@@ -31,9 +34,13 @@ void benchmarkJacobianTIDM(::benchmark::State &t_state)
 
 
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    auto polynomial_representation =
+            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
 
-    ::CROSP::CosseratRod rod(polynomial_representation);
+    auto strain_param =
+            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+    ::CROSP::CosseratRod rod(strain_param);
 
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -45,12 +52,13 @@ void benchmarkJacobianTIDM(::benchmark::State &t_state)
     rod.updateParameterisation(q, dot_q, ddot_q);
 
     rod.forwardKinematics();
-    rod.backwardDynamics(F1.block<3,1>(0, 0),
-                         F1.block<3,1>(3, 0));
+    rod.backwardDynamics(F1);
 
     Eigen::VectorXd Delta_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
+
+    ::LieAlgebra::Vector6d Delta_F1 = ::LieAlgebra::Vector6d::Zero();
 
     Eigen::MatrixXd J(coordinated_dimension, coordinated_dimension);
 
@@ -63,11 +71,10 @@ void benchmarkJacobianTIDM(::benchmark::State &t_state)
             Delta_dot_q = 400*Delta_q;
             Delta_ddot_q = 16000*Delta_q;
 
-            rod.updateParameterisationVariation(Delta_q, Delta_dot_q, Delta_ddot_q);
+            rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
             rod.forwardTangentKinematics();
-            rod.backwardTangentDynamics(F1.block<3,1>(0, 0),
-                                        F1.block<3,1>(3, 0));
+            rod.backwardTangentDynamics(Delta_F1);
 
             J.col(i) = rod.getTangentStaticEquilibrium(Delta_q);
         }
@@ -87,9 +94,13 @@ void benchmarkJacobianIDMForward(::benchmark::State &t_state)
 
 
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    auto polynomial_representation =
+            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
 
-    ::CROSP::CosseratRod rod(polynomial_representation);
+    auto strain_param =
+            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
+    ::CROSP::CosseratRod rod(strain_param);
 
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -101,8 +112,7 @@ void benchmarkJacobianIDMForward(::benchmark::State &t_state)
     rod.updateParameterisation(q, dot_q, ddot_q);
 
     rod.forwardKinematics();
-    rod.backwardDynamics(F1.block<3,1>(0, 0),
-                         F1.block<3,1>(3, 0));
+    rod.backwardDynamics(F1);
 
 
     Eigen::VectorXd residual = rod.getStaticEquilibrium(q);
@@ -128,8 +138,7 @@ void benchmarkJacobianIDMForward(::benchmark::State &t_state)
             rod.updateParameterisation(delta_q, delta_dot_q, delta_ddot_q);
 
             rod.forwardKinematics();
-            rod.backwardDynamics(F1.block<3,1>(0, 0),
-                                 F1.block<3,1>(3, 0));
+            rod.backwardDynamics(F1);
 
             const Eigen::VectorXd residual_difference = rod.getStaticEquilibrium(delta_q) - residual;
 
@@ -149,10 +158,13 @@ void benchmarkJacobianIDMCentral(::benchmark::State &t_state)
     const unsigned int coordinated_dimension = na * ne;
 
 
+    auto polynomial_representation =
+            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    auto strain_param =
+            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-    ::CROSP::CosseratRod rod(polynomial_representation);
+    ::CROSP::CosseratRod rod(strain_param);
 
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -164,8 +176,7 @@ void benchmarkJacobianIDMCentral(::benchmark::State &t_state)
     rod.updateParameterisation(q, dot_q, ddot_q);
 
     rod.forwardKinematics();
-    rod.backwardDynamics(F1.block<3,1>(0, 0),
-                         F1.block<3,1>(3, 0));
+    rod.backwardDynamics(F1);
 
 
     Eigen::VectorXd residual = rod.getStaticEquilibrium(q);
@@ -191,8 +202,7 @@ void benchmarkJacobianIDMCentral(::benchmark::State &t_state)
             rod.updateParameterisation(delta_q, delta_dot_q, delta_ddot_q);
 
             rod.forwardKinematics();
-            rod.backwardDynamics(F1.block<3,1>(0, 0),
-                                 F1.block<3,1>(3, 0));
+            rod.backwardDynamics(F1);
 
             const Eigen::VectorXd increment_residual = rod.getStaticEquilibrium(delta_q);
 
@@ -206,8 +216,7 @@ void benchmarkJacobianIDMCentral(::benchmark::State &t_state)
             rod.updateParameterisation(delta_q, delta_dot_q, delta_ddot_q);
 
             rod.forwardKinematics();
-            rod.backwardDynamics(F1.block<3,1>(0, 0),
-                                 F1.block<3,1>(3, 0));
+            rod.backwardDynamics(F1);
 
             const Eigen::VectorXd decrement_residual = rod.getStaticEquilibrium(delta_q);
 
@@ -231,11 +240,11 @@ int main(int argc, char *argv[])
     std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
 
 
-    std::string benchmark_name = "Jacobian_TIDM_na" + std::to_string(na) + "_ne";
+    std::string benchmark_name = "Jacobian_TIDM_na" + std::to_string(na) + "_Nc" + std::to_string(number_of_Chebyshev_points) + "_ne" ;
 
 
-//    for(const auto ne : ne_stack)
-//        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkJacobianTIDM)->Arg(ne)->Repetitions(repetitions);
+    for(const auto ne : ne_stack)
+        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkJacobianTIDM)->Arg(ne)->Repetitions(repetitions);
 
 
     benchmark_name = "Jacobian_forward_IDM_na" + std::to_string(na) + "_ne";

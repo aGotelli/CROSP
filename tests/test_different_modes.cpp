@@ -45,22 +45,27 @@ int main(int argc, char *argv[])
 
 
 
+    const unsigned int number_of_Chebyshev_points = 31;
+    auto poly_with_admitted_def_and_modes =
+            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, number_of_modes_stack);
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation poly_with_admitted_def_and_modes(admitted_deformations, number_of_modes_stack);
 
+    auto strain_par =
+            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(poly_with_admitted_def_and_modes, number_of_Chebyshev_points);
 
     //  Now use it in rod properties
-    ::CROSP::rod_properties::RodProperties rod_properties(poly_with_admitted_def_and_modes);
+    auto rod_properties =
+            std::make_shared<::CROSP::rod_properties::RodProperties>(strain_par);
 
 
-    const unsigned int number_of_Chebyshev_points = 31;
-
-    ::CROSP::CosseratRod rod(poly_with_admitted_def_and_modes,rod_properties, number_of_Chebyshev_points);
-    rod.printProperties();
 
 
-    writeToFile("B", rod.m_polynomial_representation.m_B, path);
-    writeToFile("B_bar", rod.m_polynomial_representation.m_Bbar, path);
+    ::CROSP::CosseratRod rod(strain_par, rod_properties);
+//    rod.printProperties();
+
+
+    writeToFile("B", rod.m_strain_parameterisation->m_polynomial_representation->m_B, path);
+    writeToFile("B_bar", rod.m_strain_parameterisation->m_polynomial_representation->m_Bbar, path);
 
 
     const auto ne = rod.getCoordinatesDimension();
@@ -92,15 +97,8 @@ int main(int argc, char *argv[])
 
     rod.updateParameterisation(q, dot_q, ddot_q);
 
-    Eigen::Vector4d init_Q(1, 0, 0, 0);
-    Eigen::Vector3d zeros_3 = Eigen::Vector3d::Zero();
 
-    rod.forwardKinematics(init_Q,
-                          zeros_3,
-                          zeros_3,
-                          zeros_3,
-                          zeros_3,
-                          zeros_3);
+    rod.forwardKinematics();
 
     auto zeros = ::LieAlgebra::Vector6d::Zero();
     rod.backwardDynamics(zeros);
@@ -149,7 +147,7 @@ int main(int argc, char *argv[])
         Delta_ddot_q = b * Delta_q;
 
 
-        rod.updateParameterisationVariation(Delta_q, Delta_dot_q, Delta_ddot_q);
+        rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
         rod.forwardTangentKinematics();
 

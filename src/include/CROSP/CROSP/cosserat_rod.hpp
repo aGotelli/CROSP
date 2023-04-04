@@ -40,28 +40,37 @@ class CosseratRod
 {
 public:
 
-    CosseratRod();
+    /*!
+     * \brief Default constructors that initialised member with by their default initialisation
+     */
+    CosseratRod()=default;
 
-    CosseratRod(unsigned int t_number_of_Chebyshev_points);
+    /*!
+     * \brief CosseratRod initialised the rod by giving its properties anly
+     * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
+     *
+     * In this constructo the strain parameterisation is initialised by its defaul value
+     */
+    CosseratRod(const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
-    CosseratRod(const rod_properties::MaterialProperties &t_material_properties);
 
-    CosseratRod(const rod_properties::RodProperties &t_rod_properties);
+    /*!
+     * \brief CosseratRod initialised the rod by giving its strain parameterisation
+     * \param t_strain_parameterisation is the sef of desiderd parameterisation of the rod strain field as a ::CROSP::strain_parameterisation::StrainParameterisation object
+     *
+     * In this constructo the rod properties is initialised by its defaul value
+     */
+    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
 
-    CosseratRod(const rod_properties::RodProperties &t_rod_properties,
-                unsigned int t_number_of_Chebyshev_points);
 
-    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation);
+    /*!
+     * \brief CosseratRod this constructor requires both argument to initialise a custom Cosserat rod
+     * \param t_strain_parameterisation is the sef of desiderd parameterisation of the rod strain field as a ::CROSP::strain_parameterisation::StrainParameterisation object
+     * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
+     */
+    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
-    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
-                unsigned int t_number_of_Chebyshev_points);
-
-    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
-                const rod_properties::RodProperties &t_rod_properties);
-
-    CosseratRod(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
-                const rod_properties::RodProperties &t_rod_properties,
-                unsigned int t_number_of_Chebyshev_points);
 
 
 
@@ -143,14 +152,14 @@ public:
 
 
     /*!
-     * \brief updateParameterisationVariation updates the variation of the strain due to the delta
+     * \brief updateDeltaParameterisation updates the variation of the strain due to the delta
      * \param t_Delta_qe the variation on the generalised coordinates
      * \param t_Delta_dot_qe the variation on the first derivative of the generalised coordinates
      * \param t_Delta_ddot_qe the variation on the second derivative of the  generalised coordinates
      */
-    void updateParameterisationVariation(const Eigen::VectorXd &t_Delta_qe,
-                                         const Eigen::VectorXd &t_Delta_dot_qe,
-                                         const Eigen::VectorXd &t_Delta_ddot_qe);
+    void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+                                     const Eigen::VectorXd &t_Delta_dot_qe,
+                                     const Eigen::VectorXd &t_Delta_ddot_qe);
 
 
     /*!
@@ -211,14 +220,6 @@ public:
     ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const;
 
 
-    /*!
-     * \brief backwardDynamics computes the backward dynamics starting from the given state at the rod tip
-     * \param t_couple_at_tip The couple expressed in reference coordinates that acts on the rod tip
-     * \param t_force_at_tip The force expressed in reference coordinates that acts on the rod tip
-     */
-    [[deprecated("This function is deprecated as its usage is not clear.\n It is not clear for the user how to deal with projections and the frame of reference")]]
-    void backwardDynamics(const Eigen::Vector3d &t_couple_at_tip,
-                          const Eigen::Vector3d &t_force_at_tip);
 
     /*!
      * \brief backwardDynamics computes the backward dynamics starting from the given state at the rod tip
@@ -229,14 +230,6 @@ public:
     void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1);
 
 
-    /*!
-     * \brief backwardTangentDynamics computes the tangent backward dynamics starting from the given state at the rod tip
-     * \param t_Delta_couple_at_tip The tangent couple expressed in reference coordinates that acts on the rod tip
-     * \param t_Delta_force_at_tip The tangent force expressed in reference coordinates that acts on the rod tip
-     */
-    [[deprecated("This function is deprecated as its usage is not clear.\n It is not clear for the user how to deal with projections and the frame of reference")]]
-    void backwardTangentDynamics(const Eigen::Vector3d &t_Delta_couple_at_tip,
-                                 const Eigen::Vector3d &t_Delta_force_at_tip);
 
     /*!
      * \brief backwardTangentDynamics computes the tangent backward dynamics starting from the given state at the rod tip
@@ -247,11 +240,7 @@ public:
     void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1);
 
 
-    ::LieAlgebra::Vector6d IDM(const Eigen::VectorXd &t_qe,
-                               const Eigen::VectorXd &t_dot_qe,
-                               const Eigen::VectorXd &t_ddot_qe,
-                               const Eigen::Vector3d &t_couple_at_tip,
-                               const Eigen::Vector3d &t_force_at_tip);
+
 
 
     /*!
@@ -263,8 +252,8 @@ public:
      * \param t_initial_position the initial position of the rod
      * \param t_initial_twist the twist at the rod base, with first the angular part followed by linear part
      * \param t_initial_acceleration the acceleration of the rod base, with first the angular part followed by linear part
-     * \param t_wrench_at_tip the wrench at the rod tip, with the couple first and then the forces
-     * \return Lambda, the vector of internal wrenches expressed in the rod local frame
+     * \param t_Lambda_X1 the wrench at the rod tip in its local coordinates frame
+     * \return Lambda_X0, the vector of internal wrenches expressed in the rod local frame at X=0
      */
     ::LieAlgebra::Vector6d IDM(const Eigen::VectorXd &t_qe,
                                const Eigen::VectorXd &t_dot_qe,
@@ -286,8 +275,11 @@ public:
      * \param t_initial_position the initial position of the rod
      * \param t_initial_twist the twist at the rod base, with first the angular part followed by linear part
      * \param t_initial_acceleration the acceleration of the rod base, with first the angular part followed by linear part
-     * \param t_wrench_at_tip the wrench at the rod tip, with the couple first and then the forces
-     * \return Lambda, the vector of internal wrenches expressed in the rod local frame
+     * \param t_Lambda_X1 the wrench at the rod tip in its local coordinates frame
+     * \return Lambda_X0, the vector of internal wrenches expressed in the rod local frame at X=0
+     *
+     * This function is a warper around the IDM(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::Vector4d &, const Eigen::Vector3d &, const ::LieAlgebra::Vector6d &, const ::LieAlgebra::Vector6d &,const LieAlgebra::Vector6d&)
+     * so that it is possible to use an Eigen::Quaterniond directly in the function call.
      */
     ::LieAlgebra::Vector6d IDM(const Eigen::VectorXd &t_qe,
                                const Eigen::VectorXd &t_dot_qe,
@@ -296,27 +288,34 @@ public:
                                const Eigen::Vector3d &t_initial_position,
                                const ::LieAlgebra::Vector6d &t_initial_twist,
                                const ::LieAlgebra::Vector6d &t_initial_acceleration,
-                               const LieAlgebra::Vector6d &t_wrench_at_tip);
+                               const ::LieAlgebra::Vector6d &t_Lambda_X1);
 
 
 
+
+    /*!
+     * \brief TIDM computes the Tangent Inverse Dynamic Model of the rod
+     * \param t_Delta_qe is the set of perturbed generalised coordinates (unitary perturbation)
+     * \param t_Delta_dot_qe is the set of perdurbed derivatives of the generalised coordinates (under integrator constrains)
+     * \param t_Delta_ddot_qe is the set of perdurbed double derivatives of the generalised coordinates (under integrator constrains)
+     * \param t_Delta_Lambda_X1 is the unitary perturbation of the wrench at the rod tip, expressed in its own reference frame
+     */
     ::LieAlgebra::Vector6d TIDM(const Eigen::VectorXd &t_Delta_qe,
                                 const Eigen::VectorXd &t_Delta_dot_qe,
                                 const Eigen::VectorXd &t_Delta_ddot_qe,
-                                const Eigen::Vector3d &t_Delta_couple_at_tip,
-                                const Eigen::Vector3d &t_Delta_force_at_tip);
+                                const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1);
 
 
     /*!
      * \brief getLambdaAtBase give Lambda at the rod base, expressed in local coordinates of the rod base frame
-     * \return Lambda at the rod base, expressed in local coordinates of the rod base frame
+     * \return Lambda at the rod base, expressed in local coordinates of the rod base frame at X=0
      */
     ::LieAlgebra::Vector6d getLambdaAtBase()const;
 
 
     /*!
      * \brief getDeltaLambdaAtBase give Delta Lambda at the rod base, expressed in local coordinates of the rod base frame
-     * \return Delta Lambda at the rod base, expressed in local coordinates of the rod base frame
+     * \return Delta Lambda at the rod base, expressed in local coordinates of the rod base frame at X=0
      */
     ::LieAlgebra::Vector6d getDeltaLambdaAtBase()const;
 
@@ -324,7 +323,7 @@ public:
      * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
      * \return the dimension of the rod parameterisation, namely ne*na
      */
-    unsigned int getCoordinatesDimension()const;
+    inline unsigned int getCoordinatesDimension()const {return m_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension();}
 
     /*!
      * \brief getStaticEquilibrium returns the static equilibrium of the rod Kee*qe - Q
@@ -334,53 +333,45 @@ public:
     Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
 
 
+
     Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe,
-                                         const Eigen::VectorXd &t_dot_qe) const
-    {
-        Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
-        Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+                                         const Eigen::VectorXd &t_dot_qe) const;
 
-
-        Eigen::VectorXd Qe = Kee * t_qe;
-        Eigen::VectorXd Ce = Dee * t_dot_qe;
-        Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-        return Qe + Ce - Qa;
-
-//        return m_rod_properties->m_Kee*t_qe
-//                + m_rod_properties->m_Dee*t_dot_qe
-//                - m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-    }
-
-
-
-    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
-                                                const Eigen::VectorXd &t_Delta_dot_qe)const
-    {
-        Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
-        Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
-
-
-        Eigen::VectorXd Delta_Qe = Kee * t_Delta_qe;
-        Eigen::VectorXd Delta_Ce = Dee * t_Delta_dot_qe;
-        Eigen::VectorXd Delta_Qa = m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-        return Delta_Qe + Delta_Ce - Delta_Qa;
-
-//        return m_rod_properties->m_Kee*t_Delta_qe
-//                + m_rod_properties->m_Dee*t_Delta_dot_qe
-//                - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-    }
 
 
     Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const;
 
 
+    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
+                                                const Eigen::VectorXd &t_Delta_dot_qe)const;
 
+
+
+    /*!
+     * \brief getRodPositionsAtChebyshevPoints gives the position of the rod at the Chebyshev points grid
+     * \return a matrix containing the stack of all the rod position at the Chebyshev points
+     *
+     * This function returns a stack of points. Each row contains the x, y, and z coordinates of the rod at the Chebyshev point.
+     * The rows are ordered so that the first correspond to the initial position at X = 0 and the last contains the position at X = 1.
+     *
+     */
     inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
 
 
-    Eigen::MatrixXd getRodShape(const Eigen::VectorXd &t_qe)const;
+    /*!
+     * \brief getRodShapeFromElasticCoordinates allows to get the shape of the rod for a given set of generalised elastic coordinates
+     * \param t_qe the set of generalised elastic coordinates
+     * \return a matrix containing the stack of all the rod position at the Chebyshev points
+     *
+     * This function makes an internal call to the function getRodPositionsAtChebyshevPoints() and shares the same return type.
+     *
+     */
+    Eigen::MatrixXd getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)const;
 
 
+    /*!
+     * \brief printProperties a function to log the rod properties with a MATLAB like layout
+     */
     void printProperties();
 
 #ifndef DEVELOPER
@@ -388,52 +379,40 @@ private:
 #endif
 
 
-    const polynomial_representation::PolynomialRepresentation m_polynomial_representation { polynomial_representation::PolynomialRepresentation() };
+    //  Representation of the rod via strain
+    const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
+        std::make_shared<strain_parameterisation::StrainParameterisation>()
+    };
 
-    //  Number of Chebyshev points used to discretise the rod
-    const unsigned int m_number_of_Chebyshev_points { 17 };
 
 
     //  The set of rod properties
-    std::shared_ptr<rod_properties::RodProperties> m_rod_properties { std::make_shared<rod_properties::RodProperties>(m_polynomial_representation) };
+    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties {
+        std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation)
+    };
 
-    //  All the strain releted variables
-//    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation { [this](){
 
-//        auto strain_parameterisation = std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
-//                                                                                                         m_number_of_Chebyshev_points);
-
-//        const unsigned int ne = m_polynomial_representation.getCoordinatesDimension();
-//        strain_parameterisation->updateStacks(Eigen::VectorXd::Zero(ne),
-//                                              Eigen::VectorXd::Zero(ne),
-//                                              Eigen::VectorXd::Zero(ne));
-
-//        return strain_parameterisation;
-//    }() };
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
-        std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
-                                                                          m_number_of_Chebyshev_points)};
 
     //  Variables related the perturbation of the strain parameterisation
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
-        std::make_shared<strain_parameterisation::StrainParameterisation>(m_polynomial_representation,
-                                                                          ::LieAlgebra::Vector6d::Zero(),
-                                                                          m_number_of_Chebyshev_points) };
+    const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
+        std::make_shared<strain_parameterisation::StrainParameterisation>(m_strain_parameterisation,
+                                                                          ::LieAlgebra::Vector6d::Zero())
+    };
+
+
     //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
-        std::make_shared<idm_integrators::IDMIntegrators>(m_number_of_Chebyshev_points,
-                                                          m_polynomial_representation,
-                                                          m_strain_parameterisation,
-                                                          m_rod_properties )};
+    const std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
+        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
+                                                          m_rod_properties )
+    };
 
     //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
-        std::make_shared<tidm_integrators::TIDMIntegrators>(m_number_of_Chebyshev_points,
-                                                            m_polynomial_representation,
-                                                            m_strain_parameterisation,
+    const std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
+        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
                                                             m_strain_parameterisation_Delta,
                                                             m_idm_integrators,
-                                                            m_rod_properties) };
+                                                            m_rod_properties)
+    };
 
 
 

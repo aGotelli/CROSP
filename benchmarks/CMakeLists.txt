@@ -1,8 +1,3 @@
-
-
-
-
-
 include_directories(../src/include)
 include_directories(include)
 
@@ -100,53 +95,4 @@ target_link_libraries(benchmark_jacobian_tidm_multi_threads
         benchmark::benchmark
 )
 target_compile_definitions(benchmark_jacobian_tidm_multi_threads PRIVATE DEVELOPER)
-
-
-add_executable(magnus magnus.cpp)
-target_link_libraries(magnus
-    PRIVATE
-        ${PROJECT_NAME}
-        utilities
-        benchmark::benchmark
-)
-target_compile_definitions(magnus PRIVATE DEVELOPER)
-
-add_executable(magnus_comparison magnus_comparison.cpp)
-target_link_libraries(magnus_comparison
-    PRIVATE
-        ${PROJECT_NAME}
-        utilities
-)
-target_compile_definitions(magnus_comparison PRIVATE DEVELOPER)
-
-
-add_executable(magnus_non_homogeneous magnus_non_homogeneous.cpp)
-target_link_libraries(magnus_non_homogeneous
-    PRIVATE
-        ${PROJECT_NAME}
-        utilities
-        benchmark::benchmark
-)
-target_compile_definitions(magnus_non_homogeneous PRIVATE DEVELOPER)
-
-
-add_executable(magnus_non_homogeneous_V magnus_non_homogeneous_V.cpp)
-target_link_libraries(magnus_non_homogeneous_V
-    PRIVATE
-        ${PROJECT_NAME}
-        utilities
-        benchmark::benchmark
-)
-target_compile_definitions(magnus_non_homogeneous_V PRIVATE DEVELOPER)
-
-
-add_executable(reconstruct_Omega reconstruct_Omega.cpp
-    chebyshev_reconstructor.hpp)
-target_link_libraries(reconstruct_Omega
-    PRIVATE
-        ${PROJECT_NAME}
-        utilities
-        benchmark::benchmark
-)
-target_compile_definitions(reconstruct_Omega PRIVATE DEVELOPER)
 
