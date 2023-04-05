@@ -4,7 +4,7 @@
 
 
 
-
+#include "CROSP/CROSP/internal_actuation.hpp"
 
 
 
@@ -16,30 +16,26 @@
 int main(int argc, char *argv[])
 {
 
+    ::CROSP::CosseratRod rod;
 
-    const auto strain_par = std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>();
-
-
-    ::CROSP::rod_properties::MaterialProperties mat_prop;
-    ::CROSP::rod_properties::RodDimensions rod_dim;
-    auto rod_properties =
-            std::make_shared<::CROSP::rod_properties::RodProperties>(strain_par, rod_dim, mat_prop);
-
-
-    ::CROSP::CosseratRod rod(strain_par, rod_properties);
-
-
-    ::CROSP::CosseratRod rod2;
 
     const unsigned int ne = rod.getCoordinatesDimension();
-    Eigen::VectorXd q      = Eigen::VectorXd::Random(ne);
-    Eigen::VectorXd dot_q  = Eigen::VectorXd::Random(ne);
-    Eigen::VectorXd ddot_q = Eigen::VectorXd::Random(ne);
+    Eigen::VectorXd q      = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd dot_q  = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
 
     rod.updateParameterisation(q, dot_q, ddot_q);
 
     rod.forwardKinematics();
 
+    const auto Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
+    rod.backwardDynamics(Lambda_X1);
+
+    rod.internal_actuator.setActuation(1);
+
+    const auto Q_ad = rod.internal_actuator.computedGeneraliseInternalActuation();
+
+    std::cout << "Q_ad : \n" << Q_ad << "\n\n";
 
     return 0;
 }

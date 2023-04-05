@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     const unsigned int ne = 4;
 
 
-    ::CROSP::CosseratRod rod(number_of_Chebyshev_points);
+    ::CROSP::CosseratRod rod;
 
 
     Eigen::VectorXd qe(ne);

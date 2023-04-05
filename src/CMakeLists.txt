@@ -95,6 +95,8 @@ add_library(${PROJECT_NAME} SHARED
                             ${PROJECT_NAME}/cosserat_rod.cpp
 #                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
 #                            static_initialiser/static_initialiser.cpp
+                            include/CROSP/CROSP/internal_actuation.hpp
+                            ${PROJECT_NAME}/internal_actuation.cpp
 
 
                             include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp

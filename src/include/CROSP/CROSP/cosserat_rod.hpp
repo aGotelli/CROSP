@@ -30,6 +30,8 @@
 #include <boost/numeric/odeint.hpp>
 
 
+#include "CROSP/CROSP/internal_actuation.hpp"
+
 namespace CROSP {
 
 
@@ -330,20 +332,20 @@ public:
      * \param t_qe the current set of generalised coordinates
      * \return the static equilibrium of the rod
      */
-    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
+    virtual Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
 
 
 
-    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe,
-                                         const Eigen::VectorXd &t_dot_qe) const;
+    virtual Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe,
+                                                 const Eigen::VectorXd &t_dot_qe) const;
 
 
 
-    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const;
+    virtual Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const;
 
 
-    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
-                                                const Eigen::VectorXd &t_Delta_dot_qe)const;
+    virtual Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
+                                                        const Eigen::VectorXd &t_Delta_dot_qe)const;
 
 
 
@@ -373,6 +375,9 @@ public:
      * \brief printProperties a function to log the rod properties with a MATLAB like layout
      */
     void printProperties();
+
+
+
 
 #ifndef DEVELOPER
 private:
@@ -414,7 +419,10 @@ private:
                                                             m_rod_properties)
     };
 
-
+public:
+    ::CROSP::internal_actuation::InternalActuation internal_actuator {
+        ::CROSP::internal_actuation::InternalActuation(m_strain_parameterisation)
+    };
 
 };
 
