@@ -36,11 +36,13 @@ Eigen::VectorXd GeneralisedInternalActuationIntegrator::computerParametersVector
     const auto norm_Gamma_1 = Gamma_1.norm();
     const auto norm_Gamma_2 = Gamma_2.norm();
 
-    const auto strain_map_1 = (::LieAlgebra::Vector6d() << D1_skew * Gamma_1,
-                                                                Gamma_1).finished();
+    ::LieAlgebra::Vector6d strain_map_1;
+    strain_map_1 << D1_skew * Gamma_1   ,
+                        Gamma_1         ;
 
-    const auto strain_map_2 = (::LieAlgebra::Vector6d() << D2_skew * Gamma_2,
-                                                                Gamma_2).finished();
+    ::LieAlgebra::Vector6d strain_map_2;
+    strain_map_2 << D2_skew * Gamma_2   ,
+                        Gamma_2         ;
 
 
     const double tau_1 = m_tau(0);
@@ -51,7 +53,6 @@ Eigen::VectorXd GeneralisedInternalActuationIntegrator::computerParametersVector
 
     const auto BPhi = m_strain_parameterisation->m_map_to_strain_stack.at(t_point);
 
-//    std::cout << "BPhi^T : \n" << BPhi.transpose() << "\n\n";
 
     Eigen::VectorXd b = BPhi.transpose() * ( strain_from_cable_1 + strain_from_cable_2 );
 
@@ -69,10 +70,10 @@ InternalActuation::InternalActuation(std::shared_ptr<const strain_parameterisati
 void InternalActuation::setActuation([[maybe_unused]]const double &t_current_time)
 {
     auto gain = Eigen::VectorXd(2);
-    gain << 1,
-            0.5;
+    gain << 0.5,
+            1;
 
-    const double k = 0.04;
+    const double k = 30;
     const unsigned int number_of_cycles = 4;
     const double omega = 2*number_of_cycles*M_PI/(10);
 

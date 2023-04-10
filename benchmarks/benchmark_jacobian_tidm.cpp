@@ -78,7 +78,7 @@ void benchmarkTIDM(::benchmark::State &t_state)
             rod.forwardTangentKinematics();
             rod.backwardTangentDynamics(Delta_F1);
 
-            J.col(i) = rod.getTangentStaticEquilibrium(Delta_q);
+            J.col(i) = rod.getTangentStaticInternalBalance(Delta_q);
         }
 
 

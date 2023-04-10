@@ -52,6 +52,56 @@ struct MaterialProperties {
 };
 
 
+struct CrossSection{
+
+    virtual double Area(const double X)const=0;
+
+    virtual double Ixx(const double X)const=0;
+
+    virtual double Iyy(const double X)const=0;
+
+    virtual double Izz(const double X)const=0;
+
+    virtual std::string printProperties() const=0;
+};
+
+struct CircularCrossSection : public CrossSection {
+
+    CircularCrossSection(const double &t_radius=0.001)
+        : m_radius(t_radius)
+    {}
+
+    virtual double Area(const double)const final
+    {
+        return M_PI*m_radius*m_radius;
+    }
+
+    virtual double Ixx(const double)const final
+    {
+        return M_PI*pow(m_radius,4)/2;
+    }
+
+    virtual double Iyy(const double)const final
+    {
+        return M_PI*pow(m_radius,4)/4;
+    }
+
+    virtual double Izz(const double)const final
+    {
+        return M_PI*pow(m_radius,4)/4;
+    }
+
+    virtual std::string printProperties() const final
+    {
+        std::stringstream properties;
+        properties << "     r : " << m_radius << "\n";
+        return properties.str();
+    }
+
+    double m_radius;
+};
+
+
 
 /*!
  * \brief The RodDimensions struct contains the geometrical dimensions of the rod
@@ -68,27 +118,19 @@ struct RodDimensions {
      * \param t_r   Radius of the section [m]
      * \param t_L   Length of the rod [m]
      */
-    RodDimensions(const double &t_r, const double &t_L) : m_r(t_r),
-                                                          m_L(t_L)
+    RodDimensions(std::unique_ptr<CrossSection> t_cross_section, const double &t_L)
+        : m_cross_section( std::move(t_cross_section) ),
+          m_L(t_L)
     {}
 
 
-    /// \brief m_r  Radius of the section [m]
-    const double m_r { 0.001 };
-
-    /// \brief m_A  Area of the section [m^2]
-    const double m_A { M_PI*m_r*m_r };
+    std::unique_ptr<CrossSection> m_cross_section {
+        std::make_unique<CircularCrossSection>()
+    };
 
     /// \brief m_L  Length of the rod [m]
     double m_L { 1.0 };
 
-    //  Moment of inertia [m^4]
-    /// \brief m_Jx pricipal moment of inertia on the x axis
-    const double m_Jx { M_PI*pow(m_r,4)/2 };
-    /// \brief m_Jy pricipal moment of inertia on the y axis
-    const double m_Jy { M_PI*pow(m_r,4)/4 };
-    /// \brief m_Jz pricipal moment of inertia on the z axis
-    const double m_Jz { M_PI*pow(m_r,4)/4 };
 };
 
 
@@ -165,12 +207,12 @@ public:
     const Eigen::Matrix<double, 6, 6> m_H { [&](){
             Eigen::Matrix<double, 6, 6> H;
             H.setZero();
-            H.diagonal() << m_material_properties.m_G * m_rod_dimensions.m_Jx,
-                            m_material_properties.m_E * m_rod_dimensions.m_Jy,
-                            m_material_properties.m_E * m_rod_dimensions.m_Jz,
-                            m_material_properties.m_E * m_rod_dimensions.m_A,
-                            m_material_properties.m_G * m_rod_dimensions.m_A,
-                            m_material_properties.m_G * m_rod_dimensions.m_A;
+            H.diagonal() << m_material_properties.m_G * m_rod_dimensions.m_cross_section->Ixx(0),
+                            m_material_properties.m_E * m_rod_dimensions.m_cross_section->Iyy(0),
+                            m_material_properties.m_E * m_rod_dimensions.m_cross_section->Izz(0),
+                            m_material_properties.m_E * m_rod_dimensions.m_cross_section->Area(0),
+                            m_material_properties.m_G * m_rod_dimensions.m_cross_section->Area(0),
+                            m_material_properties.m_G * m_rod_dimensions.m_cross_section->Area(0);
 
             return H;}() };
 
@@ -178,12 +220,12 @@ public:
     const  Eigen::Matrix<double, 6, 6>  m_M{ [&](){
             Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
 
-            M.diagonal() << m_material_properties.m_rho * m_rod_dimensions.m_Jx,
-                            m_material_properties.m_rho * m_rod_dimensions.m_Jy,
-                            m_material_properties.m_rho * m_rod_dimensions.m_Jz,
-                            m_material_properties.m_rho * m_rod_dimensions.m_A,
-                            m_material_properties.m_rho * m_rod_dimensions.m_A,
-                            m_material_properties.m_rho * m_rod_dimensions.m_A;
+            M.diagonal() << m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Ixx(0),
+                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Iyy(0),
+                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Izz(0),
+                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area(0),
+                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area(0),
+                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area(0);
             return M;}() };
 
 
