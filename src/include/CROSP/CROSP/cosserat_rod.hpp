@@ -30,8 +30,6 @@
 #include <boost/numeric/odeint.hpp>
 
 
-#include "CROSP/CROSP/internal_actuation.hpp"
-
 namespace CROSP {
 
 
@@ -350,7 +348,7 @@ public:
 
     virtual void updateInternalActuation(const double &t_current_time);
 
-    virtual Eigen::VectorXd getQad();
+    virtual Eigen::VectorXd getQad()const;
 
 
     /*!
@@ -425,10 +423,6 @@ private:
                                                             m_rod_properties)
     };
 
-public:
-    ::CROSP::internal_actuation::InternalActuation internal_actuator {
-        ::CROSP::internal_actuation::InternalActuation(m_strain_parameterisation)
-    };
 
 };
 

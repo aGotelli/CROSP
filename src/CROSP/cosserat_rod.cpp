@@ -390,7 +390,7 @@ Eigen::VectorXd CosseratRod::getTangentInternalBalance(const Eigen::VectorXd &t_
 
 void CosseratRod::updateInternalActuation([[maybe_unused]]const double &t_current_time) {};
 
-Eigen::VectorXd CosseratRod::getQad()
+Eigen::VectorXd CosseratRod::getQad()const
 {
     return Eigen::VectorXd::Zero(m_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension());
 }
