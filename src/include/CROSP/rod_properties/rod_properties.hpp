@@ -54,6 +54,8 @@ struct MaterialProperties {
 
 struct CrossSection{
 
+    virtual ~CrossSection()=default;
+
     virtual double Area()const=0;
 
     virtual double Ixx()const=0;
@@ -102,6 +104,47 @@ struct CircularCrossSection : public CrossSection {
 };
 
 
+struct RectangularCrossSection : public CrossSection {
+
+    RectangularCrossSection(const double &t_width,
+                            const double &t_height)
+        : m_width(t_width),
+          m_height(t_height)
+    {}
+
+    virtual double Area()const final
+    {
+        return m_width*m_height;
+    }
+
+    virtual double Ixx()const final
+    {
+        return (m_width*m_height/12)*(m_width*m_width + m_height*m_height);
+    }
+
+    virtual double Iyy()const final
+    {
+        return m_width*pow(m_height, 3)/12;
+    }
+
+    virtual double Izz()const final
+    {
+        return pow(m_width, 3)*m_height/12;
+    }
+
+    virtual std::string printProperties() const final
+    {
+        std::stringstream properties;
+        properties << "     width : " << m_width << ",";
+        properties << "     height : " << m_height << "\n";
+        return properties.str();
+    }
+
+    double m_width;
+    double m_height;
+};
+
+
 
 /*!
  * \brief The RodDimensions struct contains the geometrical dimensions of the rod
@@ -113,20 +156,19 @@ struct RodDimensions {
 
     RodDimensions()=default;
 
+    ~RodDimensions();
+
 
     /*!
      * \brief RodDimensions construct the object given the properties
      * \param t_r   Radius of the section [m]
      * \param t_L   Length of the rod [m]
      */
-    RodDimensions(CrossSection* t_cross_section, const double &t_L)
-        : m_cross_section( std::move(t_cross_section) ),
-          m_L(t_L)
-    {}
+    RodDimensions(CrossSection* t_cross_section, const double &t_L);
 
 
-    std::shared_ptr<CrossSection> m_cross_section {
-        std::make_shared<CircularCrossSection>()
+    CrossSection* m_cross_section {
+        new CircularCrossSection()
     };
 
     /// \brief m_L  Length of the rod [m]
