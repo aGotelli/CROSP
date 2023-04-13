@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
         ::LieAlgebra::Vector1d tau_1;
         tau_1 << K1 * (1 + cos(theta));
-
+        std::cout << "tau_1 : " << tau_1 << "\n";
         return tau_1;
     });
 
@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 
         ::LieAlgebra::Vector1d tau_2;
         tau_2 << K2 * (1 + cos(theta));
+        std::cout << "tau_2 : " << tau_2 << "\n";
         return tau_2;
     });
 
@@ -72,11 +73,19 @@ int main(int argc, char *argv[])
     const auto Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
     rod.backwardDynamics(Lambda_X1);
 
-    rod.updateInternalActuation(1);
+    const double dt = 0.01;
+    for(unsigned int step=0; step<300; step++){
+        const double t = dt*step;
 
-    const auto Q_ad = rod.getQad();
+        std::cout << "t : " << t << "\n";
 
-    std::cout << "Q_ad : \n" << Q_ad << "\n\n";
+        rod.updateInternalActuation(t);
+
+        const auto Q_ad = rod.getQad();
+
+        std::cout << "Q_ad : \n" << Q_ad << "\n\n";
+    }
+
 
     return 0;
 }

@@ -333,7 +333,7 @@ LieAlgebra::Vector6d CosseratRod::getDeltaLambdaAtBase()const
 
 
 
-Eigen::VectorXd CosseratRod::getStaticInternalBalance(const Eigen::VectorXd &t_qe)
+Eigen::VectorXd CosseratRod::getStaticInternalBalance(const Eigen::VectorXd &t_qe) const
 {
     const Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
 
@@ -342,12 +342,12 @@ Eigen::VectorXd CosseratRod::getStaticInternalBalance(const Eigen::VectorXd &t_q
     const Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     const Eigen::VectorXd Q_ad = getQad();
 
-    const Eigen::VectorXd internal_balance = Qe + Qa - Q_ad;
+    const Eigen::VectorXd internal_balance = Qe - Qa - Q_ad;
     return internal_balance;
 }
 
 Eigen::VectorXd CosseratRod::getInternalBalance(const Eigen::VectorXd &t_qe,
-                                                const Eigen::VectorXd &t_dot_qe)
+                                                const Eigen::VectorXd &t_dot_qe) const
 {
     const Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
     const Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
@@ -358,7 +358,7 @@ Eigen::VectorXd CosseratRod::getInternalBalance(const Eigen::VectorXd &t_qe,
     const Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
     const Eigen::VectorXd Q_ad = getQad();
 
-    const Eigen::VectorXd internal_balance = Qe + Ce + Qa - Q_ad;
+    const Eigen::VectorXd internal_balance = Qe + Ce - Qa - Q_ad;
     return internal_balance;
 
 }
@@ -369,8 +369,15 @@ Eigen::VectorXd CosseratRod::getInternalBalance(const Eigen::VectorXd &t_qe,
 
 Eigen::VectorXd CosseratRod::getTangentStaticInternalBalance(const Eigen::VectorXd &t_Delta_qe)const
 {
-    return m_rod_properties->m_Kee*t_Delta_qe
-            - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+        Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+
+
+    Eigen::VectorXd Delta_Qe = Kee * t_Delta_qe;
+    Eigen::VectorXd Delta_Qa = m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+
+    Eigen::VectorXd Delta_internal_balance = Delta_Qe - Delta_Qa;
+
+    return Delta_internal_balance;
 }
 
 Eigen::VectorXd CosseratRod::getTangentInternalBalance(const Eigen::VectorXd &t_Delta_qe,

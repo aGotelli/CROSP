@@ -330,12 +330,12 @@ public:
      * \param t_qe the current set of generalised coordinates
      * \return the static equilibrium of the rod
      */
-    Eigen::VectorXd getStaticInternalBalance(const Eigen::VectorXd &t_qe);
+    Eigen::VectorXd getStaticInternalBalance(const Eigen::VectorXd &t_qe)const;
 
 
 
     Eigen::VectorXd getInternalBalance(const Eigen::VectorXd &t_qe,
-                                       const Eigen::VectorXd &t_dot_qe);
+                                       const Eigen::VectorXd &t_dot_qe)const;
 
 
 
