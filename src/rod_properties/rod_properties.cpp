@@ -23,13 +23,13 @@ RodProperties::RodProperties(const std::shared_ptr<const strain_parameterisation
 
 double RodProperties::distributedDensity()const
 {
-    return m_material_properties.m_rho * m_rod_dimensions.m_A;
+    return m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area();
 }
 
 
 Eigen::Vector3d RodProperties::distributedGravitationalForce()const
 {
-    return m_material_properties.m_rho * m_rod_dimensions.m_A*m_gravity;
+    return m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area()*m_gravity;
 }
 
 
