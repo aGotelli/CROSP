@@ -19,10 +19,12 @@ namespace CROSP::tidm_integrators {
 
 DeltaRotation::DeltaRotation(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                              std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+                             const double &t_upper_integration_limit,
                              const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta )
 {
@@ -48,10 +50,12 @@ Eigen::VectorXd DeltaRotation::computerParametersVectorAtPoint(const unsigned in
 DeltaPosition::DeltaPosition(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                              std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_delta_rotation,
+                             const double &t_upper_integration_limit,
                              const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta ),
       m_delta_rotation(t_delta_rotation)
@@ -76,10 +80,12 @@ Eigen::VectorXd DeltaPosition::computerParametersVectorAtPoint(const unsigned in
 DeltaAngularVelocity::DeltaAngularVelocity(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                            std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                            std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
+                                           const double &t_upper_integration_limit,
                                            const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta ),
       m_idm_integrators( t_idm_integrators )
@@ -106,10 +112,12 @@ DeltaLinearVelocity::DeltaLinearVelocity(std::shared_ptr<const strain_parameteri
                                          std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                          std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                          std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
+                                         const double &t_upper_integration_limit,
                                          const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta ),
       m_idm_integrators( t_idm_integrators ),
@@ -139,10 +147,12 @@ DeltaAngularAccelerations::DeltaAngularAccelerations(std::shared_ptr<const strai
                                                      std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
                                                      std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
+                                                     const double &t_upper_integration_limit,
                                                      const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta ),
       m_idm_integrators( t_idm_integrators ),
@@ -174,10 +184,12 @@ DeltaLinearAccelerations::DeltaLinearAccelerations(std::shared_ptr<const strain_
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_acceleration_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_linear_velocity_integrator,
+                                                   const double &t_upper_integration_limit,
                                                    const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta ),
       m_idm_integrators( t_idm_integrators ),
@@ -217,10 +229,12 @@ DeltaInternalForcesIntegrator::DeltaInternalForcesIntegrator(std::shared_ptr<con
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_linear_velocity_integrator,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_linear_acceleration_integrator,
+                                                             const double &t_upper_integration_limit,
                                                              const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
-               ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-               t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta ),
       m_idm_integrators( t_idm_integrators ),
@@ -289,10 +303,12 @@ DeltaInternalCouplesIntegrator::DeltaInternalCouplesIntegrator(std::shared_ptr<c
                                                                std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_acceleration_integrator,
                                                                std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_linear_velocity_integrator,
                                                                std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator,
+                                                               const double &t_upper_integration_limit,
                                                                const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation( t_strain_parameterisation ),
       m_strain_parameterisation_Delta( t_strain_parameterisation_Delta ),
       m_idm_integrators(t_idm_integrators),
@@ -340,10 +356,12 @@ Eigen::Vector3d DeltaInternalCouplesIntegrator::computeLocalExternalCouples(unsi
 
 DeltaGeneralisedForcesIntegrator::DeltaGeneralisedForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_couples_integrator,
-                                                                   std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator)
+                                                                   std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator,
+                                                                   const double &t_upper_integration_limit)
     : OSNI::ODEb(t_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                 t_strain_parameterisation->m_number_of_Chebyshev_points),
+                 t_strain_parameterisation->m_number_of_Chebyshev_points,
+                 t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_Delta_internal_couples_integrator(t_Delta_internal_couples_integrator),
       m_Delta_internal_forces_integrator(t_Delta_internal_forces_integrator)

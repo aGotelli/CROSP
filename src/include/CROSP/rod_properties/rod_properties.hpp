@@ -199,6 +199,7 @@ public:
      * \brief updateRodLength this funtion is used to update the length of the rod
      * \param t_rod_lenght the new lenght of the rod.
      */
+    [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
     void updateRodLength(const double &t_rod_lenght);
 
 

@@ -51,7 +51,7 @@ public:
      *
      * In this constructo the strain parameterisation is initialised by its defaul value
      */
-    CosseratRod(const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+    CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
 
 
     /*!
@@ -69,7 +69,7 @@ public:
      * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
      */
     CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+                const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
 
 
 
@@ -383,7 +383,8 @@ public:
      * \brief updateRodLength this funtion is used to update the length of the rod
      * \param t_rod_lenght the new lenght of the rod.
      */
-    void updateRodLength(const double &t_rod_lenght);
+    [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
+    virtual void updateRodLength(const double &t_rod_lenght);
 
 
 
@@ -398,9 +399,9 @@ protected:
         std::make_shared<strain_parameterisation::StrainParameterisation>()
     };
 
-#ifndef DEVELOPER
-private:
-#endif
+//#ifndef DEVELOPER
+//private:
+//#endif
 
     //  The set of rod properties
     std::shared_ptr<rod_properties::RodProperties> m_rod_properties {

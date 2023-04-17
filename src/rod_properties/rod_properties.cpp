@@ -99,7 +99,10 @@ Eigen::MatrixXd RodProperties::defineKee(const std::shared_ptr<const polynomial_
     boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_X){
         const auto Phi = t_polynomial_representation->getPhi(t_X);
 
-        t_dKeeds = Phi.transpose()*Ha*Phi;}, Kee, 0.0, m_rod_dimensions.m_L, 0.0005);
+        t_dKeeds = Phi.transpose()*Ha*Phi;
+    }, Kee, 0.0, 1.0, 0.0005);
+
+    Kee *= m_rod_dimensions.m_L;
 
     return Kee;
 }

@@ -26,7 +26,7 @@ Config.Nt    = length(Config.time);
 
 
 % longueur de la poutre
-Config.L = 1;
+Config.L = 1.75;
 % Pas de discrétisation du corps
 Config.dX = Config.L/101;
 % Construction du corps et de ses paramètres
@@ -107,6 +107,19 @@ Const.q_dot_dot = load("../test_different_modes/ddot_q.csv");
 display(Const.q)
 display(Const.q_dot)
 display(Const.q_dot_dot)
+
+Kee_cpp = load("../test_different_modes/Kee.csv");
+Dee_cpp = load("../test_different_modes/Dee.csv");
+
+error_Kee = Kee_cpp - Kee;
+error_Kee_norm = norm(error_Kee);
+display(Kee_cpp)
+display(Kee)
+display(error_Kee_norm)
+
+error_Dee = Dee_cpp - Dee;
+error_Dee_norm = norm(error_Dee);
+display(error_Dee_norm)
 
 
 
