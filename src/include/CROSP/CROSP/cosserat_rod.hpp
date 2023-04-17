@@ -330,21 +330,25 @@ public:
      * \param t_qe the current set of generalised coordinates
      * \return the static equilibrium of the rod
      */
-    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe)const;
+    Eigen::VectorXd getStaticInternalBalance(const Eigen::VectorXd &t_qe)const;
 
 
 
-    Eigen::VectorXd getStaticEquilibrium(const Eigen::VectorXd &t_qe,
-                                         const Eigen::VectorXd &t_dot_qe) const;
+    Eigen::VectorXd getInternalBalance(const Eigen::VectorXd &t_qe,
+                                       const Eigen::VectorXd &t_dot_qe)const;
 
 
 
-    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const;
+    Eigen::VectorXd getTangentStaticInternalBalance(const Eigen::VectorXd &t_Delta_qe)const;
 
 
-    Eigen::VectorXd getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
-                                                const Eigen::VectorXd &t_Delta_dot_qe)const;
+    Eigen::VectorXd getTangentInternalBalance(const Eigen::VectorXd &t_Delta_qe,
+                                              const Eigen::VectorXd &t_Delta_dot_qe)const;
 
+
+    virtual void updateInternalActuation(const double &t_current_time);
+
+    virtual Eigen::VectorXd getQad()const;
 
 
     /*!
@@ -374,8 +378,11 @@ public:
      */
     void printProperties();
 
+
+
+
 #ifndef DEVELOPER
-private:
+protected:
 #endif
 
 
@@ -384,7 +391,9 @@ private:
         std::make_shared<strain_parameterisation::StrainParameterisation>()
     };
 
-
+#ifndef DEVELOPER
+private:
+#endif
 
     //  The set of rod properties
     const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties {
@@ -413,7 +422,6 @@ private:
                                                             m_idm_integrators,
                                                             m_rod_properties)
     };
-
 
 
 };

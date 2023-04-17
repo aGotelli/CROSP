@@ -93,10 +93,12 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp
+                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
+                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
 #                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
 #                            static_initialiser/static_initialiser.cpp
-
-
+#                            include/CROSP/CROSP/internal_actuation.hpp
+#                            ${PROJECT_NAME}/internal_actuation.cpp
                             include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
                             polynomial_representation/polynomial_representation.cpp
                             include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
@@ -113,7 +115,8 @@ target_link_libraries(${PROJECT_NAME}
         math_tools
         Eigen3::Eigen
         OSNI
-        ${CERES_LIBRARIES}
+        optimized ATORS
+        debug ATORS-debug
 #    PUBLIC
 #        StrainParameterisation
 #        RodProperties
@@ -129,7 +132,11 @@ target_compile_options(${PROJECT_NAME}
 
 
 add_executable(prove prove.cpp)
-target_link_libraries(prove ${PROJECT_NAME})
+target_link_libraries(prove
+    ${PROJECT_NAME}
+    optimized ATORS
+    debug ATORS-debug
+)
 
 
 install(

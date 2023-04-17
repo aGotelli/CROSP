@@ -76,7 +76,7 @@ void benchmarkJacobianTIDM(::benchmark::State &t_state)
             rod.forwardTangentKinematics();
             rod.backwardTangentDynamics(Delta_F1);
 
-            J.col(i) = rod.getTangentStaticEquilibrium(Delta_q);
+            J.col(i) = rod.getTangentStaticInternalBalance(Delta_q);
         }
 
 
@@ -115,7 +115,7 @@ void benchmarkJacobianIDMForward(::benchmark::State &t_state)
     rod.backwardDynamics(F1);
 
 
-    Eigen::VectorXd residual = rod.getStaticEquilibrium(q);
+    Eigen::VectorXd residual = rod.getStaticInternalBalance(q);
 
     Eigen::VectorXd delta_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd delta_dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
@@ -140,7 +140,7 @@ void benchmarkJacobianIDMForward(::benchmark::State &t_state)
             rod.forwardKinematics();
             rod.backwardDynamics(F1);
 
-            const Eigen::VectorXd residual_difference = rod.getStaticEquilibrium(delta_q) - residual;
+            const Eigen::VectorXd residual_difference = rod.getStaticInternalBalance(delta_q) - residual;
 
             J.col(i) = residual_difference / delta;
         }
@@ -179,7 +179,7 @@ void benchmarkJacobianIDMCentral(::benchmark::State &t_state)
     rod.backwardDynamics(F1);
 
 
-    Eigen::VectorXd residual = rod.getStaticEquilibrium(q);
+    Eigen::VectorXd residual = rod.getStaticInternalBalance(q);
 
     Eigen::VectorXd delta_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd delta_dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
@@ -204,7 +204,7 @@ void benchmarkJacobianIDMCentral(::benchmark::State &t_state)
             rod.forwardKinematics();
             rod.backwardDynamics(F1);
 
-            const Eigen::VectorXd increment_residual = rod.getStaticEquilibrium(delta_q);
+            const Eigen::VectorXd increment_residual = rod.getStaticInternalBalance(delta_q);
 
 
             delta_q = q;
@@ -218,7 +218,7 @@ void benchmarkJacobianIDMCentral(::benchmark::State &t_state)
             rod.forwardKinematics();
             rod.backwardDynamics(F1);
 
-            const Eigen::VectorXd decrement_residual = rod.getStaticEquilibrium(delta_q);
+            const Eigen::VectorXd decrement_residual = rod.getStaticInternalBalance(delta_q);
 
             const Eigen::VectorXd residual_difference = increment_residual - decrement_residual;
 

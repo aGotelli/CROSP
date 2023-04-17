@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
             std::make_shared<::polynomial_representation::PolynomialRepresentation>(admitted_deformations,
                                                                                    ne);
 
-
-    ::CROSP::rod_properties::RodDimensions rod_dimensions(0.01, 1.0);
+    ::CROSP::rod_properties::CircularCrossSection cs(0.01);
+    ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, 1.0);
 
 
     auto strain_param =

@@ -4,6 +4,22 @@
 
 namespace CROSP::rod_properties {
 
+RodDimensions::RodDimensions(CrossSection* t_cross_section, const double &t_L)
+    : m_cross_section( t_cross_section ),
+      m_L(t_L)
+{}
+
+
+
+RodDimensions::~RodDimensions()
+{
+    delete m_cross_section;
+}
+
+
+
+
+
 
 RodProperties::RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
     : m_Kee( defineKee(t_strain_parameterisation->m_polynomial_representation) )
@@ -23,13 +39,13 @@ RodProperties::RodProperties(const std::shared_ptr<const strain_parameterisation
 
 double RodProperties::distributedDensity()const
 {
-    return m_material_properties.m_rho * m_rod_dimensions.m_A;
+    return m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area();
 }
 
 
 Eigen::Vector3d RodProperties::distributedGravitationalForce()const
 {
-    return m_material_properties.m_rho * m_rod_dimensions.m_A*m_gravity;
+    return m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area()*m_gravity;
 }
 
 

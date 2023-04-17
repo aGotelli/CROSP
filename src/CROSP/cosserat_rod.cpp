@@ -333,25 +333,32 @@ LieAlgebra::Vector6d CosseratRod::getDeltaLambdaAtBase()const
 
 
 
-Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe) const
+Eigen::VectorXd CosseratRod::getStaticInternalBalance(const Eigen::VectorXd &t_qe) const
 {
-    const Eigen::VectorXd Qe = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-    const Eigen::VectorXd elastic_internal_effort = m_rod_properties->m_Kee*t_qe;
-    return elastic_internal_effort - Qe;
+    const Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+
+
+    const Eigen::VectorXd Qe = Kee * t_qe;
+    const Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+    const Eigen::VectorXd Q_ad = getQad();
+
+    const Eigen::VectorXd internal_balance = Qe - Qa - Q_ad;
+    return internal_balance;
 }
 
-Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe,
-                                                  const Eigen::VectorXd &t_dot_qe) const
+Eigen::VectorXd CosseratRod::getInternalBalance(const Eigen::VectorXd &t_qe,
+                                                const Eigen::VectorXd &t_dot_qe) const
 {
-    Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
-    Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+    const Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
+    const Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
 
 
-    Eigen::VectorXd Qe = Kee * t_qe;
-    Eigen::VectorXd Ce = Dee * t_dot_qe;
-    Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+    const Eigen::VectorXd Qe = Kee * t_qe;
+    const Eigen::VectorXd Ce = Dee * t_dot_qe;
+    const Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+    const Eigen::VectorXd Q_ad = getQad();
 
-    Eigen::VectorXd internal_balance = Qe + Ce - Qa;
+    const Eigen::VectorXd internal_balance = Qe + Ce - Qa - Q_ad;
     return internal_balance;
 
 }
@@ -360,14 +367,21 @@ Eigen::VectorXd CosseratRod::getStaticEquilibrium(const Eigen::VectorXd &t_qe,
 
 
 
-Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe)const
+Eigen::VectorXd CosseratRod::getTangentStaticInternalBalance(const Eigen::VectorXd &t_Delta_qe)const
 {
-    return m_rod_properties->m_Kee*t_Delta_qe
-            - m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+        Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+
+
+    Eigen::VectorXd Delta_Qe = Kee * t_Delta_qe;
+    Eigen::VectorXd Delta_Qa = m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+
+    Eigen::VectorXd Delta_internal_balance = Delta_Qe - Delta_Qa;
+
+    return Delta_internal_balance;
 }
 
-Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &t_Delta_qe,
-                                                         const Eigen::VectorXd &t_Delta_dot_qe)const
+Eigen::VectorXd CosseratRod::getTangentInternalBalance(const Eigen::VectorXd &t_Delta_qe,
+                                                       const Eigen::VectorXd &t_Delta_dot_qe)const
 {
     Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
     Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
@@ -381,7 +395,12 @@ Eigen::VectorXd CosseratRod::getTangentStaticEquilibrium(const Eigen::VectorXd &
     return Delta_internal_balance;
 }
 
+void CosseratRod::updateInternalActuation([[maybe_unused]]const double &t_current_time) {};
 
+Eigen::VectorXd CosseratRod::getQad()const
+{
+    return Eigen::VectorXd::Zero(m_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension());
+}
 
 Eigen::MatrixXd CosseratRod::getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)const
 {
@@ -404,11 +423,10 @@ void CosseratRod::printProperties()
 
 
     {   //  Start listing rod dimensions
-    const auto r = m_rod_properties->m_rod_dimensions.m_r;
     const auto l = m_rod_properties->m_rod_dimensions.m_L;
     rod_properties << "Rod dimensions :\n"
-                      "     r : " << r << "\n"
-                      "     l : " << l << "\n";
+                      "     l : " << l << "\n" <<
+                      m_rod_properties->m_rod_dimensions.m_cross_section->printProperties();
     }
 
     {   //  Start listing material properties
