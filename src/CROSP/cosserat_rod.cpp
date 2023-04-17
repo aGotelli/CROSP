@@ -482,15 +482,17 @@ void CosseratRod::printProperties()
 
     }
 
-
-
-
-
-
-
-
     std::cout << rod_properties.str() << "\n";
     std::cout.flush();
+}
+
+void CosseratRod::updateRodLength(const double &t_rod_lenght)
+{
+    m_rod_properties->updateRodLength( t_rod_lenght );
+
+    m_idm_integrators->updateIntegrationDomain( t_rod_lenght );
+
+    m_tidm_integrators->updateIntegrationDomain( t_rod_lenght );
 }
 
 }   //  namespace CROSP

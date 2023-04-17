@@ -358,6 +358,23 @@ IDMIntegrators::IDMIntegrators(std::shared_ptr<const strain_parameterisation::St
       m_rod_properties(t_rod_properties)
 {}
 
+void IDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_limit)
+{
+    m_quaternion->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_position->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_angular_velocity->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_linear_velocity->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_angular_acceleration->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_linear_acceleration->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_internal_forces->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_internal_couples->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_generalised_forces->setUpperIntegrationDomain(t_upper_integration_limit);
+}
+
 
 
 }   //  namespace CROSP::IDMIntegrators

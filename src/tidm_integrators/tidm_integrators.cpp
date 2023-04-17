@@ -380,6 +380,23 @@ TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const strain_parameterisation::
 {}
 
 
+void TIDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_limit)
+    {
+        m_Delta_rotation->setUpperIntegrationDomain(t_upper_integration_limit);
+        m_Delta_position->setUpperIntegrationDomain(t_upper_integration_limit);
+
+        m_Delta_angular_velocity->setUpperIntegrationDomain(t_upper_integration_limit);
+        m_Delta_linear_velocity->setUpperIntegrationDomain(t_upper_integration_limit);
+
+        m_Delta_angular_acceleration->setUpperIntegrationDomain(t_upper_integration_limit);
+        m_Delta_linear_acceleration->setUpperIntegrationDomain(t_upper_integration_limit);
+
+        m_Delta_internal_forces->setUpperIntegrationDomain(t_upper_integration_limit);
+        m_Delta_internal_couples->setUpperIntegrationDomain(t_upper_integration_limit);
+
+        m_Delta_generalised_forces->setUpperIntegrationDomain(t_upper_integration_limit);
+    }
+
 
 
 }   //  namespace CROSP::tidm_integrators

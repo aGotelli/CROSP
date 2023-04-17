@@ -625,7 +625,11 @@ struct TIDMIntegrators{
 
 
 
-
+    /*!
+     * \brief updateIntegrationDomain this function is used to set the integration upper limit at every integrator
+     * \param t_upper_integration_limit is the upper integration limit used to scale the normalised domain [0, 1]
+     */
+    void updateIntegrationDomain(const double &t_upper_integration_limit=1.0f);
 };
 
 }   //  namespace CROSP
