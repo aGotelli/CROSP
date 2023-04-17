@@ -195,6 +195,14 @@ public:
                   const MaterialProperties &t_material_properties);
 
 
+    /*!
+     * \brief updateRodLength this funtion is used to update the length of the rod
+     * \param t_rod_lenght the new lenght of the rod.
+     */
+    [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
+    void updateRodLength(const double &t_rod_lenght);
+
+
 
     /// \brief m_material_properties instance of the rod material properties
     MaterialProperties m_material_properties;
@@ -247,7 +255,7 @@ public:
 
 
     /// \brief m_H The Hookean matrix default initialised using the members m_material_properties and m_rod_dimensions
-    const Eigen::Matrix<double, 6, 6> m_H { [&](){
+    Eigen::Matrix<double, 6, 6> m_H { [&](){
             Eigen::Matrix<double, 6, 6> H;
             H.setZero();
             H.diagonal() << m_material_properties.m_G * m_rod_dimensions.m_cross_section->Ixx(),
@@ -260,7 +268,7 @@ public:
             return H;}() };
 
     /// \brief m_M The inertia matrix default initialised using the members m_material_properties and m_rod_dimensions
-    const  Eigen::Matrix<double, 6, 6>  m_M{ [&](){
+     Eigen::Matrix<double, 6, 6>  m_M{ [&](){
             Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
 
             M.diagonal() << m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Ixx(),
@@ -273,10 +281,10 @@ public:
 
 
     /// \brief m_Kee The generalised elasticity matrix
-    const Eigen::MatrixXd m_Kee;
+    Eigen::MatrixXd m_Kee;
 
     /// \brief m_Dee The matrix of the internal dumping
-    const Eigen::MatrixXd m_Dee { m_material_properties.m_mu*m_Kee };
+    Eigen::MatrixXd m_Dee { m_material_properties.m_mu*m_Kee };
 
 
 private:
@@ -291,7 +299,7 @@ private:
     Eigen::MatrixXd defineKee(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)const;
 
 
-    const double gamma = 9.81;
+    double gamma = 9.81;
 public : Eigen::Vector3d m_gravity { Eigen::Vector3d(0, 0, -gamma) };
 
 };

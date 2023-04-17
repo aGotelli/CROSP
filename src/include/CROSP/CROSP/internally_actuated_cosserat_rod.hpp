@@ -32,7 +32,7 @@ public:
      *
      * In this constructo the strain parameterisation is initialised by its defaul value
      */
-    InternallyActuatedCosseratRod(const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+    InternallyActuatedCosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties,
                                   const ::ATORS::tendon_driven_actuation::ActuatedTendons t_actuated_tendons);
 
 
@@ -54,13 +54,16 @@ public:
      * \param t_actuated_tendons is the set of actuated tendons acting on the rod
      */
     InternallyActuatedCosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                  const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                                  const std::shared_ptr<rod_properties::RodProperties> t_rod_properties,
                                   const ::ATORS::tendon_driven_actuation::ActuatedTendons t_actuated_tendons);
 
 
     virtual void updateInternalActuation(const double &t_current_time) override;
 
     virtual Eigen::VectorXd getQad() const override;
+
+    [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
+    virtual void updateRodLength(const double &t_rod_lenght) override;
 
 
     ::ATORS::tendon_driven_actuation::TendonDrivenActuation m_tendon_driven_actuator;

@@ -22,10 +22,12 @@ namespace CROSP::idm_integrators {
 
 
 QuaternionIntegrator::QuaternionIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                                           const double &t_upper_integration_limit,
                                            const Eigen::Vector4d &t_initial_condition)
     : OSNI::ODEA(4,
                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                 t_strain_parameterisation->m_number_of_Chebyshev_points),
+                 t_strain_parameterisation->m_number_of_Chebyshev_points,
+                 t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation)
 {
     this->setInitialConditions(t_initial_condition);
@@ -49,10 +51,12 @@ Eigen::MatrixXd QuaternionIntegrator::computeMatrixAtChebyshevPoint(const unsign
 
 PositionIntegrator::PositionIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                        std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
+                                       const double &t_upper_integration_limit,
                                        const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEb(3,
                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                 t_strain_parameterisation->m_number_of_Chebyshev_points),
+                 t_strain_parameterisation->m_number_of_Chebyshev_points,
+                 t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_quaternion(t_quaternion_integrator)
 {
@@ -76,10 +80,12 @@ Eigen::VectorXd PositionIntegrator::computerParametersVectorAtPoint(const unsign
 
 
 AngularVelocityIntegrator::AngularVelocityIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+                                                     const double &t_upper_integration_limit,
                                                      const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation)
 {
     this->setInitialConditions(t_initial_condition);
@@ -103,10 +109,12 @@ Eigen::VectorXd AngularVelocityIntegrator::computerParametersVectorAtPoint(const
 
 LinearVelocityIntegrator::LinearVelocityIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                                                   const double &t_upper_integration_limit,
                                                    const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_angular_velocity(t_angular_velocity_integrator)
 {
@@ -135,10 +143,12 @@ Eigen::VectorXd LinearVelocityIntegrator::computerParametersVectorAtPoint(const 
 
 AngularAccelerationIntegrator::AngularAccelerationIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
+                                                             const double &t_upper_integration_limit,
                                                              const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_angular_velocity(t_angular_velocity_integrator)
 {
@@ -171,10 +181,12 @@ LinearAccelerationIntegrator::LinearAccelerationIntegrator(std::shared_ptr<const
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
+                                                           const double &t_upper_integration_limit,
                                                            const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_angular_velocity(t_angular_velocity_integrator),
       m_linear_velocity(t_linear_velocity_integrator),
@@ -211,10 +223,12 @@ InternalForcesIntegrator::InternalForcesIntegrator(std::shared_ptr<const strain_
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
+                                                   const double &t_upper_integration_limit,
                                                    const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_rod_properties(t_rod_properties),
       m_angular_velocity(t_angular_velocity_integrator),
@@ -279,10 +293,12 @@ InternalCouplesIntegrator::InternalCouplesIntegrator(std::shared_ptr<const strai
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
+                                                     const double &t_upper_integration_limit,
                                                      const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points),
+                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_rod_properties( t_rod_properties ),
       m_angular_velocity(t_angular_velocity_integrator),
@@ -325,10 +341,12 @@ Eigen::VectorXd InternalCouplesIntegrator::computeDistributedCouple(const unsign
 
 GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
-                                                         std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator)
+                                                         std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
+                                                         const double &t_upper_integration_limit)
     : OSNI::ODEb(t_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                 t_strain_parameterisation->m_number_of_Chebyshev_points),
+                 t_strain_parameterisation->m_number_of_Chebyshev_points,
+                 t_upper_integration_limit),
       m_strain_parameterisation(t_strain_parameterisation),
       m_internal_couples_integrator(t_internal_couples_integrator),
       m_internal_forces_integrator(t_internal_forces_integrator)
@@ -357,6 +375,23 @@ IDMIntegrators::IDMIntegrators(std::shared_ptr<const strain_parameterisation::St
     : m_strain_parameterisation(t_strain_parameterisation),
       m_rod_properties(t_rod_properties)
 {}
+
+void IDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_limit)
+{
+    m_quaternion->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_position->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_angular_velocity->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_linear_velocity->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_angular_acceleration->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_linear_acceleration->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_internal_forces->setUpperIntegrationDomain(t_upper_integration_limit);
+    m_internal_couples->setUpperIntegrationDomain(t_upper_integration_limit);
+
+    m_generalised_forces->setUpperIntegrationDomain(t_upper_integration_limit);
+}
 
 
 

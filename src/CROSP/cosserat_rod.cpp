@@ -20,7 +20,7 @@
 namespace CROSP {
 
 
-CosseratRod::CosseratRod(const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+CosseratRod::CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties)
     : m_rod_properties( t_rod_properties )
 {}
 
@@ -33,7 +33,7 @@ CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainPa
 
 
 CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                         const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+                         const std::shared_ptr<rod_properties::RodProperties> t_rod_properties)
     : m_strain_parameterisation( t_strain_parameterisation ),
       m_rod_properties( t_rod_properties )
 {}
@@ -482,15 +482,17 @@ void CosseratRod::printProperties()
 
     }
 
-
-
-
-
-
-
-
     std::cout << rod_properties.str() << "\n";
     std::cout.flush();
+}
+
+void CosseratRod::updateRodLength(const double &t_rod_lenght)
+{
+    m_rod_properties->updateRodLength( t_rod_lenght );
+
+    m_idm_integrators->updateIntegrationDomain( t_rod_lenght );
+
+    m_tidm_integrators->updateIntegrationDomain( t_rod_lenght );
 }
 
 }   //  namespace CROSP

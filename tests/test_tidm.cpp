@@ -265,9 +265,9 @@ int main(int argc, char *argv[])
         }
     })->Repetitions(5);
 
-    ::benchmark::Initialize(&argc, argv);
+//    ::benchmark::Initialize(&argc, argv);
 
-    ::benchmark::RunSpecifiedBenchmarks();
+//    ::benchmark::RunSpecifiedBenchmarks();
 
 
 

@@ -51,7 +51,7 @@ public:
      *
      * In this constructo the strain parameterisation is initialised by its defaul value
      */
-    CosseratRod(const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+    CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
 
 
     /*!
@@ -69,7 +69,7 @@ public:
      * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
      */
     CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                const std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+                const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
 
 
 
@@ -379,6 +379,14 @@ public:
     void printProperties();
 
 
+    /*!
+     * \brief updateRodLength this funtion is used to update the length of the rod
+     * \param t_rod_lenght the new lenght of the rod.
+     */
+    [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
+    virtual void updateRodLength(const double &t_rod_lenght);
+
+
 
 
 #ifndef DEVELOPER
@@ -387,36 +395,36 @@ protected:
 
 
     //  Representation of the rod via strain
-    const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
         std::make_shared<strain_parameterisation::StrainParameterisation>()
     };
 
-#ifndef DEVELOPER
-private:
-#endif
+//#ifndef DEVELOPER
+//private:
+//#endif
 
     //  The set of rod properties
-    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties {
+    std::shared_ptr<rod_properties::RodProperties> m_rod_properties {
         std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation)
     };
 
 
 
     //  Variables related the perturbation of the strain parameterisation
-    const std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
+    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
         std::make_shared<strain_parameterisation::StrainParameterisation>(m_strain_parameterisation,
                                                                           ::LieAlgebra::Vector6d::Zero())
     };
 
 
     //  The set of integrators needed for the IDM
-    const std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
+    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
         std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
                                                           m_rod_properties )
     };
 
     //  The set of integrators needed for the TIDM
-    const std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
+    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
         std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
                                                             m_strain_parameterisation_Delta,
                                                             m_idm_integrators,
