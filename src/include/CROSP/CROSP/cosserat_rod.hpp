@@ -30,6 +30,9 @@
 #include <boost/numeric/odeint.hpp>
 
 
+#include "ATORS/simple_actuator/passive.hpp"
+
+
 namespace CROSP {
 
 
@@ -430,6 +433,11 @@ protected:
                                                             m_idm_integrators,
                                                             m_rod_properties)
     };
+
+
+    std::unique_ptr<::ATORS::ActuatorBase> m_internal_actuator;
+
+
 
 
 };
