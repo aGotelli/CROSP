@@ -530,18 +530,18 @@ struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
 
 struct TIDMIntegrators{
 
-    TIDMIntegrators(const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
-                    const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+    TIDMIntegrators(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                    std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                     const std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                    const rod_properties::RodProperties t_rod_properties,
-                    const unsigned int t_number_of_Chebyshev_points);
+                    const rod_properties::RodProperties t_rod_properties);
 
 
     //  Instance of the rod properties
     rod_properties::RodProperties m_rod_properties;
 
     //  Instance of the variation of the strain parameterisation
-    std::shared_ptr<ParameterisationStack> m_parameterisation_stack_Delta;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
     //  Instance of the IDM integrators
     const std::shared_ptr<const idm_integrators::IDMIntegrators> m_idm_integrators;
@@ -552,27 +552,27 @@ struct TIDMIntegrators{
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_rotation {
-        std::make_shared<DeltaRotation>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaRotation>(m_parameterisation_stack,
                                         m_parameterisation_stack_Delta,
                                         m_rod_properties.m_rod_dimensions.m_L)
     };
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_position {
-        std::make_shared<DeltaPosition>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaPosition>(m_parameterisation_stack,
                                         m_parameterisation_stack_Delta,
                                         m_Delta_rotation,
                                         m_rod_properties.m_rod_dimensions.m_L)
     };
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_velocity {
-        std::make_shared<DeltaAngularVelocity>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaAngularVelocity>(m_parameterisation_stack,
                                                m_parameterisation_stack_Delta,
                                                m_idm_integrators,
                                                m_rod_properties.m_rod_dimensions.m_L)
     };
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_linear_velocity {
-        std::make_shared<DeltaLinearVelocity>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaLinearVelocity>(m_parameterisation_stack,
                                               m_parameterisation_stack_Delta,
                                               m_idm_integrators,
                                               m_Delta_angular_velocity,
@@ -580,7 +580,7 @@ struct TIDMIntegrators{
     };
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_acceleration {
-        std::make_shared<DeltaAngularAccelerations>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaAngularAccelerations>(m_parameterisation_stack,
                                                     m_parameterisation_stack_Delta,
                                                     m_idm_integrators,
                                                     m_Delta_angular_velocity,
@@ -591,7 +591,7 @@ struct TIDMIntegrators{
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_linear_acceleration {
-        std::make_shared<DeltaLinearAccelerations>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaLinearAccelerations>(m_parameterisation_stack,
                                                    m_parameterisation_stack_Delta,
                                                    m_idm_integrators,
                                                    m_Delta_angular_velocity,
@@ -602,7 +602,7 @@ struct TIDMIntegrators{
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_forces {
-        std::make_shared<DeltaInternalForcesIntegrator>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaInternalForcesIntegrator>(m_parameterisation_stack,
                                                         m_parameterisation_stack_Delta,
                                                         m_idm_integrators,
                                                         m_rod_properties,
@@ -614,7 +614,7 @@ struct TIDMIntegrators{
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_couples {
-        std::make_shared<DeltaInternalCouplesIntegrator>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaInternalCouplesIntegrator>(m_parameterisation_stack,
                                                          m_parameterisation_stack_Delta,
                                                          m_idm_integrators,
                                                          m_rod_properties,
@@ -627,7 +627,7 @@ struct TIDMIntegrators{
 
 
     std::shared_ptr<OSNI::ODESolverInterface> m_Delta_generalised_forces {
-        std::make_shared<DeltaGeneralisedForcesIntegrator>(m_idm_integrators->m_parameterisation_stack,
+        std::make_shared<DeltaGeneralisedForcesIntegrator>(m_parameterisation_stack,
                                                            m_Delta_internal_couples,
                                                            m_Delta_internal_forces,
                                                            m_rod_properties.m_rod_dimensions.m_L)

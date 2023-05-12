@@ -35,11 +35,10 @@ struct SpectralIntegrators {
                                                       t_number_of_Chebyshev_points)
             ),
           m_tidm_integrators(
-              std::make_shared<tidm_integrators::TIDMIntegrators>(t_strain_parameterisation_Delta,
-                                                                  t_polynomial_representation,
+              std::make_shared<tidm_integrators::TIDMIntegrators>(m_parameterisation_stack,
+                                                                  m_parameterisation_stack_Delta,
                                                                   m_idm_integrators,
-                                                                  t_rod_properties,
-                                                                  t_number_of_Chebyshev_points)
+                                                                  t_rod_properties)
             )
     {}
 

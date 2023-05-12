@@ -385,17 +385,13 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
 
 
 
-TIDMIntegrators::TIDMIntegrators(const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
-                                 const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                                 std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                                  const std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                                 const rod_properties::RodProperties t_rod_properties,
-                                 const unsigned int t_number_of_Chebyshev_points)
+                                 const rod_properties::RodProperties t_rod_properties)
     : m_rod_properties(t_rod_properties),
-      m_parameterisation_stack_Delta(
-          std::make_shared<ParameterisationStack>(t_strain_parameterisation_Delta,
-                                                  t_polynomial_representation,
-                                                  t_number_of_Chebyshev_points)
-          ),
+      m_parameterisation_stack(t_parameterisation_stack),
+      m_parameterisation_stack_Delta(t_parameterisation_stack_Delta),
       m_idm_integrators(t_idm_integrators)
 {}
 
