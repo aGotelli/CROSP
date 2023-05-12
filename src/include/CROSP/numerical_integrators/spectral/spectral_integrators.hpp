@@ -8,14 +8,15 @@
 namespace CROSP::spectral_integrators {
 
 
-struct SpectralIntegrator {
+struct SpectralIntegrators {
 
-    SpectralIntegrator(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
-                       const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
-                       const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                       const rod_properties::RodProperties t_rod_properties,
-                       const unsigned int t_number_of_Chebyshev_points)
-        : m_idm_integrators(
+    SpectralIntegrators(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
+                        const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
+                        const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                        const rod_properties::RodProperties t_rod_properties,
+                        const unsigned int t_number_of_Chebyshev_points)
+        : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+          m_idm_integrators(
               std::make_shared<idm_integrators::IDMIntegrators>(t_strain_parameterisation,
                                                                 t_polynomial_representation,
                                                                 t_rod_properties,
@@ -31,7 +32,7 @@ struct SpectralIntegrator {
     {}
 
 
-
+    unsigned int m_number_of_Chebyshev_points;
 
     std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators;
 
@@ -229,6 +230,33 @@ struct SpectralIntegrator {
                           m_tidm_integrators->m_Delta_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 
         return Delta_Lambda;
+    }
+
+
+    ::LieAlgebra::Vector6d getQaAtBase()const
+    {
+        return m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
+    }
+
+
+
+    LieAlgebra::Vector6d getDeltaQaAtBase()const
+    {
+        return m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
+    }
+
+
+    void updateIntegrationDomain(const double &t_rod_lenght)
+    {
+        m_idm_integrators->updateIntegrationDomain( t_rod_lenght );
+
+        m_tidm_integrators->updateIntegrationDomain( t_rod_lenght );
+    }
+
+
+    Eigen::MatrixXd getRodPositions()const
+    {
+        return m_idm_integrators->m_position->getStackAsMatrix();
     }
 
 
