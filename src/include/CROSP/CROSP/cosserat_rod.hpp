@@ -23,10 +23,13 @@
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
+#include <boost/numeric/odeint.hpp>
+
+#include "CROSP/numerical_integrators/cosserat_rod_integrators.hpp"
 #include "CROSP/numerical_integrators/spectral/spectral_integrators.hpp"
 
 
-#include <boost/numeric/odeint.hpp>
+
 
 
 namespace CROSP {
@@ -423,7 +426,7 @@ protected:
     unsigned int number_of_Chebyshev_points { 31 };
 
 
-    std::shared_ptr<numerical_integrators::spectral::SpectralIntegrators> m_integrators {
+    std::shared_ptr<numerical_integrators::CosseratRodIntegrators> m_integrators {
         std::make_shared<numerical_integrators::spectral::SpectralIntegrators>(m_strain_parameterisation,
                                                                                m_strain_parameterisation_Delta,
                                                                                m_polynomial_representation,

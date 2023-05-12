@@ -20,6 +20,9 @@ struct CosseratRodIntegrators {
     virtual ~CosseratRodIntegrators()=default;
 
 
+    virtual std::string printIntegratorProperties()const=0;
+
+
     virtual void updateParameterisation(const Eigen::VectorXd &t_qe,
                                         const Eigen::VectorXd &t_dot_qe,
                                         const Eigen::VectorXd &t_ddot_qe)=0;

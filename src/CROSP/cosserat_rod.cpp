@@ -359,7 +359,7 @@ void CosseratRod::printProperties()
     {   //  Strain parameterisation
     rod_properties << "Strain parameterisation : \n";
 
-    rod_properties << "     Number of Chebyshev points : " << m_integrators->m_number_of_Chebyshev_points << "\n";
+    rod_properties << m_integrators->printIntegratorProperties() << "\n";
 
        //  get the admitted deformations
     Eigen::VectorXi def(6);
