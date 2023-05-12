@@ -21,14 +21,14 @@ namespace CROSP::idm_integrators {
 
 
 
-QuaternionIntegrator::QuaternionIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+QuaternionIntegrator::QuaternionIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                            const double &t_upper_integration_limit,
                                            const Eigen::Vector4d &t_initial_condition)
     : OSNI::ODEA(4,
                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                 t_strain_parameterisation->m_number_of_Chebyshev_points,
+                 t_parameterisation_stack->m_number_of_Chebyshev_points,
                  t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation)
+      m_parameterisation_stack(t_parameterisation_stack)
 {
     this->setInitialConditions(t_initial_condition);
 }
@@ -49,15 +49,15 @@ Eigen::MatrixXd QuaternionIntegrator::computeMatrixAtChebyshevPoint(const unsign
 
 
 
-PositionIntegrator::PositionIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+PositionIntegrator::PositionIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                        std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                                        const double &t_upper_integration_limit,
                                        const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEb(3,
                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                 t_strain_parameterisation->m_number_of_Chebyshev_points,
+                 t_parameterisation_stack->m_number_of_Chebyshev_points,
                  t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation),
+      m_parameterisation_stack(t_parameterisation_stack),
       m_quaternion(t_quaternion_integrator)
 {
     this->setInitialConditions(t_initial_condition);
@@ -79,14 +79,14 @@ Eigen::VectorXd PositionIntegrator::computerParametersVectorAtPoint(const unsign
 
 
 
-AngularVelocityIntegrator::AngularVelocityIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+AngularVelocityIntegrator::AngularVelocityIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                                      const double &t_upper_integration_limit,
                                                      const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_parameterisation_stack->m_number_of_Chebyshev_points,
                   t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation)
+      m_parameterisation_stack(t_parameterisation_stack)
 {
     this->setInitialConditions(t_initial_condition);
 }
@@ -107,15 +107,15 @@ Eigen::VectorXd AngularVelocityIntegrator::computerParametersVectorAtPoint(const
 
 
 
-LinearVelocityIntegrator::LinearVelocityIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+LinearVelocityIntegrator::LinearVelocityIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                    const double &t_upper_integration_limit,
                                                    const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_parameterisation_stack->m_number_of_Chebyshev_points,
                   t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation),
+      m_parameterisation_stack(t_parameterisation_stack),
       m_angular_velocity(t_angular_velocity_integrator)
 {
     this->setInitialConditions(t_initial_condition);
@@ -141,15 +141,15 @@ Eigen::VectorXd LinearVelocityIntegrator::computerParametersVectorAtPoint(const 
 
 
 
-AngularAccelerationIntegrator::AngularAccelerationIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+AngularAccelerationIntegrator::AngularAccelerationIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                              const double &t_upper_integration_limit,
                                                              const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_parameterisation_stack->m_number_of_Chebyshev_points,
                   t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation),
+      m_parameterisation_stack(t_parameterisation_stack),
       m_angular_velocity(t_angular_velocity_integrator)
 {
     this->setInitialConditions(t_initial_condition);
@@ -177,7 +177,7 @@ Eigen::VectorXd AngularAccelerationIntegrator::computerParametersVectorAtPoint(c
 
 
 
-LinearAccelerationIntegrator::LinearAccelerationIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+LinearAccelerationIntegrator::LinearAccelerationIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
@@ -185,9 +185,9 @@ LinearAccelerationIntegrator::LinearAccelerationIntegrator(std::shared_ptr<const
                                                            const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_parameterisation_stack->m_number_of_Chebyshev_points,
                   t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation),
+      m_parameterisation_stack(t_parameterisation_stack),
       m_angular_velocity(t_angular_velocity_integrator),
       m_linear_velocity(t_linear_velocity_integrator),
       m_angular_acceleration(t_angular_acceleration_integrator)
@@ -216,7 +216,7 @@ Eigen::VectorXd LinearAccelerationIntegrator::computerParametersVectorAtPoint(co
 
 
 
-InternalForcesIntegrator::InternalForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+InternalForcesIntegrator::InternalForcesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
@@ -227,9 +227,9 @@ InternalForcesIntegrator::InternalForcesIntegrator(std::shared_ptr<const strain_
                                                    const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_parameterisation_stack->m_number_of_Chebyshev_points,
                   t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation),
+      m_parameterisation_stack(t_parameterisation_stack),
       m_rod_properties(t_rod_properties),
       m_angular_velocity(t_angular_velocity_integrator),
       m_linear_velocity(t_linear_velocity_integrator),
@@ -265,7 +265,7 @@ Eigen::VectorXd InternalForcesIntegrator::computerParametersVectorAtPoint(const 
 
 Eigen::VectorXd InternalForcesIntegrator::computeDistributedForce(const unsigned int t_point) const
 {
-    if(t_point == 0 or t_point == m_strain_parameterisation->m_number_of_Chebyshev_points-1)
+    if(t_point == 0 or t_point == m_parameterisation_stack->m_number_of_Chebyshev_points-1)
         return Eigen::Vector3d::Zero();
 
     Eigen::Vector4d q(m_quaternion->getStateAtPoint(t_point));
@@ -285,7 +285,7 @@ Eigen::VectorXd InternalForcesIntegrator::computeDistributedForce(const unsigned
 
 
 
-InternalCouplesIntegrator::InternalCouplesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+InternalCouplesIntegrator::InternalCouplesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                                      std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
@@ -297,9 +297,9 @@ InternalCouplesIntegrator::InternalCouplesIntegrator(std::shared_ptr<const strai
                                                      const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
                   ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                  t_strain_parameterisation->m_number_of_Chebyshev_points,
+                  t_parameterisation_stack->m_number_of_Chebyshev_points,
                   t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation),
+      m_parameterisation_stack(t_parameterisation_stack),
       m_rod_properties( t_rod_properties ),
       m_angular_velocity(t_angular_velocity_integrator),
       m_linear_velocity(t_linear_velocity_integrator),
@@ -339,19 +339,19 @@ Eigen::VectorXd InternalCouplesIntegrator::computeDistributedCouple(const unsign
 
 
 
-GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
                                                          const double &t_upper_integration_limit)
-    : OSNI::ODEb(t_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension(),
+    : OSNI::ODEb(t_parameterisation_stack->m_polynomial_representation.getCoordinatesDimension(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
-                 t_strain_parameterisation->m_number_of_Chebyshev_points,
+                 t_parameterisation_stack->m_number_of_Chebyshev_points,
                  t_upper_integration_limit),
-      m_strain_parameterisation(t_strain_parameterisation),
+      m_parameterisation_stack(t_parameterisation_stack),
       m_internal_couples_integrator(t_internal_couples_integrator),
       m_internal_forces_integrator(t_internal_forces_integrator)
 {
-    this->setInitialConditions( Eigen::VectorXd::Zero(t_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension()) );
+    this->setInitialConditions( Eigen::VectorXd::Zero(t_parameterisation_stack->m_polynomial_representation.getCoordinatesDimension()) );
 }
 
 Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
@@ -363,17 +363,78 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
     Gamma << C,
               N;
 
-    const Eigen::VectorXd b_at_point = -m_strain_parameterisation->m_map_to_strain_stack.at(t_point).transpose()*Gamma;
+    const Eigen::VectorXd b_at_point = -m_parameterisation_stack->m_map_to_strain_stack.at(t_point).transpose()*Gamma;
     return b_at_point;
 }
 
 
 
 
-IDMIntegrators::IDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                               std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
-    : m_strain_parameterisation(t_strain_parameterisation),
-      m_rod_properties(t_rod_properties)
+
+
+
+
+
+ParameterisationStack::ParameterisationStack(const strain_parameterisation::StrainParameterisation &t_strain_parameterisation,
+                                             const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                                             const unsigned int t_number_of_Chebyshev_points)
+    : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+      m_strain_parameterisation(t_strain_parameterisation),
+      m_polynomial_representation(t_polynomial_representation)
+{
+    //  Default initialisation with nominal strain
+    Eigen::VectorXd zeros = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension());
+    updateStacks(zeros, zeros, zeros);
+}
+
+
+
+
+void ParameterisationStack::updateStacks(const Eigen::VectorXd &t_qe,
+                                         const Eigen::VectorXd &t_dot_qe,
+                                         const Eigen::VectorXd &t_ddot_qe)
+{
+
+    ::LieAlgebra::Vector6d xi;
+    ::LieAlgebra::Vector6d dot_xi;
+    ::LieAlgebra::Vector6d ddot_xi;
+
+
+    for(unsigned int i=0; i<m_number_of_Chebyshev_points; i++){
+
+        xi      = m_map_to_strain_stack[i]*t_qe + m_strain_parameterisation.m_constant_strain;
+        dot_xi  = m_map_to_strain_stack[i]*t_dot_qe;
+        ddot_xi = m_map_to_strain_stack[i]*t_ddot_qe;
+
+        m_K_stack->at(i)      = xi.block<3,1>(0,0);
+        m_dot_K_stack->at(i)  = dot_xi.block<3,1>(0,0);
+        m_ddot_K_stack->at(i) = ddot_xi.block<3,1>(0,0);
+
+        m_Gamma_stack->at(i)      = xi.block<3,1>(3,0);
+        m_dot_Gamma_stack->at(i)  = dot_xi.block<3,1>(3,0);
+        m_ddot_Gamma_stack->at(i) = ddot_xi.block<3,1>(3,0);
+
+    }
+
+}
+
+
+
+
+
+
+
+
+IDMIntegrators::IDMIntegrators(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
+                               const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                               const rod_properties::RodProperties t_rod_properties,
+                               const unsigned int t_number_of_Chebyshev_points)
+    : m_rod_properties(t_rod_properties),
+      m_parameterisation_stack(
+          std::make_shared<ParameterisationStack>(t_strain_parameterisation,
+                                                  t_polynomial_representation,
+                                                  t_number_of_Chebyshev_points)
+          )
 {}
 
 void IDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_limit)

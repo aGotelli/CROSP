@@ -32,10 +32,108 @@ namespace CROSP::tidm_integrators {
 
 
 
+
+
+
+struct ParameterisationStack {
+
+
+    ParameterisationStack(const strain_parameterisation::StrainParameterisation &t_strain_parameterisation,
+                          const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
+                          const unsigned int t_number_of_Chebyshev_points);
+
+
+    /*!
+     * \brief updateStacks updates the stacks of strain and its first and second derivative
+     * \param t_qe the generalised elastic coordinates
+     * \param t_dot_qe the first derivative of the generalised elastic coordinates
+     * \param t_ddot_qe the second derivative of the generalised elastic coordinates
+     */
+    void updateStacks(const Eigen::VectorXd &t_qe,
+                      const Eigen::VectorXd &t_dot_qe,
+                      const Eigen::VectorXd &t_ddot_qe);
+
+
+
+    //  The number of Chebyshev points used to represent the rod
+    const unsigned int m_number_of_Chebyshev_points { 17 };
+
+
+    //  The strain parameterisation of the rod
+    strain_parameterisation::StrainParameterisation m_strain_parameterisation;
+
+    //  The polynomial representation of the field of strain
+    polynomial_representation::PolynomialRepresentation m_polynomial_representation;
+
+    //  The stacks for the strain, decomposed in angular and linear part
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+
+    //  The stacks for the first derivative of the strain, decomposed in angular and linear part
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Gamma_stack{
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+
+    //  The stacks for the first derivative of the strain, decomposed in angular and linear part
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack {
+        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
+    };
+
+
+
+
+
+
+
+    //  The vector stack of B Phi used to map the generalised coordinates into the strain field
+    std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [this](){
+
+        std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
+
+        std::vector<Eigen::MatrixXd> Phi_stack( m_number_of_Chebyshev_points );
+
+        const auto Chebyshev_points = ::Chebyshev::ComputeChebyshevPoints( m_number_of_Chebyshev_points );
+
+        std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
+            const auto Phi = m_polynomial_representation.getPhi( Chebyshev_points[index] );
+            index++;
+            return Phi;
+        });
+
+
+        std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
+            return m_polynomial_representation.m_B*Phi_stack[index++];
+        });
+
+        return map_to_strain_stack;
+    }() };
+
+
+};
+
+
+
+
+/*
+
+
+
+
+
 struct DeltaRotation : public OSNI::ODEAb {
 
-    DeltaRotation(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                  std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaRotation(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                  std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                   const double &t_upper_integration_limit=1.0f,
                   const Eigen::Vector3d &t_initial_condition=Eigen::Vector3d::Zero());
 
@@ -45,26 +143,26 @@ struct DeltaRotation : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-            m_strain_parameterisation->m_K_stack
+            m_parameterisation_stack->m_K_stack
         };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_strain_parameterisation_Delta->m_K_stack
+        m_parameterisation_stack_Delta->m_K_stack
     };
 };
 
 
 struct DeltaPosition : public OSNI::ODEAb {
 
-    DeltaPosition(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                  std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaPosition(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                  std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                   std::shared_ptr<const OSNI::ODESolverInterface> t_delta_rotation,
                   const double &t_upper_integration_limit=1.0f,
                   const Eigen::Vector3d &t_initial_condition=Eigen::Vector3d::Zero());
@@ -76,21 +174,21 @@ struct DeltaPosition : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation->m_K_stack
+        m_parameterisation_stack->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation->m_Gamma_stack
+        m_parameterisation_stack->m_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
-        m_strain_parameterisation_Delta->m_Gamma_stack
+        m_parameterisation_stack_Delta->m_Gamma_stack
     };
 
     //  Pointers to the needed previous integrator(s)
@@ -102,8 +200,8 @@ struct DeltaPosition : public OSNI::ODEAb {
 
 struct DeltaAngularVelocity : public OSNI::ODEAb {
 
-    DeltaAngularVelocity(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                         std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaAngularVelocity(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                         std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                          std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                          const double &t_upper_integration_limit=1.0f,
                          const Eigen::Vector3d &t_initial_condition=Eigen::Vector3d::Zero());
@@ -115,21 +213,21 @@ struct DeltaAngularVelocity : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation->m_K_stack
+        m_parameterisation_stack->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_strain_parameterisation_Delta->m_K_stack
+        m_parameterisation_stack_Delta->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack {
-        m_strain_parameterisation_Delta->m_dot_K_stack
+        m_parameterisation_stack_Delta->m_dot_K_stack
     };
 
 
@@ -146,8 +244,8 @@ struct DeltaAngularVelocity : public OSNI::ODEAb {
 
 struct DeltaLinearVelocity : public OSNI::ODEAb {
 
-    DeltaLinearVelocity(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                        std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaLinearVelocity(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                        std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                         std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                         std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                         const double &t_upper_integration_limit=1.0f,
@@ -160,27 +258,27 @@ struct DeltaLinearVelocity : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation->m_K_stack
+        m_parameterisation_stack->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_strain_parameterisation_Delta->m_K_stack
+        m_parameterisation_stack_Delta->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation->m_Gamma_stack
+        m_parameterisation_stack->m_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
-        m_strain_parameterisation_Delta->m_Gamma_stack
+        m_parameterisation_stack_Delta->m_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Gamma_stack {
-        m_strain_parameterisation_Delta->m_dot_Gamma_stack
+        m_parameterisation_stack_Delta->m_dot_Gamma_stack
     };
 
 
@@ -203,8 +301,8 @@ struct DeltaLinearVelocity : public OSNI::ODEAb {
 
 struct DeltaAngularAccelerations : public OSNI::ODEAb {
 
-    DeltaAngularAccelerations(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                              std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaAngularAccelerations(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                              std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                               std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                               const double &t_upper_integration_limit=1.0f,
@@ -217,27 +315,27 @@ struct DeltaAngularAccelerations : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation->m_K_stack
+        m_parameterisation_stack->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        m_strain_parameterisation->m_dot_K_stack
+        m_parameterisation_stack->m_dot_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_strain_parameterisation_Delta->m_K_stack
+        m_parameterisation_stack_Delta->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack {
-        m_strain_parameterisation_Delta->m_dot_K_stack
+        m_parameterisation_stack_Delta->m_dot_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_ddot_K_stack {
-        m_strain_parameterisation_Delta->m_ddot_K_stack
+        m_parameterisation_stack_Delta->m_ddot_K_stack
     };
 
 
@@ -260,8 +358,8 @@ struct DeltaAngularAccelerations : public OSNI::ODEAb {
 
 struct DeltaLinearAccelerations : public OSNI::ODEAb {
 
-    DeltaLinearAccelerations(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                             std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaLinearAccelerations(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                             std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                              std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_velocity_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_angular_acceleration_integrator,
@@ -276,40 +374,40 @@ struct DeltaLinearAccelerations : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation->m_K_stack
+        m_parameterisation_stack->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        m_strain_parameterisation->m_dot_K_stack
+        m_parameterisation_stack->m_dot_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_strain_parameterisation_Delta->m_K_stack
+        m_parameterisation_stack_Delta->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack {
-        m_strain_parameterisation_Delta->m_dot_K_stack
+        m_parameterisation_stack_Delta->m_dot_K_stack
     };
 
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation->m_Gamma_stack
+        m_parameterisation_stack->m_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
-        m_strain_parameterisation->m_dot_Gamma_stack
+        m_parameterisation_stack->m_dot_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
-        m_strain_parameterisation_Delta->m_Gamma_stack
+        m_parameterisation_stack_Delta->m_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Gamma_stack {
-        m_strain_parameterisation_Delta->m_dot_Gamma_stack
+        m_parameterisation_stack_Delta->m_dot_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_ddot_Gamma_stack {
-        m_strain_parameterisation_Delta->m_ddot_Gamma_stack
+        m_parameterisation_stack_Delta->m_ddot_Gamma_stack
     };
 
 
@@ -342,8 +440,8 @@ struct DeltaLinearAccelerations : public OSNI::ODEAb {
 
 struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
-    DeltaInternalForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                  std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaInternalForcesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                                  std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                                   std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                   std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                   std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
@@ -364,18 +462,18 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation->m_K_stack
+        m_parameterisation_stack->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_strain_parameterisation_Delta->m_K_stack
+        m_parameterisation_stack_Delta->m_K_stack
     };
 
 
@@ -423,8 +521,8 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
 struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 
-    DeltaInternalCouplesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                   std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    DeltaInternalCouplesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                                   std::shared_ptr<const ParameterisationStack> t_parameterisation_stack_Delta,
                                    std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_rotation_integrator,
@@ -447,24 +545,24 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Pointer to the perturbation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack_Delta;
 
 
     //  Storing pointers to direct access to the needed stacks
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation->m_K_stack
+        m_parameterisation_stack->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_strain_parameterisation_Delta->m_K_stack
+        m_parameterisation_stack_Delta->m_K_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation->m_Gamma_stack
+        m_parameterisation_stack->m_Gamma_stack
     };
     const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
-        m_strain_parameterisation_Delta->m_Gamma_stack
+        m_parameterisation_stack_Delta->m_Gamma_stack
     };
 
 
@@ -514,7 +612,7 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 
 struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
 
-    DeltaGeneralisedForcesIntegrator(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+    DeltaGeneralisedForcesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
                                      std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_couples_integrator,
                                      std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator,
                                      const double &t_upper_integration_limit=1.0f);
@@ -523,7 +621,7 @@ struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
 
 
     //  Pointer to the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
     //  Set of pointers to the other Delta integrators
     const std::shared_ptr<const OSNI::ODESolverInterface> m_Delta_internal_couples_integrator;
@@ -532,113 +630,114 @@ struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
 };
 
 
+*/
 
 
 struct TIDMIntegrators{
 
-    TIDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                    std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
-                    std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+    TIDMIntegrators(const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
+                    const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                    const std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
+                    const rod_properties::RodProperties t_rod_properties,
+                    const unsigned int t_number_of_Chebyshev_points);
 
 
-    //  Instance of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation;
+    //  Instance of the rod properties
+    rod_properties::RodProperties m_rod_properties;
 
     //  Instance of the variation of the strain parameterisation
-    const std::shared_ptr<const strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta;
+    std::shared_ptr<ParameterisationStack> m_parameterisation_stack_Delta;
 
     //  Instance of the IDM integrators
     const std::shared_ptr<const idm_integrators::IDMIntegrators> m_idm_integrators;
 
-    //  Instance of the rod properties
-    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
-
-
-
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_rotation {
-        std::make_shared<DeltaRotation>(m_strain_parameterisation,
-                                        m_strain_parameterisation_Delta,
-                                        m_rod_properties->m_rod_dimensions.m_L)
-    };
-
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_position {
-        std::make_shared<DeltaPosition>(m_strain_parameterisation,
-                                        m_strain_parameterisation_Delta,
-                                        m_Delta_rotation,
-                                        m_rod_properties->m_rod_dimensions.m_L)
-    };
-
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_velocity {
-        std::make_shared<DeltaAngularVelocity>(m_strain_parameterisation,
-                                               m_strain_parameterisation_Delta,
-                                               m_idm_integrators,
-                                               m_rod_properties->m_rod_dimensions.m_L)
-    };
-
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_linear_velocity {
-        std::make_shared<DeltaLinearVelocity>(m_strain_parameterisation,
-                                              m_strain_parameterisation_Delta,
-                                              m_idm_integrators,
-                                              m_Delta_angular_velocity,
-                                              m_rod_properties->m_rod_dimensions.m_L)
-    };
-
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_acceleration {
-        std::make_shared<DeltaAngularAccelerations>(m_strain_parameterisation,
-                                                    m_strain_parameterisation_Delta,
-                                                    m_idm_integrators,
-                                                    m_Delta_angular_velocity,
-                                                    m_rod_properties->m_rod_dimensions.m_L)
-    };
 
 
 
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_linear_acceleration {
-        std::make_shared<DeltaLinearAccelerations>(m_strain_parameterisation,
-                                                   m_strain_parameterisation_Delta,
-                                                   m_idm_integrators,
-                                                   m_Delta_angular_velocity,
-                                                   m_Delta_angular_acceleration,
-                                                   m_Delta_linear_velocity,
-                                                   m_rod_properties->m_rod_dimensions.m_L)
-    };
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_rotation {
+//        std::make_shared<DeltaRotation>(m_idm_integrators->m_parameterisation_stack,
+//                                        m_parameterisation_stack_Delta,
+//                                        m_rod_properties.m_rod_dimensions.m_L)
+//    };
+
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_position {
+//        std::make_shared<DeltaPosition>(m_idm_integrators->m_parameterisation_stack,
+//                                        m_parameterisation_stack_Delta,
+//                                        m_Delta_rotation,
+//                                        m_rod_properties.m_rod_dimensions.m_L)
+//    };
+
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_velocity {
+//        std::make_shared<DeltaAngularVelocity>(m_idm_integrators->m_parameterisation_stack,
+//                                               m_parameterisation_stack_Delta,
+//                                               m_idm_integrators,
+//                                               m_rod_properties.m_rod_dimensions.m_L)
+//    };
+
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_linear_velocity {
+//        std::make_shared<DeltaLinearVelocity>(m_idm_integrators->m_parameterisation_stack,
+//                                              m_parameterisation_stack_Delta,
+//                                              m_idm_integrators,
+//                                              m_Delta_angular_velocity,
+//                                              m_rod_properties.m_rod_dimensions.m_L)
+//    };
+
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_angular_acceleration {
+//        std::make_shared<DeltaAngularAccelerations>(m_idm_integrators->m_parameterisation_stack,
+//                                                    m_parameterisation_stack_Delta,
+//                                                    m_idm_integrators,
+//                                                    m_Delta_angular_velocity,
+//                                                    m_rod_properties.m_rod_dimensions.m_L)
+//    };
 
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_forces {
-        std::make_shared<DeltaInternalForcesIntegrator>(m_strain_parameterisation,
-                                                        m_strain_parameterisation_Delta,
-                                                        m_idm_integrators,
-                                                        m_rod_properties,
-                                                        m_Delta_rotation,
-                                                        m_Delta_angular_velocity,
-                                                        m_Delta_linear_velocity,
-                                                        m_Delta_linear_acceleration,
-                                                        m_rod_properties->m_rod_dimensions.m_L)
-    };
 
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_couples {
-        std::make_shared<DeltaInternalCouplesIntegrator>(m_strain_parameterisation,
-                                                         m_strain_parameterisation_Delta,
-                                                         m_idm_integrators,
-                                                         m_rod_properties,
-                                                         m_Delta_rotation,
-                                                         m_Delta_angular_velocity,
-                                                         m_Delta_angular_acceleration,
-                                                         m_Delta_linear_velocity,
-                                                         m_Delta_internal_forces,
-                                                         m_rod_properties->m_rod_dimensions.m_L)
-    };
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_linear_acceleration {
+//        std::make_shared<DeltaLinearAccelerations>(m_idm_integrators->m_parameterisation_stack,
+//                                                   m_parameterisation_stack_Delta,
+//                                                   m_idm_integrators,
+//                                                   m_Delta_angular_velocity,
+//                                                   m_Delta_angular_acceleration,
+//                                                   m_Delta_linear_velocity,
+//                                                   m_rod_properties.m_rod_dimensions.m_L)
+//    };
 
 
-    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_generalised_forces {
-        std::make_shared<DeltaGeneralisedForcesIntegrator>(m_strain_parameterisation,
-                                                           m_Delta_internal_couples,
-                                                           m_Delta_internal_forces,
-                                                           m_rod_properties->m_rod_dimensions.m_L)
-    };
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_forces {
+//        std::make_shared<DeltaInternalForcesIntegrator>(m_idm_integrators->m_parameterisation_stack,
+//                                                        m_parameterisation_stack_Delta,
+//                                                        m_idm_integrators,
+//                                                        m_rod_properties,
+//                                                        m_Delta_rotation,
+//                                                        m_Delta_angular_velocity,
+//                                                        m_Delta_linear_velocity,
+//                                                        m_Delta_linear_acceleration,
+//                                                        m_rod_properties.m_rod_dimensions.m_L)
+//    };
+
+
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_internal_couples {
+//        std::make_shared<DeltaInternalCouplesIntegrator>(m_idm_integrators->m_parameterisation_stack,
+//                                                         m_parameterisation_stack_Delta,
+//                                                         m_idm_integrators,
+//                                                         m_rod_properties,
+//                                                         m_Delta_rotation,
+//                                                         m_Delta_angular_velocity,
+//                                                         m_Delta_angular_acceleration,
+//                                                         m_Delta_linear_velocity,
+//                                                         m_Delta_internal_forces,
+//                                                         m_rod_properties.m_rod_dimensions.m_L)
+//    };
+
+
+//    std::shared_ptr<OSNI::ODESolverInterface> m_Delta_generalised_forces {
+//        std::make_shared<DeltaGeneralisedForcesIntegrator>(m_idm_integrators->m_parameterisation_stack,
+//                                                           m_Delta_internal_couples,
+//                                                           m_Delta_internal_forces,
+//                                                           m_rod_properties.m_rod_dimensions.m_L)
+//    };
 
 
 

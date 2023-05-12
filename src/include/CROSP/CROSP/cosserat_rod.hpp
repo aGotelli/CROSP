@@ -51,7 +51,8 @@ public:
      *
      * In this constructo the strain parameterisation is initialised by its defaul value
      */
-    CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
+    CosseratRod(const rod_properties::RodDimensions t_rod_dimensions,
+                const rod_properties::MaterialProperties t_material_properties);
 
 
     /*!
@@ -60,7 +61,7 @@ public:
      *
      * In this constructo the rod properties is initialised by its defaul value
      */
-    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
+    CosseratRod(const strain_parameterisation::StrainParameterisation t_strain_parameterisation);
 
 
     /*!
@@ -68,8 +69,10 @@ public:
      * \param t_strain_parameterisation is the sef of desiderd parameterisation of the rod strain field as a ::CROSP::strain_parameterisation::StrainParameterisation object
      * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
      */
-    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
+    CosseratRod(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
+                const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                const rod_properties::RodDimensions t_rod_dimensions,
+                const rod_properties::MaterialProperties t_material_properties);
 
 
 
@@ -323,7 +326,7 @@ public:
      * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
      * \return the dimension of the rod parameterisation, namely ne*na
      */
-    inline unsigned int getCoordinatesDimension()const {return m_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension();}
+    inline unsigned int getCoordinatesDimension()const {return m_polynomial_representation.getCoordinatesDimension();}
 
     /*!
      * \brief getStaticEquilibrium returns the static equilibrium of the rod Kee*qe - Q
@@ -359,7 +362,7 @@ public:
      * The rows are ordered so that the first correspond to the initial position at X = 0 and the last contains the position at X = 1.
      *
      */
-    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
+//    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
 
 
     /*!
@@ -395,41 +398,42 @@ protected:
 
 
     //  Representation of the rod via strain
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
-        std::make_shared<strain_parameterisation::StrainParameterisation>()
-    };
+    strain_parameterisation::StrainParameterisation m_strain_parameterisation;
 
-//#ifndef DEVELOPER
-//private:
-//#endif
+    //  Representation of the rod via strain
+    polynomial_representation::PolynomialRepresentation m_polynomial_representation;
+
+
+
+    rod_properties::RodDimensions m_rod_dimensions;
+    rod_properties::MaterialProperties m_material_properties;
 
     //  The set of rod properties
-    std::shared_ptr<rod_properties::RodProperties> m_rod_properties {
-        std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation)
+    rod_properties::RodProperties m_rod_properties {
+        rod_properties::RodProperties(m_polynomial_representation, m_rod_dimensions, m_material_properties)
     };
 
 
 
     //  Variables related the perturbation of the strain parameterisation
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
-        std::make_shared<strain_parameterisation::StrainParameterisation>(m_strain_parameterisation,
-                                                                          ::LieAlgebra::Vector6d::Zero())
+    strain_parameterisation::StrainParameterisation m_strain_parameterisation_Delta {
+        strain_parameterisation::StrainParameterisation(::LieAlgebra::Vector6d::Zero())
     };
 
 
-    //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
-        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
-                                                          m_rod_properties )
-    };
+//    //  The set of integrators needed for the IDM
+//    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
+//        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
+//                                                          m_rod_properties )
+//    };
 
-    //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
-        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
-                                                            m_strain_parameterisation_Delta,
-                                                            m_idm_integrators,
-                                                            m_rod_properties)
-    };
+//    //  The set of integrators needed for the TIDM
+//    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
+//        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
+//                                                            m_strain_parameterisation_Delta,
+//                                                            m_idm_integrators,
+//                                                            m_rod_properties)
+//    };
 
 
 };

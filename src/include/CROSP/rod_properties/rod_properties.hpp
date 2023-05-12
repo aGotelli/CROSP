@@ -187,10 +187,7 @@ class RodProperties {
 public:
 
 
-    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
-
-
-    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+    RodProperties(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                   const RodDimensions &t_rod_dimensions,
                   const MaterialProperties &t_material_properties);
 
@@ -296,7 +293,7 @@ private:
      * \param t_B the map matrix to map the allowed strains in the space of the full strain
      * \return
      */
-    Eigen::MatrixXd defineKee(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)const;
+    Eigen::MatrixXd defineKee(const polynomial_representation::PolynomialRepresentation t_polynomial_representation)const;
 
 
     double gamma = 9.81;
