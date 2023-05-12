@@ -41,7 +41,7 @@ if(GTest_FOUND)
   message(STATUS "Building tests")
   enable_testing()
 
-  #add_subdirectory(tests)
+  add_subdirectory(tests)
 
 endif(GTest_FOUND)
 
