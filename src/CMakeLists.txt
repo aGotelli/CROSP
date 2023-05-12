@@ -114,6 +114,10 @@ add_library(${PROJECT_NAME} SHARED
                             numerical_integrators/spectral/parameterisation_stack.cpp
 
 
+                            include/${PROJECT_NAME}/numerical_integrators/runge_kutta/runge_kutta_integrator.hpp
+                            numerical_integrators/runge_kutta/runge_kutta_integrator.cpp
+
+
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
