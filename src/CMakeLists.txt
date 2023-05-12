@@ -105,6 +105,8 @@ add_library(${PROJECT_NAME} SHARED
                             rod_properties/rod_properties.cpp
                             include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
                             strain_parameterisation/strain_parameterisation.cpp
+                            include/${PROJECT_NAME}/idm_integrators/parameterisation_stack.hpp
+                            idm_integrators/parameterisation_stack.cpp
                             include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
                             idm_integrators/idm_integrators.cpp
                             include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp

@@ -362,7 +362,7 @@ public:
      * The rows are ordered so that the first correspond to the initial position at X = 0 and the last contains the position at X = 1.
      *
      */
-//    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
+    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
 
 
     /*!
@@ -432,13 +432,14 @@ protected:
                                                           number_of_Chebyshev_points)
     };
 
-//    //  The set of integrators needed for the TIDM
-//    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
-//        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
-//                                                            m_strain_parameterisation_Delta,
-//                                                            m_idm_integrators,
-//                                                            m_rod_properties)
-//    };
+    //  The set of integrators needed for the TIDM
+    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
+        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation_Delta,
+                                                            m_polynomial_representation,
+                                                            m_idm_integrators,
+                                                            m_rod_properties,
+                                                            number_of_Chebyshev_points)
+    };
 
 
 };
