@@ -1,6 +1,6 @@
 #include "CROSP/numerical_integrators/spectral/parameterisation_stack.hpp"
 
-namespace CROSP::spectral_integrators {
+namespace CROSP::numerical_integrators::spectral {
 
 
 
@@ -53,4 +53,4 @@ void ParameterisationStack::updateStacks(const Eigen::VectorXd &t_qe,
 
 
 
-}   //  namespace   CROSP::spectral_integrators
+}   //  namespace   CROSP::numerical_integrators::spectral

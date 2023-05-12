@@ -14,7 +14,7 @@
 
 
 
-namespace CROSP::spectral_integrators::idm_integrators {
+namespace CROSP::numerical_integrators::spectral::idm_integrators {
 
 
 
@@ -411,4 +411,4 @@ void IDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_l
 
 
 
-}   //  namespace CROSP::spectral_integrators::IDMIntegrators
+}   //  namespace CROSP::numerical_integrators::spectral::idm_integrators

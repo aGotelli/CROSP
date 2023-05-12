@@ -17,7 +17,7 @@
 #include "idm_integrators.hpp"
 
 
-namespace CROSP::spectral_integrators::tidm_integrators {
+namespace CROSP::numerical_integrators::spectral::tidm_integrators {
 
 
 
@@ -643,6 +643,6 @@ struct TIDMIntegrators{
     void updateIntegrationDomain(const double &t_upper_integration_limit=1.0f);
 };
 
-}   //  namespace CROSP
+}   //  namespace CROSP::numerical_integrators::spectral::tidm_integrators
 
 #endif // TIDM_INTEGRATORS_HPP

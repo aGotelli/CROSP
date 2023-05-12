@@ -8,7 +8,7 @@
 #include "idm_integrators.hpp"
 #include "tidm_integrators.hpp"
 
-namespace CROSP::spectral_integrators {
+namespace CROSP::numerical_integrators::spectral {
 
 
 struct SpectralIntegrators {
@@ -280,7 +280,7 @@ struct SpectralIntegrators {
 
 
 
-}   //  namespace CROSP::spectral_integrator
+}   //  CROSP::numerical_integrators::spectral
 
 
 

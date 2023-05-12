@@ -423,12 +423,12 @@ protected:
     unsigned int number_of_Chebyshev_points { 31 };
 
 
-    std::shared_ptr<spectral_integrators::SpectralIntegrators> m_integrators {
-        std::make_shared<spectral_integrators::SpectralIntegrators>(m_strain_parameterisation,
-                                                                    m_strain_parameterisation_Delta,
-                                                                    m_polynomial_representation,
-                                                                    m_rod_properties,
-                                                                    number_of_Chebyshev_points)
+    std::shared_ptr<numerical_integrators::spectral::SpectralIntegrators> m_integrators {
+        std::make_shared<numerical_integrators::spectral::SpectralIntegrators>(m_strain_parameterisation,
+                                                                               m_strain_parameterisation_Delta,
+                                                                               m_polynomial_representation,
+                                                                               m_rod_properties,
+                                                                               number_of_Chebyshev_points)
     };
 
 };

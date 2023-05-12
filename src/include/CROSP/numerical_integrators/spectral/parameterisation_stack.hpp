@@ -8,7 +8,7 @@
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
-namespace CROSP::spectral_integrators {
+namespace CROSP::numerical_integrators::spectral {
 
 
 struct ParameterisationStack {
@@ -99,7 +99,7 @@ struct ParameterisationStack {
 
 };
 
-}   //  namespace   CROSP::spectral_integrators
+}   //  namespace   CROSP::numerical_integrators::spectral
 
 
 

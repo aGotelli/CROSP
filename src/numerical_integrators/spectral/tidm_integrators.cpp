@@ -12,7 +12,7 @@
 
 #include "CROSP/numerical_integrators/spectral/tidm_integrators.hpp"
 
-namespace CROSP::spectral_integrators::tidm_integrators {
+namespace CROSP::numerical_integrators::spectral::tidm_integrators {
 
 
 
@@ -418,4 +418,4 @@ void TIDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_
 
 
 
-}   //  namespace CROSP::spectral_integrators::tidm_integrators
+}   //  namespace CROSP::numerical_integrators::spectral::tidm_integrators
