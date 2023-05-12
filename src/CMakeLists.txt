@@ -111,6 +111,16 @@ add_library(${PROJECT_NAME} SHARED
                             idm_integrators/idm_integrators.cpp
                             include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
                             tidm_integrators/tidm_integrators.cpp
+
+                            include/${PROJECT_NAME}/numerical_integrators/spectral/spectral_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral/idm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral/tidm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral/parameterisation_stack.hpp
+                            numerical_integrators/spectral/idm_integrators.cpp
+                            numerical_integrators/spectral/tidm_integrators.cpp
+                            numerical_integrators/spectral/parameterisation_stack.cpp
+
+
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
