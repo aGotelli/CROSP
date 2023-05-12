@@ -95,22 +95,13 @@ add_library(${PROJECT_NAME} SHARED
                             ${PROJECT_NAME}/cosserat_rod.cpp
 #                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
 #                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
-#                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
-#                            static_initialiser/static_initialiser.cpp
-#                            include/CROSP/CROSP/internal_actuation.hpp
-#                            ${PROJECT_NAME}/internal_actuation.cpp
+#
                             include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
                             polynomial_representation/polynomial_representation.cpp
                             include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
                             rod_properties/rod_properties.cpp
                             include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
                             strain_parameterisation/strain_parameterisation.cpp
-#                            include/${PROJECT_NAME}/idm_integrators/parameterisation_stack.hpp
-#                            idm_integrators/parameterisation_stack.cpp
-#                            include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
-#                            idm_integrators/idm_integrators.cpp
-#                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
-#                            tidm_integrators/tidm_integrators.cpp
 
                             include/${PROJECT_NAME}/numerical_integrators/spectral/spectral_integrators.hpp
                             include/${PROJECT_NAME}/numerical_integrators/spectral/idm_integrators.hpp
@@ -118,7 +109,7 @@ add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/numerical_integrators/spectral/parameterisation_stack.hpp
                             numerical_integrators/spectral/idm_integrators.cpp
                             numerical_integrators/spectral/tidm_integrators.cpp
-#                            numerical_integrators/spectral/parameterisation_stack.cpp
+                            numerical_integrators/spectral/parameterisation_stack.cpp
 
 
 )
