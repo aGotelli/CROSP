@@ -103,6 +103,8 @@ add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
                             strain_parameterisation/strain_parameterisation.cpp
 
+                            include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
+
                             include/${PROJECT_NAME}/numerical_integrators/spectral/spectral_integrators.hpp
                             include/${PROJECT_NAME}/numerical_integrators/spectral/idm_integrators.hpp
                             include/${PROJECT_NAME}/numerical_integrators/spectral/tidm_integrators.hpp
