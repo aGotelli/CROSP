@@ -13,7 +13,7 @@ RodDimensions::RodDimensions(CrossSection* t_cross_section, const double &t_L)
 
 RodDimensions::~RodDimensions()
 {
-    delete m_cross_section;
+//    delete m_cross_section;
 }
 
 

@@ -384,17 +384,13 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
 
 
 
-IDMIntegrators::IDMIntegrators(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
-                               const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                               const rod_properties::RodProperties t_rod_properties,
-                               const unsigned int t_number_of_Chebyshev_points)
-    : m_rod_properties(t_rod_properties),
-      m_parameterisation_stack(
-          std::make_shared<ParameterisationStack>(t_strain_parameterisation,
-                                                  t_polynomial_representation,
-                                                  t_number_of_Chebyshev_points)
-          )
+IDMIntegrators::IDMIntegrators(const std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                               const rod_properties::RodProperties t_rod_properties)
+    : m_rod_properties( t_rod_properties ),
+      m_parameterisation_stack( t_parameterisation_stack )
 {}
+
+
 
 void IDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_limit)
 {

@@ -13,19 +13,8 @@
 #ifndef TIDM_INTEGRATORS_HPP
 #define TIDM_INTEGRATORS_HPP
 
-#include <memory>
-#include <vector>
 
-#include "OSNI/OSNI.hpp"
-
-#include "CROSP/polynomial_representation/polynomial_representation.hpp"
-
-
-#include "CROSP/rod_properties/rod_properties.hpp"
-
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
-#include "CROSP/idm_integrators/idm_integrators.hpp"
-
+#include "idm_integrators.hpp"
 
 
 namespace CROSP::spectral_integrators::tidm_integrators {

@@ -1,6 +1,9 @@
 #ifndef SPECTRAL_INTEGRATORS_HPP
 #define SPECTRAL_INTEGRATORS_HPP
 
+#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+#include "CROSP/rod_properties/rod_properties.hpp"
+
 #include "parameterisation_stack.hpp"
 #include "idm_integrators.hpp"
 #include "tidm_integrators.hpp"
@@ -15,27 +18,39 @@ struct SpectralIntegrators {
                         const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                         const rod_properties::RodProperties t_rod_properties,
                         const unsigned int t_number_of_Chebyshev_points)
-        : m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+        :
+          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+          m_parameterisation_stack(
+            std::make_shared<ParameterisationStack>(t_strain_parameterisation,
+                                                    t_polynomial_representation,
+                                                    t_number_of_Chebyshev_points)
+            ),
           m_idm_integrators(
-              std::make_shared<idm_integrators::IDMIntegrators>(t_strain_parameterisation,
-                                                                t_polynomial_representation,
-                                                                t_rod_properties,
-                                                                t_number_of_Chebyshev_points)
+              std::make_shared<idm_integrators::IDMIntegrators>(m_parameterisation_stack,
+                                                                t_rod_properties)
               ),
+          m_parameterisation_stack_Delta(
+              std::make_shared<ParameterisationStack>(t_strain_parameterisation_Delta,
+                                                      t_polynomial_representation,
+                                                      t_number_of_Chebyshev_points)
+            ),
           m_tidm_integrators(
               std::make_shared<tidm_integrators::TIDMIntegrators>(t_strain_parameterisation_Delta,
                                                                   t_polynomial_representation,
                                                                   m_idm_integrators,
                                                                   t_rod_properties,
                                                                   t_number_of_Chebyshev_points)
-              )
+            )
     {}
 
 
     unsigned int m_number_of_Chebyshev_points;
 
+    std::shared_ptr<ParameterisationStack> m_parameterisation_stack;
+
     std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators;
 
+    std::shared_ptr<ParameterisationStack> m_parameterisation_stack_Delta;
 
     std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators;
 
@@ -44,7 +59,7 @@ struct SpectralIntegrators {
                                 const Eigen::VectorXd &t_dot_qe,
                                 const Eigen::VectorXd &t_ddot_qe)
     {
-        m_idm_integrators->m_parameterisation_stack->updateStacks(t_qe, t_dot_qe, t_ddot_qe);
+        m_parameterisation_stack->updateStacks(t_qe, t_dot_qe, t_ddot_qe);
     }
 
 
@@ -93,7 +108,7 @@ struct SpectralIntegrators {
                                     const Eigen::VectorXd &t_Delta_dot_qe,
                                     const Eigen::VectorXd &t_Delta_ddot_qe)
     {
-        m_tidm_integrators->m_parameterisation_stack_Delta->updateStacks(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
+        m_parameterisation_stack_Delta->updateStacks(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
     }
 
     void forwardTangentKinematics()
@@ -207,6 +222,7 @@ struct SpectralIntegrators {
         m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip);
 
         m_tidm_integrators->m_Delta_generalised_forces->solveSystem();
+
     }
 
 

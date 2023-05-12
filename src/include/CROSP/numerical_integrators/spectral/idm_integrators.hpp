@@ -16,17 +16,15 @@
 
 #include <memory>
 
-#include "CROSP/rod_properties/rod_properties.hpp"
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
-
 #include "OSNI/OSNI.hpp"
+
+#include "parameterisation_stack.hpp"
+#include "CROSP/rod_properties/rod_properties.hpp"
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
-#include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 
-#include "parameterisation_stack.hpp"
 
 /// \brief CROSP::spectral_integrator::idm_integrators is the namespace containing the integrators for the IDM
 namespace CROSP::spectral_integrators::idm_integrators {
@@ -375,16 +373,14 @@ struct GeneralisedForcesIntegrator : public OSNI::ODEb {
  */
 struct IDMIntegrators {
 
-    IDMIntegrators(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
-                   const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                   const rod_properties::RodProperties t_rod_properties,
-                   const unsigned int t_number_of_Chebyshev_points);
+    IDMIntegrators(const std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
+                   const rod_properties::RodProperties t_rod_properties);
 
 
     //  Instance of the rod properties
     rod_properties::RodProperties m_rod_properties;
 
-    std::shared_ptr<ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
 
     //  Integrator for the quaternions
