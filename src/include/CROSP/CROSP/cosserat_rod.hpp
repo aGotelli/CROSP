@@ -421,11 +421,16 @@ protected:
     };
 
 
-//    //  The set of integrators needed for the IDM
-//    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
-//        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
-//                                                          m_rod_properties )
-//    };
+    unsigned int number_of_Chebyshev_points { 31 };
+
+
+    //  The set of integrators needed for the IDM
+    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
+        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
+                                                          m_polynomial_representation,
+                                                          m_rod_properties,
+                                                          number_of_Chebyshev_points)
+    };
 
 //    //  The set of integrators needed for the TIDM
 //    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {

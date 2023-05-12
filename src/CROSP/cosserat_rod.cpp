@@ -402,13 +402,13 @@ Eigen::VectorXd CosseratRod::getQad()const
 
 Eigen::MatrixXd CosseratRod::getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)const
 {
-    auto rod = *this;
+//    auto rod = *this;
 
-    rod.updateParameterisation(t_qe, 0*t_qe, 0*t_qe);
+//    rod.updateParameterisation(t_qe, 0*t_qe, 0*t_qe);
 
-    rod.forwardKinematics();
+//    rod.forwardKinematics();
 
-    return rod.getRodPositionsAtChebyshevPoints();
+//    return rod.getRodPositionsAtChebyshevPoints();
 }
 
 

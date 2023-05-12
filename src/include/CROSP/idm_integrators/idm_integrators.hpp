@@ -342,13 +342,12 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
 struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     InternalForcesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
-                             std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                             const rod_properties::RodProperties t_rod_properties,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                              std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
-                             const double &t_upper_integration_limit=1.0f,
                              const Eigen::Vector3d &t_initial_condition=Eigen::Vector3d::Zero());
 
 
@@ -364,25 +363,25 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
 
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_parameterisation_stack->m_K_stack
     };
 
-    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
+    rod_properties::RodProperties m_rod_properties;
 
-    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
+    Eigen::Matrix3d m_M_linear { m_rod_properties.getMLinear() };
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_acceleration;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_linear_acceleration;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_position;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_position;
 
 };
 
@@ -390,14 +389,13 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
     InternalCouplesIntegrator(std::shared_ptr<const ParameterisationStack> t_parameterisation_stack,
-                              std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                              const rod_properties::RodProperties t_rod_properties,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_position_integrator,
                               std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
-                              const double &t_upper_integration_limit=1.0f,
                               const Eigen::Vector3d &t_initial_condition=Eigen::Vector3d::Zero());
 
 
@@ -412,33 +410,33 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
     virtual Eigen::VectorXd computeDistributedCouple(const unsigned int) const;
 
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_parameterisation_stack->m_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
         m_parameterisation_stack->m_Gamma_stack
     };
 
-    const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
+    rod_properties::RodProperties m_rod_properties;
 
-    const Eigen::Matrix3d m_M_angular { m_rod_properties->getMAngular() };
+    Eigen::Matrix3d m_M_angular { m_rod_properties.getMAngular() };
 
-    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
+    Eigen::Matrix3d m_M_linear { m_rod_properties.getMLinear() };
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_acceleration;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_angular_acceleration;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_position;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_position;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_internal_forces;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_internal_forces;
 
 };
 
@@ -485,81 +483,79 @@ struct IDMIntegrators {
     std::shared_ptr<ParameterisationStack> m_parameterisation_stack;
 
 
-//    //  Integrator for the quaternions
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_quaternion {
-//        std::make_shared<QuaternionIntegrator>(m_parameterisation_stack,
-//                                               m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the quaternions
+    const std::shared_ptr<OSNI::ODESolverInterface> m_quaternion {
+        std::make_shared<QuaternionIntegrator>(m_parameterisation_stack,
+                                               m_rod_properties.m_rod_dimensions.m_L)
+    };
 
-//    //  Integrator for the positions
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_position {
-//        std::make_shared<PositionIntegrator>(m_parameterisation_stack,
-//                                             m_quaternion,
-//                                             m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the positions
+    const std::shared_ptr<OSNI::ODESolverInterface> m_position {
+        std::make_shared<PositionIntegrator>(m_parameterisation_stack,
+                                             m_quaternion,
+                                             m_rod_properties.m_rod_dimensions.m_L)
+    };
 
-//    //  Integrator for the angular velocities
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity {
-//        std::make_shared<AngularVelocityIntegrator>(m_parameterisation_stack,
-//                                                    m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the angular velocities
+    const std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity {
+        std::make_shared<AngularVelocityIntegrator>(m_parameterisation_stack,
+                                                    m_rod_properties.m_rod_dimensions.m_L)
+    };
 
-//    //  Integrator for the linear velocities
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity {
-//        std::make_shared<LinearVelocityIntegrator>(m_parameterisation_stack,
-//                                                   m_angular_velocity,
-//                                                   m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the linear velocities
+    const std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity {
+        std::make_shared<LinearVelocityIntegrator>(m_parameterisation_stack,
+                                                   m_angular_velocity,
+                                                   m_rod_properties.m_rod_dimensions.m_L)
+    };
 
-//    //  Integrator for the angular accelerations
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration {
-//        std::make_shared<AngularAccelerationIntegrator>(m_parameterisation_stack,
-//                                                        m_angular_velocity,
-//                                                        m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the angular accelerations
+    const std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration {
+        std::make_shared<AngularAccelerationIntegrator>(m_parameterisation_stack,
+                                                        m_angular_velocity,
+                                                        m_rod_properties.m_rod_dimensions.m_L)
+    };
 
-//    //  Integrator for the linear accelerations
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration {
-//        std::make_shared<LinearAccelerationIntegrator>(m_parameterisation_stack,
-//                                                       m_angular_velocity,
-//                                                       m_linear_velocity,
-//                                                       m_angular_acceleration,
-//                                                       m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the linear accelerations
+    const std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration {
+        std::make_shared<LinearAccelerationIntegrator>(m_parameterisation_stack,
+                                                       m_angular_velocity,
+                                                       m_linear_velocity,
+                                                       m_angular_acceleration,
+                                                       m_rod_properties.m_rod_dimensions.m_L)
+    };
 
 
-//    //  Integrator for the internal forces
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces {
-//        std::make_shared<InternalForcesIntegrator>(m_parameterisation_stack,
-//                                                   m_rod_properties,
-//                                                   m_angular_velocity,
-//                                                   m_linear_velocity,
-//                                                   m_linear_acceleration,
-//                                                   m_quaternion,
-//                                                   m_position,
-//                                                   m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the internal forces
+    const std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces {
+        std::make_shared<InternalForcesIntegrator>(m_parameterisation_stack,
+                                                   m_rod_properties,
+                                                   m_angular_velocity,
+                                                   m_linear_velocity,
+                                                   m_linear_acceleration,
+                                                   m_quaternion,
+                                                   m_position)
+    };
 
-//    //  Integrator for the internal couples
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples {
-//        std::make_shared<InternalCouplesIntegrator>(m_parameterisation_stack,
-//                                                    m_rod_properties,
-//                                                    m_angular_velocity,
-//                                                    m_linear_velocity,
-//                                                    m_angular_acceleration,
-//                                                    m_quaternion,
-//                                                    m_position,
-//                                                    m_internal_forces,
-//                                                    m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the internal couples
+    const std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples {
+        std::make_shared<InternalCouplesIntegrator>(m_parameterisation_stack,
+                                                    m_rod_properties,
+                                                    m_angular_velocity,
+                                                    m_linear_velocity,
+                                                    m_angular_acceleration,
+                                                    m_quaternion,
+                                                    m_position,
+                                                    m_internal_forces)
+    };
 
-//    //  Integrator for the generalised coordinates
-//    const std::shared_ptr<OSNI::ODESolverInterface> m_generalised_forces {
-//        std::make_unique<GeneralisedForcesIntegrator>(m_parameterisation_stack,
-//                                                      m_internal_couples,
-//                                                      m_internal_forces,
-//                                                      m_rod_properties.m_rod_dimensions.m_L)
-//    };
+    //  Integrator for the generalised coordinates
+    const std::shared_ptr<OSNI::ODESolverInterface> m_generalised_forces {
+        std::make_unique<GeneralisedForcesIntegrator>(m_parameterisation_stack,
+                                                      m_internal_couples,
+                                                      m_internal_forces,
+                                                      m_rod_properties.m_rod_dimensions.m_L)
+    };
 
 
     /*!

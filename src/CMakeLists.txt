@@ -93,8 +93,8 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp
-                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
-                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
+#                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
+#                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
 #                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
 #                            static_initialiser/static_initialiser.cpp
 #                            include/CROSP/CROSP/internal_actuation.hpp
