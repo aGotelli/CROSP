@@ -64,20 +64,7 @@ public:
         m_Delta_ddot_qe = t_Delta_ddot_qe;
     }
 
-    virtual void forwardTangentKinematics() final
-    {
-//        //  Integrate Delta zeta
-//        m_tidm_integrators->m_Delta_rotation->solveSystem();
-//        m_tidm_integrators->m_Delta_position->solveSystem();
-
-//        //  Integrate Delta eta
-//        m_tidm_integrators->m_Delta_angular_velocity->solveSystem();
-//        m_tidm_integrators->m_Delta_linear_velocity->solveSystem();
-
-//        //  Integrate Delta dot eta
-//        m_tidm_integrators->m_Delta_angular_acceleration->solveSystem();
-//        m_tidm_integrators->m_Delta_linear_acceleration->solveSystem();
-    }
+    virtual void forwardTangentKinematics() final;
 
 
     virtual void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
@@ -85,21 +72,7 @@ public:
                                           const Eigen::Vector3d &t_initial_Delta_angular_velocity,
                                           const Eigen::Vector3d &t_initial_Delta_linear_velocity,
                                           const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
-                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration) final
-    {
-//        //  Integrate Delta zeta
-//        m_tidm_integrators->m_Delta_rotation->integrate( t_initial_Delta_orientation );
-//        m_tidm_integrators->m_Delta_position->integrate( t_initial_Delta_position );
-
-//        //  Integrate Delta eta
-//        m_tidm_integrators->m_Delta_angular_velocity->integrate( t_initial_Delta_angular_velocity );
-//        m_tidm_integrators->m_Delta_linear_velocity->integrate( t_initial_Delta_linear_velocity );
-
-//        //  Integrate Delta dot eta
-//        m_tidm_integrators->m_Delta_angular_acceleration->integrate( t_initial_Delta_angular_acceleration );
-//        m_tidm_integrators->m_Delta_linear_acceleration->integrate( t_initial_Delta_linear_acceleration );
-
-    }
+                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration) final;
 
 
 
@@ -162,19 +135,7 @@ public:
 
 
 
-    virtual void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1) final
-    {
-
-//        Eigen::Vector3d Delta_couple_at_tip = t_Delta_Lambda_X1.block<3, 1>(0, 0);
-//        Eigen::Vector3d Delta_force_at_tip  = t_Delta_Lambda_X1.block<3, 1>(3, 0);
-
-
-//        m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip);
-//        m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip);
-
-//        m_tidm_integrators->m_Delta_generalised_forces->solveSystem();
-
-    }
+    virtual void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1) final;
 
 
 
@@ -254,10 +215,7 @@ private:
 
 
 
-    Eigen::VectorXd m_forward_integration_state_X0 { Eigen::VectorXd::Zero(19) };
-    Eigen::VectorXd m_forward_integration_state_X1 { Eigen::VectorXd::Zero(19) };
 
-    Eigen::VectorXd m_backward_integration_state_X0 { Eigen::VectorXd::Zero(25+m_ne) };
 
 
     Eigen::VectorXd m_qe { Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension()) };
@@ -272,16 +230,74 @@ private:
 
 
 
-    void forwardODEs(const Eigen::VectorXd &t_y,
-                     Eigen::VectorXd &t_dyds,
-                     const double t_s) const;
+    //  Define a compiled time known dimension for the state of the pose (quaternion + position)
+    typedef Eigen::Matrix<double, 7, 1> PoseState;
+
+    typedef Eigen::Matrix<double, 19, 1> ForwardKinematicState;
+
+    ForwardKinematicState m_forward_integration_state_X0 { ForwardKinematicState::Zero() };
+    ForwardKinematicState m_forward_integration_state_X1 { ForwardKinematicState::Zero() };
 
 
-    void backwardODEs(const Eigen::VectorXd &t_y,
-                      Eigen::VectorXd &t_dyds,
-                      const double t_s)const;
+
+    Eigen::VectorXd m_backward_integration_state_X0 { Eigen::VectorXd::Zero(25+m_ne) };
+    Eigen::VectorXd m_backward_integration_state_X1 { Eigen::VectorXd::Zero(25+m_ne) };
 
 
+    PoseState forwardStaticODEs(const RungeKuttaIntegrator::PoseState &t_state,
+                                const ::LieAlgebra::Vector6d &t_Xi) const;
+
+
+
+    ForwardKinematicState forwardODEs(const ForwardKinematicState &t_state,
+                                      const ::LieAlgebra::Vector6d &t_Xi,
+                                      const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                      const ::LieAlgebra::Vector6d &t_ddot_Xi) const;
+
+
+
+    ::LieAlgebra::Vector6d getLambdaPrime(const Eigen::Quaterniond &t_Q,
+                                          const ::LieAlgebra::Vector6d &t_Lambda,
+                                          const ::LieAlgebra::Vector6d &t_eta,
+                                          const ::LieAlgebra::Vector6d &t_dot_eta,
+                                          const ::LieAlgebra::Matrix6d &t_ad_Xi)const;
+
+
+
+    Eigen::VectorXd backwardODEs(const Eigen::VectorXd &t_y,
+                                 const ::LieAlgebra::Vector6d &t_Xi,
+                                 const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                 const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                 const Eigen::MatrixXd &t_BPhi)const;
+
+
+
+    typedef Eigen::Matrix<double, 37, 1> TangentKinematicState;
+
+    TangentKinematicState m_forward_tangent_kinematics_state_X0 { TangentKinematicState::Zero() };
+    TangentKinematicState m_forward_tangent_kinematics_state_X1 { TangentKinematicState::Zero() };
+
+
+    Eigen::VectorXd m_tangent_dynamics_state_X0 { Eigen::VectorXd::Zero(49+m_ne) };
+
+
+    TangentKinematicState tangentKinematicsODEs(const TangentKinematicState &t_state,
+                                                const ::LieAlgebra::Vector6d &t_Xi,
+                                                const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                                const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                                const ::LieAlgebra::Vector6d &t_Delta_Xi,
+                                                const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
+                                                const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi) const;
+
+
+    Eigen::VectorXd tangentDynamicsODEs(const Eigen::VectorXd &t_state,
+                                        const ::LieAlgebra::Vector6d &t_Xi,
+                                        const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                        const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                        const ::LieAlgebra::Vector6d &t_Delta_Xi,
+                                        const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
+                                        const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
+                                        const Eigen::MatrixXd &t_BPhi)const;
 
 };
 

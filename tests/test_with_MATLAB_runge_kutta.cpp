@@ -160,28 +160,28 @@ int main(int argc, char *argv[])
 
 
 
-//    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
-//    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
-//    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
 
 
-//    const unsigned int a = 400;
-//    const unsigned int b = 160000;
+    const unsigned int a = 400;
+    const unsigned int b = 160000;
 
-//    for(unsigned int i=0; i<ne; i++){
+    for(unsigned int i=0; i<ne; i++){
 
-//        Delta_q.setZero();
-//        Delta_q[i] = 1;
+        Delta_q.setZero();
+        Delta_q[i] = 1;
 
-//        Delta_dot_q  = a * Delta_q;
-//        Delta_ddot_q = b * Delta_q;
+        Delta_dot_q  = a * Delta_q;
+        Delta_ddot_q = b * Delta_q;
 
 
-//        m_integrators->updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
+        m_integrators.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
-//        m_integrators->forwardTangentKinematics();
+        m_integrators.forwardTangentKinematics();
 
-//        m_integrators->backwardTangentDynamics(zeros);
+        m_integrators.backwardTangentDynamics(zeros);
 
 
 
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
 //        writeToFile("Delta_C_stack" "_Delta" + std::to_string(i), Delta_C_stack, path);
 //        writeToFile("Delta_Qa_stack" "_Delta" + std::to_string(i), Delta_Qa_stack, path);
 
-//    }
+    }
 
 
 
