@@ -14,6 +14,10 @@
 
 namespace CROSP::numerical_integrators::runge_kutta {
 
+
+/*!
+ * \brief The RungeKuttaIntegrator class provides a numeric integrator for the Cosserat IDM and TIDM using the standard Runge-Kutta integrator
+ */
 class RungeKuttaIntegrator : public CosseratRodIntegrators
 {
 public:
@@ -24,24 +28,12 @@ public:
                          const unsigned int t_number_of_Chebyshev_points);
 
 
-    virtual std::string printIntegratorProperties()const final
-    {
-        std::stringstream integrator_properties;
-        integrator_properties << "Runge Kutta integrator\n" "Adaptive step with initial value of : " << m_dX << " m";
-
-        return integrator_properties.str();
-
-    }
+    virtual std::string printIntegratorProperties()const final;
 
 
     virtual void updateParameterisation(const Eigen::VectorXd &t_qe,
                                         const Eigen::VectorXd &t_dot_qe,
-                                        const Eigen::VectorXd &t_ddot_qe) final
-    {
-        m_qe      = t_qe;
-        m_dot_qe  = t_dot_qe;
-        m_ddot_qe = t_ddot_qe;
-    }
+                                        const Eigen::VectorXd &t_ddot_qe) final;
 
 
     virtual void forwardKinematics() final;
@@ -57,12 +49,8 @@ public:
 
     virtual void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
                                              const Eigen::VectorXd &t_Delta_dot_qe,
-                                             const Eigen::VectorXd &t_Delta_ddot_qe) final
-    {
-        m_Delta_qe      = t_Delta_qe;
-        m_Delta_dot_qe  = t_Delta_dot_qe;
-        m_Delta_ddot_qe = t_Delta_ddot_qe;
-    }
+                                             const Eigen::VectorXd &t_Delta_ddot_qe) final;
+
 
     virtual void forwardTangentKinematics() final;
 
@@ -75,105 +63,31 @@ public:
                                           const Eigen::Vector3d &t_initial_Delta_linear_acceleration) final;
 
 
+    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const final;
 
 
-
-
-    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const final
-    {
-        //  Get the quaternion at the rod tip
-        const Eigen::Quaterniond Q(m_forward_integration_state_X1[0],
-                                   m_forward_integration_state_X1[1],
-                                   m_forward_integration_state_X1[2],
-                                   m_forward_integration_state_X1[3]);
-
-        //  Get the quaternion at the rod tip
-        const Eigen::Vector3d r(m_forward_integration_state_X1[4],
-                                m_forward_integration_state_X1[5],
-                                m_forward_integration_state_X1[6]);
-
-
-        ::LieAlgebra::Kinematics rod_tip_kinematics;
-
-
-        rod_tip_kinematics.m_pose =
-                ::LieAlgebra::SE3Pose( Q, r );
-
-
-        rod_tip_kinematics.m_twist <<
-                m_forward_integration_state_X1.block<6, 1>(7, 0);
-
-        rod_tip_kinematics.m_accelerations <<
-                m_forward_integration_state_X1.block<6, 1>(13, 0);
-
-        return rod_tip_kinematics;
-    }
-
-
-    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const final
-    {
-//        ::LieAlgebra::TangentKinematics rod_tip_tangent_kinematics;
-
-//        rod_tip_tangent_kinematics.m_Delta_zeta <<
-//                m_tidm_integrators->m_Delta_rotation->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-//                m_tidm_integrators->m_Delta_position->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
-
-//        rod_tip_tangent_kinematics.m_Delta_twist <<
-//                m_tidm_integrators->m_Delta_angular_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-//                m_tidm_integrators->m_Delta_linear_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
-
-//        rod_tip_tangent_kinematics.m_Delta_acceleration <<
-//                m_tidm_integrators->m_Delta_angular_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-//                m_tidm_integrators->m_Delta_linear_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
-
-//        return rod_tip_tangent_kinematics;
-    }
-
+    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const final;
 
 
     virtual void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1) final;
 
 
-
     virtual void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1) final;
 
 
+    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const final;
 
 
-    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const final
-    {
-        return m_backward_integration_state_X0.block<6, 1>(19, 0);
-    }
+    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const final;
 
 
-
-    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const final
-    {
-//        ::LieAlgebra::Vector6d Delta_Lambda;
-//        Delta_Lambda <<   m_tidm_integrators->m_Delta_internal_couples->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN),
-//                          m_tidm_integrators->m_Delta_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-
-//        return Delta_Lambda;
-    }
+    virtual ::LieAlgebra::Vector6d getQaAtBase()const final;
 
 
-    virtual ::LieAlgebra::Vector6d getQaAtBase()const final
-    {
-        return m_backward_integration_state_X0.block(25, 0, m_ne, 1);
-    }
+    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const final;
 
 
-
-    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const final
-    {
-//        return m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
-    }
-
-
-    virtual void updateIntegrationDomain(const double &t_rod_lenght) final
-    {
-        m_rod_length = t_rod_lenght;
-    }
+    virtual void updateIntegrationDomain(const double &t_rod_lenght) final;
 
 
     virtual Eigen::MatrixXd getRodPositions()const;
@@ -194,7 +108,7 @@ private:
     unsigned int m_ne { m_polynomial_representation.getCoordinatesDimension() };
 
 
-    double m_rod_length { 1.0 };
+    double m_rod_length { m_rod_properties.m_rod_dimensions.m_L };
 
 
     unsigned int m_number_of_Chebyshev_points { 31 };
@@ -298,6 +212,23 @@ private:
                                         const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
                                         const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
                                         const Eigen::MatrixXd &t_BPhi)const;
+
+#ifdef TESTING
+public:
+    Eigen::MatrixXd m_forward_kinematics_stack {
+        Eigen::MatrixXd::Zero(ForwardKinematicState::RowsAtCompileTime, m_number_of_Chebyshev_points)
+    };
+
+
+
+    Eigen::MatrixXd m_backward_Lambda_Qa_stack {
+        Eigen::MatrixXd::Zero(6 + m_ne, m_number_of_Chebyshev_points)
+    };
+
+    std::vector<double> m_Chebyshev_points { ::Chebyshev::ComputeChebyshevPoints(m_number_of_Chebyshev_points) };
+
+
+#endif
 
 };
 

@@ -86,5 +86,6 @@ target_link_libraries(test_with_MATLAB_runge_kutta
 target_compile_definitions(test_with_MATLAB_runge_kutta
     PRIVATE
         DEVELOPER
+        TESTING
 )
 

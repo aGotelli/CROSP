@@ -37,6 +37,26 @@ RungeKuttaIntegrator::RungeKuttaIntegrator(const strain_parameterisation::Strain
 {}
 
 
+std::string RungeKuttaIntegrator::printIntegratorProperties()const
+{
+    std::stringstream integrator_properties;
+    integrator_properties << "Runge Kutta integrator\n" "Adaptive step with initial value of : " << m_dX << " m";
+
+    return integrator_properties.str();
+
+}
+
+
+void RungeKuttaIntegrator::updateParameterisation(const Eigen::VectorXd &t_qe,
+                                                  const Eigen::VectorXd &t_dot_qe,
+                                                  const Eigen::VectorXd &t_ddot_qe)
+{
+    m_qe      = t_qe;
+    m_dot_qe  = t_dot_qe;
+    m_ddot_qe = t_ddot_qe;
+}
+
+
 void RungeKuttaIntegrator::forwardKinematics()
 {
     forwardKinematics(Eigen::Vector4d(1, 0, 0, 0),
@@ -73,7 +93,12 @@ void RungeKuttaIntegrator::forwardKinematics(const Eigen::Vector4d &t_initial_qu
 
 
 //  Forward Integration
-    boost::numeric::odeint::integrate_adaptive(eigen_stepper(),
+#ifndef TESTING
+    boost::numeric::odeint::integrate_adaptive(
+#else
+    boost::numeric::odeint::integrate_times(
+#endif
+                                                eigen_stepper(),
                                                [this](const Eigen::VectorXd &t_y,
                                                       Eigen::VectorXd &t_dyds,
                                                       const double t_X){
@@ -88,10 +113,21 @@ void RungeKuttaIntegrator::forwardKinematics(const Eigen::Vector4d &t_initial_qu
         t_dyds = this->forwardODEs(t_y, Xi, dot_Xi, ddot_Xi);
 
                                                 },
+#ifndef TESTING
                                                 forward_integration_state,
                                                 0.0,
                                                 1.0,
                                                 m_dX);
+#else
+                                                forward_integration_state,
+                                                m_Chebyshev_points_reversed.begin(),
+                                                m_Chebyshev_points_reversed.end(),
+                                                m_dX,
+    [&, this, col=0](const Eigen::VectorXd& t_y, const double)mutable{
+        m_forward_kinematics_stack.block<ForwardKinematicState::RowsAtCompileTime, 1>(0, col++) = t_y;
+    });
+#endif
+
     //  Save a track of the state
     m_forward_integration_state_X1 = forward_integration_state;
 }
@@ -106,6 +142,17 @@ void RungeKuttaIntegrator::forwardTangentKinematics()
                              Eigen::Vector3d::Zero(),
                              Eigen::Vector3d::Zero(),
                              Eigen::Vector3d::Zero());
+}
+
+
+
+void RungeKuttaIntegrator::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+                                                       const Eigen::VectorXd &t_Delta_dot_qe,
+                                                       const Eigen::VectorXd &t_Delta_ddot_qe)
+{
+    m_Delta_qe      = t_Delta_qe;
+    m_Delta_dot_qe  = t_Delta_dot_qe;
+    m_Delta_ddot_qe = t_Delta_ddot_qe;
 }
 
 
@@ -164,6 +211,55 @@ void RungeKuttaIntegrator::forwardTangentKinematics(const Eigen::Vector3d &t_ini
 }
 
 
+::LieAlgebra::Kinematics RungeKuttaIntegrator::getKinematicsAtTip()const
+{
+    //  Get the quaternion at the rod tip
+    const Eigen::Quaterniond Q(m_forward_integration_state_X1[0],
+                               m_forward_integration_state_X1[1],
+                               m_forward_integration_state_X1[2],
+                               m_forward_integration_state_X1[3]);
+
+    //  Get the quaternion at the rod tip
+    const Eigen::Vector3d r(m_forward_integration_state_X1[4],
+                            m_forward_integration_state_X1[5],
+                            m_forward_integration_state_X1[6]);
+
+
+    ::LieAlgebra::Kinematics rod_tip_kinematics;
+
+
+    rod_tip_kinematics.m_pose =
+            ::LieAlgebra::SE3Pose( Q, r );
+
+
+    rod_tip_kinematics.m_twist <<
+            m_forward_integration_state_X1.block<6, 1>(7, 0);
+
+    rod_tip_kinematics.m_accelerations <<
+            m_forward_integration_state_X1.block<6, 1>(13, 0);
+
+    return rod_tip_kinematics;
+}
+
+
+::LieAlgebra::TangentKinematics RungeKuttaIntegrator::getTangentKinematicsAtTip()const
+{
+    ::LieAlgebra::TangentKinematics rod_tip_tangent_kinematics;
+
+
+    rod_tip_tangent_kinematics.m_Delta_zeta =
+            m_forward_tangent_kinematics_state_X1.block<6,1>(19,0);
+
+    rod_tip_tangent_kinematics.m_Delta_twist =
+            m_forward_tangent_kinematics_state_X1.block<6,1>(25,0);
+
+    rod_tip_tangent_kinematics.m_Delta_acceleration =
+            m_forward_tangent_kinematics_state_X1.block<6,1>(31,0);
+
+    return rod_tip_tangent_kinematics;
+}
+
+
 
 
 
@@ -194,7 +290,12 @@ void RungeKuttaIntegrator::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lamb
 
 
 //  Backward Integration
-    boost::numeric::odeint::integrate_adaptive(eigen_stepper(),
+#ifndef TESTING
+    boost::numeric::odeint::integrate_adaptive(
+#else
+    boost::numeric::odeint::integrate_times(
+#endif
+                                                eigen_stepper(),
                                                [this](const Eigen::VectorXd& t_y,
                                                       Eigen::VectorXd& t_dyds,
                                                       const double t_X){
@@ -208,11 +309,22 @@ void RungeKuttaIntegrator::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lamb
 
         t_dyds = this->backwardODEs(t_y, Xi, dot_Xi, ddot_Xi, BPhi);
 
-                                                      },
-                                                      m_backward_integration_state_X0,
-                                                      1.0,
-                                                      0.0,
-                                                      -m_dX);
+                                                    },
+#ifndef TESTING
+                                                    m_backward_integration_state_X0,
+                                                    1.0,
+                                                    0.0,
+                                                    -m_dX);
+#else
+                                                    m_backward_integration_state_X0,
+                                                    m_Chebyshev_points.begin(),
+                                                    m_Chebyshev_points.end(),
+                                                    -m_dX,
+    [&, this, col=0](const Eigen::VectorXd& t_y, const double)mutable{
+        m_backward_Lambda_Qa_stack.block(0, m_number_of_Chebyshev_points-1-(col++), 6+m_ne, 1) = t_y.block(19, 0, 6+m_ne, 1);
+    });
+#endif
+
 
 
 }
@@ -283,7 +395,36 @@ void RungeKuttaIntegrator::backwardTangentDynamics(const ::LieAlgebra::Vector6d 
 
 
 
+::LieAlgebra::Vector6d RungeKuttaIntegrator::getLambdaAtBase()const
+{
+    return m_backward_integration_state_X0.block<6, 1>(19, 0);
+}
 
+
+
+LieAlgebra::Vector6d RungeKuttaIntegrator::getDeltaLambdaAtBase()const
+{
+    return m_tangent_dynamics_state_X0.block<6, 1>(43,0);
+}
+
+
+::LieAlgebra::Vector6d RungeKuttaIntegrator::getQaAtBase()const
+{
+    return m_backward_integration_state_X0.block(25, 0, m_ne, 1);
+}
+
+
+
+LieAlgebra::Vector6d RungeKuttaIntegrator::getDeltaQaAtBase()const
+{
+    return m_tangent_dynamics_state_X0.block(49, 0, m_ne, 1);
+}
+
+
+void RungeKuttaIntegrator::updateIntegrationDomain(const double &t_rod_lenght)
+{
+    m_rod_length = t_rod_lenght;
+}
 
 
 
@@ -296,8 +437,6 @@ Eigen::MatrixXd RungeKuttaIntegrator::getRodPositions() const
     /*  The forward state has the form
      *  | Q |   w, x, y, z                  0-3
      *  | r |   x, y, z                     4-6
-     *  | η |   Ω1 , Ω2 , Ω3 , V1 , V2 , V3 7-12
-     *  | η̇ |   Ω1 , Ω2 , Ω3 , V1 , V2 , V3 13-18
      */
     Eigen::VectorXd y = m_forward_integration_state_X0.block<7, 1>(0, 0);
 
@@ -306,49 +445,17 @@ Eigen::MatrixXd RungeKuttaIntegrator::getRodPositions() const
 
 //  Forward Integration with observer
     boost::numeric::odeint::integrate_times(eigen_stepper(),
-                                            [this](const Eigen::VectorXd& t_y, Eigen::VectorXd& t_dyds, const double t_s){
+                                            [this](const Eigen::VectorXd& t_y, Eigen::VectorXd& t_dydX, const double t_s){
 
         /*  Preprocessing    */
-
-            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_s);
+        Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_s);
 
         //  Get the strains for the rod
-            const Eigen::VectorXd xi = BPhi*m_qe + m_strain_parameterisation.m_constant_strain;
+        const Eigen::VectorXd Xi = BPhi*m_qe + m_strain_parameterisation.m_constant_strain;
 
 
-        //  Decompose the strain
-            const Eigen::Vector3d k = xi.block<3,1>(0,0);
-            const Eigen::Vector3d gamma = xi.block<3,1>(3,0);
+        t_dydX = this->forwardStaticODEs(t_y, Xi);
 
-
-
-        /*  The state has the form
-         *  | Q |   w, x, y, z                  0-3
-         *  | r |   x, y, z                     4-6
-         *  | η |   Ω1 , Ω2 , Ω3 , V1 , V2 , V3 7-12
-         *  | η̇ |   Ω1 , Ω2 , Ω3 , V1 , V2 , V3 13-18
-         */
-
-
-        //  Unpack state vector
-            const Eigen::Quaterniond Q(t_y[0], t_y[1],t_y[2], t_y[3]);
-            [[maybe_unused]] const Eigen::Vector3d r = t_y.block<3,1>(4,0);
-
-
-            const Eigen::Matrix3d R = Q.toRotationMatrix();
-
-
-        //  Actual ODE
-
-            const Eigen::Vector4d Q_prime = 0.5*getA(k)*Eigen::Vector4d(Q.w(),Q.x(),Q.y(),Q.z());
-            const Eigen::Vector3d r_prime = R*gamma;
-
-        //  Packing state vector derivative
-            t_dyds.resize( t_y.rows() );
-            t_dyds << Q_prime,
-                      r_prime;
-
-            t_dyds *= m_rod_length;
 
     },
     y,
@@ -604,8 +711,8 @@ Eigen::VectorXd RungeKuttaIntegrator::tangentDynamicsODEs(const Eigen::VectorXd 
      *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   25-30
      *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
      *  | Λ  |   C1, C2, C3, N1, N2, N3          37-42
-     *  | ∆Λ |   C1, C2, C3, N1, N2, N3          43-43+ne
-     *  | ∆Qa|                                   44+ne-44+ne
+     *  | ∆Λ |   C1, C2, C3, N1, N2, N3          43-48
+     *  | ∆Qa|                                   49-49+ne
      */
 
 

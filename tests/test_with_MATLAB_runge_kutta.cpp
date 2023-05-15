@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-    const std::string path = "../../../MATLAB/test_different_modes/";
+    const std::string path = "../../../MATLAB/test_runge_kutta/";
 
     std::array<bool, 6> admitted_deformations = {
             true,
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
 
 
-    const unsigned int number_of_Chebyshev_points = 31;
+    constexpr unsigned int number_of_Chebyshev_points = 31;
     ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, number_of_modes_stack);
 
 
@@ -103,9 +103,9 @@ int main(int argc, char *argv[])
 //        ddot_q(i) = 0.2*(ne - i);
 //    }
 
-//    q.setRandom();
-//    dot_q.setRandom();
-//    ddot_q.setRandom();
+    q.setRandom();
+    dot_q.setRandom();
+    ddot_q.setRandom();
 
 
     std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
@@ -123,8 +123,15 @@ int main(int argc, char *argv[])
 
     m_integrators.forwardKinematics();
 
+
+
+    auto forward_kinematics_stack = m_integrators.m_forward_kinematics_stack;
+
+
     auto zeros = ::LieAlgebra::Vector6d::Zero();
     m_integrators.backwardDynamics(zeros);
+
+    auto Lambda_Qa_stack = m_integrators.m_backward_Lambda_Qa_stack;
 
 
 
@@ -133,30 +140,30 @@ int main(int argc, char *argv[])
 
     std::cout << "Rod shape : \n" << rod_shape << "\n\n";
 
-//    const auto Q_stack = m_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
-//    const auto r_stack = m_integrators->m_idm_integrators->m_position->getStackAsMatrix();
-//    const auto Omega_stack = m_integrators->m_idm_integrators->m_angular_velocity->getStackAsMatrix();
-//    const auto V_stack     = m_integrators->m_idm_integrators->m_linear_velocity->getStackAsMatrix();
-//    const auto dot_Omega_stack = m_integrators->m_idm_integrators->m_angular_acceleration->getStackAsMatrix();
-//    const auto dot_V_stack     = m_integrators->m_idm_integrators->m_linear_acceleration->getStackAsMatrix();
+    const auto Q_stack         = forward_kinematics_stack.block<4, number_of_Chebyshev_points>(0, 0);
+    const auto r_stack         = forward_kinematics_stack.block<3, number_of_Chebyshev_points>(4, 0);
+    const auto Omega_stack     = forward_kinematics_stack.block<3, number_of_Chebyshev_points>(7, 0);
+    const auto V_stack         = forward_kinematics_stack.block<3, number_of_Chebyshev_points>(10, 0);
+    const auto dot_Omega_stack = forward_kinematics_stack.block<3, number_of_Chebyshev_points>(13, 0);
+    const auto dot_V_stack     = forward_kinematics_stack.block<3, number_of_Chebyshev_points>(16, 0);
 
-//    const auto N_stack = m_integrators->m_idm_integrators->m_internal_forces->getStackAsMatrix();
-//    const auto C_stack = m_integrators->m_idm_integrators->m_internal_couples->getStackAsMatrix();
-//    const auto Qa_stack = m_integrators->m_idm_integrators->m_generalised_forces->getStackAsMatrix();
-
-
+    const auto N_stack  = Lambda_Qa_stack.block<3, number_of_Chebyshev_points>(0, 0);
+    const auto C_stack  = Lambda_Qa_stack.block<3, number_of_Chebyshev_points>(3, 0);
+    const auto Qa_stack = Lambda_Qa_stack.block(6, 0, ne, 1);
 
 
 
-//    writeToFile("Q_stack", Q_stack, path);
-//    writeToFile("r_stack", r_stack, path);
-//    writeToFile("Omega_stack", Omega_stack, path);
-//    writeToFile("V_stack", V_stack, path);
-//    writeToFile("dot_Omega_stack", dot_Omega_stack, path);
-//    writeToFile("dot_V_stack", dot_V_stack, path);
-//    writeToFile("N_stack", N_stack, path);
-//    writeToFile("C_stack", C_stack, path);
-//    writeToFile("Qa_stack", Qa_stack, path);
+
+
+    writeToFile("Q_stack", Q_stack, path);
+    writeToFile("r_stack", r_stack, path);
+    writeToFile("Omega_stack", Omega_stack, path);
+    writeToFile("V_stack", V_stack, path);
+    writeToFile("dot_Omega_stack", dot_Omega_stack, path);
+    writeToFile("dot_V_stack", dot_V_stack, path);
+    writeToFile("N_stack", N_stack, path);
+    writeToFile("C_stack", C_stack, path);
+    writeToFile("Qa_stack", Qa_stack, path);
 
 
 
