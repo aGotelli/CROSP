@@ -174,7 +174,8 @@ private:
                                           const ::LieAlgebra::Vector6d &t_Lambda,
                                           const ::LieAlgebra::Vector6d &t_eta,
                                           const ::LieAlgebra::Vector6d &t_dot_eta,
-                                          const ::LieAlgebra::Matrix6d &t_ad_Xi)const;
+                                          const ::LieAlgebra::Matrix6d &t_ad_Xi,
+                                          const double &t_X)const;
 
 
 
@@ -182,7 +183,8 @@ private:
                                  const ::LieAlgebra::Vector6d &t_Xi,
                                  const ::LieAlgebra::Vector6d &t_dot_Xi,
                                  const ::LieAlgebra::Vector6d &t_ddot_Xi,
-                                 const Eigen::MatrixXd &t_BPhi)const;
+                                 const Eigen::MatrixXd &t_BPhi,
+                                 const double &t_X)const;
 
 
 
@@ -211,7 +213,8 @@ private:
                                         const ::LieAlgebra::Vector6d &t_Delta_Xi,
                                         const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
                                         const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
-                                        const Eigen::MatrixXd &t_BPhi)const;
+                                        const Eigen::MatrixXd &t_BPhi,
+                                        const double &t_X)const;
 
 #ifdef TESTING
 public:

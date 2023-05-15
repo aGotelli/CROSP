@@ -307,7 +307,7 @@ void RungeKuttaIntegrator::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lamb
         const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
         const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
 
-        t_dyds = this->backwardODEs(t_y, Xi, dot_Xi, ddot_Xi, BPhi);
+        t_dyds = this->backwardODEs(t_y, Xi, dot_Xi, ddot_Xi, BPhi, t_X);
 
                                                     },
 #ifndef TESTING
@@ -383,7 +383,7 @@ void RungeKuttaIntegrator::backwardTangentDynamics(const ::LieAlgebra::Vector6d 
         t_dyds = this->tangentDynamicsODEs(t_y,
                                            Xi, dot_Xi, ddot_Xi,
                                            Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi,
-                                           BPhi);
+                                           BPhi, t_X);
 
                                                       },
                                                       m_tangent_dynamics_state_X0,
@@ -563,8 +563,13 @@ RungeKuttaIntegrator::ForwardKinematicState RungeKuttaIntegrator::forwardODEs(co
                                                             const ::LieAlgebra::Vector6d &t_Lambda,
                                                             const ::LieAlgebra::Vector6d &t_eta,
                                                             const ::LieAlgebra::Vector6d &t_dot_eta,
-                                                            const ::LieAlgebra::Matrix6d &t_ad_Xi)const
+                                                            const ::LieAlgebra::Matrix6d &t_ad_Xi,
+                                                            const double &t_X)const
 {
+    if(t_X == 0 or t_X == 1.0)
+        return ::LieAlgebra::Vector6d::Zero();
+
+
     //  Some needed variables
     const Eigen::Matrix3d R = t_Q.toRotationMatrix();
     ::LieAlgebra::Vector6d F_bar = ::LieAlgebra::Vector6d::Zero();
@@ -587,7 +592,8 @@ Eigen::VectorXd RungeKuttaIntegrator::backwardODEs(const Eigen::VectorXd &t_y,
                                                    const ::LieAlgebra::Vector6d &t_Xi,
                                                    const ::LieAlgebra::Vector6d &t_dot_Xi,
                                                    const ::LieAlgebra::Vector6d &t_ddot_Xi,
-                                                   const Eigen::MatrixXd &t_BPhi)const
+                                                   const Eigen::MatrixXd &t_BPhi,
+                                                   const double &t_X)const
 {
     /*  The state has the form
      *  | Q |   w, x, y, z                  0-3
@@ -617,7 +623,7 @@ Eigen::VectorXd RungeKuttaIntegrator::backwardODEs(const Eigen::VectorXd &t_y,
 
 
     const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_y[0], t_y[1],t_y[2], t_y[3]),
-                                                                           Lambda, eta, dot_eta, ad_Xi);
+                                                                           Lambda, eta, dot_eta, ad_Xi, t_X);
     const Eigen::VectorXd Qa_prime = - t_BPhi.transpose()*Lambda;
 
     //  Packing state vector derivative
@@ -699,7 +705,8 @@ Eigen::VectorXd RungeKuttaIntegrator::tangentDynamicsODEs(const Eigen::VectorXd 
                                                           const ::LieAlgebra::Vector6d &t_Delta_Xi,
                                                           const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
                                                           const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
-                                                          const Eigen::MatrixXd &t_BPhi)const
+                                                          const Eigen::MatrixXd &t_BPhi,
+                                                          const double &t_X)const
 {
 
     /*  The state has the form
@@ -766,7 +773,7 @@ Eigen::VectorXd RungeKuttaIntegrator::tangentDynamicsODEs(const Eigen::VectorXd 
                                                                                       t_Xi, t_dot_Xi, t_ddot_Xi,
                                                                                       t_Delta_Xi, t_Delta_dot_Xi, t_Delta_ddot_Xi);
     const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_state[0], t_state[1],t_state[2], t_state[3]),
-                                                                           Lambda, eta, dot_eta, ad_Xi);
+                                                                           Lambda, eta, dot_eta, ad_Xi, t_X);
     const ::LieAlgebra::Vector6d Delta_Lambda_prime =
             M*Delta_dot_eta - ad_eta.transpose()*M*Delta_eta - ad_Delta_eta.transpose()*M*eta + ad_Xi.transpose()*Delta_Lambda + ad_Delta_Xi.transpose()*Lambda - Delta_F_bar;
 
