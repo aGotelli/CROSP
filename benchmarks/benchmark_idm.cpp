@@ -34,13 +34,9 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
 
-    auto polynomial_representation =
-            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-    auto strain_param =
-            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
-
-    ::CROSP::CosseratRod rod(strain_param);
+    ::CROSP::CosseratRod rod(polynomial_representation);
 
     ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -84,7 +80,7 @@ int main(int argc, char *argv[])
 
 
     for(const auto ne : ne_stack)
-        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions);
+        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 

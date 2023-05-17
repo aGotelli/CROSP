@@ -17,15 +17,15 @@ target_compile_definitions(benchmark_idm_runge_kutta PRIVATE DEVELOPER)
 
 
 
-#add_executable(benchmark_idm benchmark_idm.cpp
-#)
-#target_link_libraries(benchmark_idm
-#    PRIVATE
-#        ${PROJECT_NAME}
-#        utilities
-#        benchmark::benchmark
-#)
-#target_compile_definitions(benchmark_idm PRIVATE DEVELOPER)
+add_executable(benchmark_idm benchmark_idm.cpp
+)
+target_link_libraries(benchmark_idm
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+        benchmark::benchmark
+)
+target_compile_definitions(benchmark_idm PRIVATE DEVELOPER)
 
 #add_executable(benchmark_tidm benchmark_tidm.cpp
 #)

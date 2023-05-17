@@ -64,7 +64,7 @@ public:
      *
      * In this constructo the rod properties is initialised by its defaul value
      */
-    CosseratRod(const strain_parameterisation::StrainParameterisation t_strain_parameterisation);
+    CosseratRod(const polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
 
     /*!

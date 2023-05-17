@@ -21,8 +21,8 @@ namespace CROSP {
 
 
 
-CosseratRod::CosseratRod(const strain_parameterisation::StrainParameterisation t_strain_parameterisation)
-    : m_strain_parameterisation( t_strain_parameterisation )
+CosseratRod::CosseratRod(const polynomial_representation::PolynomialRepresentation t_polynomial_representation)
+    : m_polynomial_representation( t_polynomial_representation )
 {}
 
 
