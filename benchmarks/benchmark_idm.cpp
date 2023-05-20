@@ -33,6 +33,12 @@ void benchmarkIDM(::benchmark::State &t_state)
     const unsigned int coordinated_dimension = na * ne;
 
 
+    t_state.counters = {
+      {"na", na},
+      {"ne", ne}
+    };
+
+
 
     auto polynomial_representation =
             std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
@@ -80,11 +86,11 @@ int main(int argc, char *argv[])
     std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
 
 
-    const std::string benchmark_name = "IDM_na" + std::to_string(na) + "_ne";
+    const std::string benchmark_name = "IDM";
 
 
     for(const auto ne : ne_stack)
-        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions);
+        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
 
