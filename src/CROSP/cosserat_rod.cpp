@@ -495,4 +495,12 @@ void CosseratRod::updateRodLength(const double &t_rod_lenght)
     m_tidm_integrators->updateIntegrationDomain( t_rod_lenght );
 }
 
+
+void CosseratRod::updateMaterialProperties(const ::CROSP::rod_properties::MaterialProperties &t_material_properties)
+{
+    m_rod_properties->updateMaterialProperties(t_material_properties,
+                                               m_strain_parameterisation->m_polynomial_representation);
+}
+
+
 }   //  namespace CROSP

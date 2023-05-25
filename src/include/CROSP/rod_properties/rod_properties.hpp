@@ -253,31 +253,16 @@ public:
     Eigen::Matrix3d getHLinear()const;
 
 
+    void updateMaterialProperties(const ::CROSP::rod_properties::MaterialProperties &t_material_properties,
+                                  const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
+
+
 
     /// \brief m_H The Hookean matrix default initialised using the members m_material_properties and m_rod_dimensions
-    Eigen::Matrix<double, 6, 6> m_H { [&](){
-            Eigen::Matrix<double, 6, 6> H;
-            H.setZero();
-            H.diagonal() << m_material_properties.m_G * m_rod_dimensions.m_cross_section->Ixx(),
-                            m_material_properties.m_E * m_rod_dimensions.m_cross_section->Iyy(),
-                            m_material_properties.m_E * m_rod_dimensions.m_cross_section->Izz(),
-                            m_material_properties.m_E * m_rod_dimensions.m_cross_section->Area(),
-                            m_material_properties.m_G * m_rod_dimensions.m_cross_section->Area(),
-                            m_material_properties.m_G * m_rod_dimensions.m_cross_section->Area();
-
-            return H;}() };
+    Eigen::Matrix<double, 6, 6> m_H { computeHookTensorMatrix() };
 
     /// \brief m_M The inertia matrix default initialised using the members m_material_properties and m_rod_dimensions
-     Eigen::Matrix<double, 6, 6>  m_M{ [&](){
-            Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
-
-            M.diagonal() << m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Ixx(),
-                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Iyy(),
-                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Izz(),
-                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area(),
-                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area(),
-                            m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area();
-            return M;}() };
+     Eigen::Matrix<double, 6, 6>  m_M{ computeCrossSectionalInertiaMatrix() };
 
 
     /// \brief m_Kee The generalised elasticity matrix
@@ -288,6 +273,11 @@ public:
 
 
 private:
+
+    ::LieAlgebra::Matrix6d computeHookTensorMatrix()const;
+
+    ::LieAlgebra::Matrix6d computeCrossSectionalInertiaMatrix()const;
+
 
     /*!
      * \brief defineKee defines the elasticity matrix Kee

@@ -410,9 +410,6 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
     //  Pointer to the rod properties for the rod physics
     const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
-    //  Store the linear block of the inertia matrix
-    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
-
 
 };
 
@@ -503,10 +500,6 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 
     //  Pointer to the rod properties for the rod physics
     const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
-
-    //  Store the two blocks of the inertia matrix separately
-    const Eigen::Matrix3d m_M_angular { m_rod_properties->m_M.block<3,3>(0, 0) };
-    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
 
 };
 

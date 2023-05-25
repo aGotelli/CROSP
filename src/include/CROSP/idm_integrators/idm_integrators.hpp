@@ -271,8 +271,6 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
-    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
-
     const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
 
     const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity;
@@ -322,10 +320,6 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
     };
 
     const std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
-
-    const Eigen::Matrix3d m_M_angular { m_rod_properties->getMAngular() };
-
-    const Eigen::Matrix3d m_M_linear { m_rod_properties->getMLinear() };
 
     const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
 
