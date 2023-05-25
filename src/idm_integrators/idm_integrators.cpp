@@ -249,8 +249,8 @@ Eigen::MatrixXd InternalForcesIntegrator::computeMatrixAtChebyshevPoint(const un
 
 Eigen::VectorXd InternalForcesIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    Eigen::Vector3d inertial_acceleration = m_M_linear*m_linear_acceleration->getStateAtPoint(t_point);
-    Eigen::Vector3d inertial_velocities = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_M_linear * m_linear_velocity->getStateAtPoint(t_point);
+    Eigen::Vector3d inertial_acceleration = m_rod_properties->getMLinear()*m_linear_acceleration->getStateAtPoint(t_point);
+    Eigen::Vector3d inertial_velocities = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_rod_properties->getMLinear() * m_linear_velocity->getStateAtPoint(t_point);
     Eigen::Vector3d distributed_forces = computeDistributedForce(t_point);
 
     Eigen::Vector3d b = inertial_acceleration
@@ -324,9 +324,9 @@ Eigen::VectorXd InternalCouplesIntegrator::computerParametersVectorAtPoint(const
 {
 
     return ::LieAlgebra::skew( m_Gamma_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point)
-            + m_M_angular*m_angular_acceleration->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * m_M_angular * m_angular_velocity->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew( m_linear_velocity->getStateAtPoint(t_point) ).transpose()* m_M_linear * m_linear_velocity->getStateAtPoint(t_point)
+            + m_rod_properties->getMAngular()*m_angular_acceleration->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * m_rod_properties->getMAngular() * m_angular_velocity->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew( m_linear_velocity->getStateAtPoint(t_point) ).transpose()* m_rod_properties->getMLinear() * m_linear_velocity->getStateAtPoint(t_point)
             + computeDistributedCouple(t_point);
 }
 

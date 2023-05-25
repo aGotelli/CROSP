@@ -387,6 +387,9 @@ public:
     virtual void updateRodLength(const double &t_rod_lenght);
 
 
+    virtual void updateMaterialProperties(const ::CROSP::rod_properties::MaterialProperties &t_material_properties);
+
+
 
 
 #ifndef DEVELOPER

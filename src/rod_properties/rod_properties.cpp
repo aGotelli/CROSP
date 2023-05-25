@@ -81,6 +81,48 @@ Eigen::Matrix3d RodProperties::getHLinear()const
 }
 
 
+void RodProperties::updateMaterialProperties(const ::CROSP::rod_properties::MaterialProperties &t_material_properties,
+                                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)
+{
+    m_material_properties = t_material_properties;
+
+    m_H = computeHookTensorMatrix();
+
+    m_M = computeCrossSectionalInertiaMatrix();
+
+
+    m_Kee = defineKee(t_polynomial_representation);
+
+    m_Dee = m_material_properties.m_mu*m_Kee;
+
+}
+
+
+::LieAlgebra::Matrix6d RodProperties::computeHookTensorMatrix()const
+{
+    ::LieAlgebra::Matrix6d H = ::LieAlgebra::Matrix6d::Zero();
+    H.diagonal() << m_material_properties.m_G * m_rod_dimensions.m_cross_section->Ixx(),
+                    m_material_properties.m_E * m_rod_dimensions.m_cross_section->Iyy(),
+                    m_material_properties.m_E * m_rod_dimensions.m_cross_section->Izz(),
+                    m_material_properties.m_E * m_rod_dimensions.m_cross_section->Area(),
+                    m_material_properties.m_G * m_rod_dimensions.m_cross_section->Area(),
+                    m_material_properties.m_G * m_rod_dimensions.m_cross_section->Area();
+
+    return H;
+}
+
+::LieAlgebra::Matrix6d RodProperties::computeCrossSectionalInertiaMatrix()const
+{
+    ::LieAlgebra::Matrix6d M = ::LieAlgebra::Matrix6d::Zero();
+    M.diagonal() << m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Ixx(),
+                    m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Iyy(),
+                    m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Izz(),
+                    m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area(),
+                    m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area(),
+                    m_material_properties.m_rho * m_rod_dimensions.m_cross_section->Area();
+    return M;
+}
+
 Eigen::MatrixXd RodProperties::defineKee(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)const
 {
 
@@ -96,8 +138,9 @@ Eigen::MatrixXd RodProperties::defineKee(const std::shared_ptr<const polynomial_
                                                          boost::numeric::odeint::vector_space_algebra> Ke_stepper;
     Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
 
-    boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_X){
-        const auto Phi = t_polynomial_representation->getPhi(t_X);
+    boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_s){
+        const double X = t_s/m_rod_dimensions.m_L;
+        const auto Phi = t_polynomial_representation->getPhi( X );
 
         t_dKeeds = Phi.transpose()*Ha*Phi;
     }, Kee, 0.0, 1.0, 0.0005);
