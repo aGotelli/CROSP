@@ -253,8 +253,13 @@ public:
     Eigen::Matrix3d getHLinear()const;
 
 
-    void updateMaterialProperties(const ::CROSP::rod_properties::MaterialProperties &t_material_properties,
-                                  const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
+    void updateRodProperties(const RodDimensions &t_rod_dimensions,
+                             const MaterialProperties &t_material_properties,
+                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
+
+
+    void updateRodProperties(const double &t_EI,
+                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
 
 
 

@@ -11,6 +11,18 @@ include_directories(include)
 
 
 
+add_executable(test_idm test_idm.cpp)
+target_link_libraries(test_idm
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+        benchmark::benchmark
+
+)
+target_compile_definitions(test_idm
+    PRIVATE
+        DEVELOPER
+)
 
 
 

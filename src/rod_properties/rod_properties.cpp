@@ -81,9 +81,12 @@ Eigen::Matrix3d RodProperties::getHLinear()const
 }
 
 
-void RodProperties::updateMaterialProperties(const ::CROSP::rod_properties::MaterialProperties &t_material_properties,
-                                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)
+void RodProperties::updateRodProperties(const RodDimensions &t_rod_dimensions,
+                                        const MaterialProperties &t_material_properties,
+                                        const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)
 {
+    m_rod_dimensions = t_rod_dimensions;
+
     m_material_properties = t_material_properties;
 
     m_H = computeHookTensorMatrix();
@@ -95,6 +98,17 @@ void RodProperties::updateMaterialProperties(const ::CROSP::rod_properties::Mate
 
     m_Dee = m_material_properties.m_mu*m_Kee;
 
+}
+
+
+void RodProperties::updateRodProperties(const double &t_EI,
+                                        const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)
+{
+    m_H(2, 2) = t_EI;
+
+    m_Kee = defineKee(t_polynomial_representation);
+
+    m_Dee = m_material_properties.m_mu*m_Kee;
 }
 
 
@@ -130,20 +144,21 @@ Eigen::MatrixXd RodProperties::defineKee(const std::shared_ptr<const polynomial_
 
     const Eigen::MatrixXd Ha = t_polynomial_representation->m_B.transpose() * m_H * t_polynomial_representation->m_B;
 
-    typedef Eigen::MatrixXd Kee_state_type;
 
-
-    typedef boost::numeric::odeint::runge_kutta_dopri5< Kee_state_type, double,
-                                                         Kee_state_type, double,
+    typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::MatrixXd, double,
+                                                         Eigen::MatrixXd, double,
                                                          boost::numeric::odeint::vector_space_algebra> Ke_stepper;
     Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
 
-    boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Kee_state_type &, Kee_state_type &t_dKeeds, const double t_s){
-        const double X = t_s/m_rod_dimensions.m_L;
-        const auto Phi = t_polynomial_representation->getPhi( X );
+    const double X0 = 0.0;
+    const double X1 = 1.0;
+    const double dX = 0.0005;
+
+    boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Eigen::MatrixXd &, Eigen::MatrixXd &t_dKeeds, const double t_X){
+        const auto Phi = t_polynomial_representation->getPhi( t_X );
 
         t_dKeeds = Phi.transpose()*Ha*Phi;
-    }, Kee, 0.0, 1.0, 0.0005);
+    }, Kee, X0, X1, dX);
 
     Kee *= m_rod_dimensions.m_L;
 

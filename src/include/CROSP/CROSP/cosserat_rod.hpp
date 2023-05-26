@@ -387,7 +387,10 @@ public:
     virtual void updateRodLength(const double &t_rod_lenght);
 
 
-    virtual void updateMaterialProperties(const ::CROSP::rod_properties::MaterialProperties &t_material_properties);
+    void updateRodProperties(const rod_properties::RodDimensions &t_rod_dimensions,
+                             const rod_properties::MaterialProperties &t_material_properties);
+
+    void updateRodProperties(const double &t_EI);
 
 
 

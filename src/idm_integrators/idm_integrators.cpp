@@ -249,8 +249,11 @@ Eigen::MatrixXd InternalForcesIntegrator::computeMatrixAtChebyshevPoint(const un
 
 Eigen::VectorXd InternalForcesIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    Eigen::Vector3d inertial_acceleration = m_rod_properties->getMLinear()*m_linear_acceleration->getStateAtPoint(t_point);
-    Eigen::Vector3d inertial_velocities = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * m_rod_properties->getMLinear() * m_linear_velocity->getStateAtPoint(t_point);
+    const auto M_linear = m_rod_properties->getMLinear();
+
+
+    Eigen::Vector3d inertial_acceleration = M_linear*m_linear_acceleration->getStateAtPoint(t_point);
+    Eigen::Vector3d inertial_velocities = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * M_linear * m_linear_velocity->getStateAtPoint(t_point);
     Eigen::Vector3d distributed_forces = computeDistributedForce(t_point);
 
     Eigen::Vector3d b = inertial_acceleration
@@ -323,10 +326,13 @@ Eigen::MatrixXd InternalCouplesIntegrator::computeMatrixAtChebyshevPoint(const u
 Eigen::VectorXd InternalCouplesIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
 
+    const auto M_linear = m_rod_properties->getMLinear();
+    const auto M_angular = m_rod_properties->getHAngular();
+
     return ::LieAlgebra::skew( m_Gamma_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point)
-            + m_rod_properties->getMAngular()*m_angular_acceleration->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * m_rod_properties->getMAngular() * m_angular_velocity->getStateAtPoint(t_point)
-            - ::LieAlgebra::skew( m_linear_velocity->getStateAtPoint(t_point) ).transpose()* m_rod_properties->getMLinear() * m_linear_velocity->getStateAtPoint(t_point)
+            + M_angular*m_angular_acceleration->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew(m_angular_velocity->getStateAtPoint(t_point)).transpose() * M_angular * m_angular_velocity->getStateAtPoint(t_point)
+            - ::LieAlgebra::skew( m_linear_velocity->getStateAtPoint(t_point) ).transpose()* M_linear * m_linear_velocity->getStateAtPoint(t_point)
             + computeDistributedCouple(t_point);
 }
 
