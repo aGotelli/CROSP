@@ -7,6 +7,12 @@ Const.J(1,1) = pi*Const.Rc^4/2;
 Const.J(2,2) = pi*Const.Rc^4/4;
 Const.J(3,3) = pi*Const.Rc^4/4;
 
+Const.Gj = 80e9;% 2.1e8;
+Const.E  = 210e9;%2.1e8;
+
+
+
+
 % 
 % I1 = (pi*Const.Rc^4)/2;%(pi*(2*Const.Rc)^4)/32;
 % I2 = (pi*Const.Rc^4)/4;%(pi*(2*Const.Rc)^4)/64;
@@ -18,15 +24,21 @@ Const.Aire = pi*Const.Rc^2;
 % Gj = 10e4*Const.rho;
 % E  = 10e4*Const.rho;
 
-Const.mu = 1e-3;
+Const.mu = 1e-4;
 
 % H = diag([Gj*I1,E*I2,E*I3,E*Aire,Gj*Aire,Gj*Aire]);
 % H = diag([3.5e7,3.5e7,3.5e7,4.2e8,1.61e8,1.61e8]);
 
-Const.GI = 79;
-Const.EI = 3.5e7;
-Const.EA = 1.64e7;
-Const.GA = 6.34e6;
+Const.GIxx = Const.Gj*Const.J(1,1);
+Const.EIyy = Const.E*Const.J(2,2);
+Const.EIzz = Const.E*Const.J(3,3);
+Const.EA = Const.E*Const.Aire;
+Const.GA = Const.Gj*Const.Aire;
+
+Const.GI = Const.GIxx;
+Const.EI = Const.EIyy;
+% Const.EA = 1.64e7;
+% Const.GA = 6.34e6;
 
 
 % definition des matrices constantes dans ce pb

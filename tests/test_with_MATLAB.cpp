@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
             std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(poly_with_admitted_def_and_modes, number_of_Chebyshev_points);
 
     ::CROSP::rod_properties::CircularCrossSection cs;
-    const double length = 1.75;
+    const double length = 1.0;
     ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, length);
 
     //  Now use it in rod properties

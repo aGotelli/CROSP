@@ -327,7 +327,7 @@ Eigen::VectorXd InternalCouplesIntegrator::computerParametersVectorAtPoint(const
 {
 
     const auto M_linear = m_rod_properties->getMLinear();
-    const auto M_angular = m_rod_properties->getHAngular();
+    const auto M_angular = m_rod_properties->getMAngular();
 
     return ::LieAlgebra::skew( m_Gamma_stack->at(t_point) ).transpose()*m_internal_forces->getStateAtPoint(t_point)
             + M_angular*m_angular_acceleration->getStateAtPoint(t_point)

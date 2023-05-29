@@ -332,7 +332,7 @@ Eigen::VectorXd DeltaInternalCouplesIntegrator::computerParametersVectorAtPoint(
 {
 
     const auto M_linear = m_rod_properties->getMLinear();
-    const auto M_angular = m_rod_properties->getHAngular();
+    const auto M_angular = m_rod_properties->getMAngular();
 
     return ::LieAlgebra::skew(m_Gamma_stack->at(t_point)).transpose() * m_Delta_internal_forces_integrator->getStateAtPoint(t_point)
             + ::LieAlgebra::skew(m_Delta_K_stack->at(t_point)).transpose() * m_internal_couples_integrator->getStateAtPoint(t_point)

@@ -26,7 +26,7 @@ Config.Nt    = length(Config.time);
 
 
 % longueur de la poutre
-Config.L = 1.75;
+Config.L = 1.0;
 % Pas de discrétisation du corps
 Config.dX = Config.L/101;
 % Construction du corps et de ses paramètres
@@ -83,7 +83,7 @@ Dee = reshape(Dee_vec, [Const.dim_base Const.dim_base]);
 
 Const.Kee = Kee;
 % Const.Dee = Dee;
-Const.Dee = 0*1e-3*Kee;
+Const.Dee = Const.mu*Kee;
 
 % ------------------------------------------------------- %
 
