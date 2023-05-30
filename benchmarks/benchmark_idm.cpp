@@ -22,7 +22,7 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
-constexpr unsigned int number_of_Chebyshev_points = 17;
+constexpr unsigned int number_of_Chebyshev_points = 21;
 
 
 void benchmarkIDM(::benchmark::State &t_state)
