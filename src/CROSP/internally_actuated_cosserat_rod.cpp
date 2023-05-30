@@ -10,7 +10,8 @@ InternallyActuatedCosseratRod::InternallyActuatedCosseratRod(const ::ATORS::tend
       m_tendon_driven_actuator(this->m_strain_parameterisation->m_K_stack,
                                this->m_strain_parameterisation->m_Gamma_stack,
                                this->m_strain_parameterisation->m_map_to_strain_stack,
-                               t_actuated_tendons)
+                               t_actuated_tendons,
+                               m_rod_properties->m_rod_dimensions.m_L)
 {}
 
 
@@ -20,7 +21,8 @@ InternallyActuatedCosseratRod::InternallyActuatedCosseratRod(const std::shared_p
       m_tendon_driven_actuator(this->m_strain_parameterisation->m_K_stack,
                                this->m_strain_parameterisation->m_Gamma_stack,
                                this->m_strain_parameterisation->m_map_to_strain_stack,
-                               t_actuated_tendons)
+                               t_actuated_tendons,
+                               m_rod_properties->m_rod_dimensions.m_L)
 {}
 
 
@@ -31,7 +33,8 @@ InternallyActuatedCosseratRod::InternallyActuatedCosseratRod(const std::shared_p
       m_tendon_driven_actuator(this->m_strain_parameterisation->m_K_stack,
                                this->m_strain_parameterisation->m_Gamma_stack,
                                this->m_strain_parameterisation->m_map_to_strain_stack,
-                               t_actuated_tendons)
+                               t_actuated_tendons,
+                               m_rod_properties->m_rod_dimensions.m_L)
 {}
 
 
@@ -43,7 +46,8 @@ InternallyActuatedCosseratRod::InternallyActuatedCosseratRod(const std::shared_p
       m_tendon_driven_actuator(this->m_strain_parameterisation->m_K_stack,
                                this->m_strain_parameterisation->m_Gamma_stack,
                                this->m_strain_parameterisation->m_map_to_strain_stack,
-                               t_actuated_tendons)
+                               t_actuated_tendons,
+                               m_rod_properties->m_rod_dimensions.m_L)
 {}
 
 

@@ -1,5 +1,5 @@
 #include "CROSP/CROSP/cosserat_rod.hpp"
-
+#include "CROSP/CROSP/internally_actuated_cosserat_rod.hpp"
 
 #include "utilities/Eigen/eigen_io.hpp"
 
@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
     const std::string path = "../../../MATLAB/test_different_modes/";
 
     std::array<bool, 6> admitted_deformations = {
-            true,
-            true,
+            false,
+            false,
             true,
             false,
             false,
@@ -28,8 +28,6 @@ int main(int argc, char *argv[])
     writeToFile("deformations_stack", deformations_stack, path);
 
     std::vector<unsigned int> number_of_modes_stack {
-        2,
-        3,
         5
     };
 
@@ -54,7 +52,7 @@ int main(int argc, char *argv[])
             std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(poly_with_admitted_def_and_modes, number_of_Chebyshev_points);
 
     ::CROSP::rod_properties::CircularCrossSection cs;
-    const double length = 1.0;
+    const double length = 0.284901172870460;
     ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, length);
 
     //  Now use it in rod properties
@@ -90,9 +88,9 @@ int main(int argc, char *argv[])
 //        ddot_q(i) = 0.2*(ne - i);
 //    }
 
-    q.setRandom();
-    dot_q.setRandom();
-    ddot_q.setRandom();
+//    q.setRandom();
+//    dot_q.setRandom();
+//    ddot_q.setRandom();
 
 
     std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
@@ -189,6 +187,44 @@ int main(int argc, char *argv[])
 
     }
 
+    ::ATORS::tendon_driven_actuation::ActuatedTendons actuated_tendons;
+
+    const double d_tendon = -0.011;
+    ::ATORS::tendon_driven_actuation::Tendon tendon1(Eigen::Vector3d(0, d_tendon, 0));
+
+
+    unsigned int weight = 2000;
+    const double gravity_Toronto = 9.80436;
+
+    ::ATORS::simple_actuator::SimpleActuator motor_tendon_1([&](const double &t)->Eigen::VectorXd{
+        ::LieAlgebra::Vector1d tension;
+        tension << weight*gravity_Toronto/1000;
+
+        return tension;
+    });
+
+
+
+
+    actuated_tendons = {
+        { motor_tendon_1, tendon1 }
+    };
+
+
+    //  Now the internal actuation
+    ::ATORS::tendon_driven_actuation::TendonDrivenActuation tendond_driven_actuation(strain_par->m_K_stack,
+                                                                                    strain_par->m_Gamma_stack,
+                                                                                    strain_par->m_map_to_strain_stack,
+                                                                                    actuated_tendons,
+                                                                                    rod_dimensions.m_L);
+
+    tendond_driven_actuation.updateActuation(0.0);
+    const auto Q_ad_stack = tendond_driven_actuation.getStackAsMatrix();
+    Eigen::VectorXd Q_ad = tendond_driven_actuation.getActuation();
+
+    std::cout << "Q_ad:\n" << Q_ad << "\n\n";
+
+    writeToFile("Q_ad_stack" + std::to_string(weight) + "g", Q_ad_stack, path);
 
 
     std::cout << "Ok saved all the data\n\n\n";
