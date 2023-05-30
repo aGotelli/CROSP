@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
     const double radius = 0.001; //mm
     const double length = 1.0; // m
 
+    const double rho = 7800;    //  Specific weight
+
 
     const std::string path_where_to_write_the_results = "data/"; //  If empty it will write in the build folder
     //  Note that if it starts with a / then the path is absolute (starting from the home directory of your pc)
@@ -78,10 +80,12 @@ int main(int argc, char *argv[])
                                                                                        number_of_Chebyshev_points);
 
 
+    ::CROSP::rod_properties::MaterialProperties mat;
+    mat.m_rho = rho;
     std::shared_ptr<::rod_properties::RodProperties> rod_properties =
             std::make_shared<::rod_properties::RodProperties>(strain_param,
                                                               rod_dimensions,
-                                                              ::CROSP::rod_properties::MaterialProperties());
+                                                              mat);
 
 
 
