@@ -83,7 +83,7 @@ Dee = reshape(Dee_vec, [Const.dim_base Const.dim_base]);
 
 Const.Kee = Kee;
 % Const.Dee = Dee;
-Const.Dee = 0*1e-3*Kee;
+Const.Dee = Const.mu*Kee;
 
 % ------------------------------------------------------- %
 

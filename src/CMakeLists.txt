@@ -123,7 +123,8 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         math_tools
         Eigen3::Eigen
-        OSNI
+        debug OSNI-debug
+        optimized OSNI
         optimized ATORS
         debug ATORS-debug
 #    PUBLIC

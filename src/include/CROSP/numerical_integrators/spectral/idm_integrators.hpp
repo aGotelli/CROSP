@@ -48,9 +48,9 @@ struct QuaternionIntegrator : public OSNI::ODEA {
 
     virtual Eigen::MatrixXd computeMatrixAtChebyshevPoint(const unsigned int t_point) final;
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_parameterisation_stack->m_K_stack
     };
 
@@ -71,13 +71,13 @@ struct PositionIntegrator : public OSNI::ODEb {
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
 
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
         m_parameterisation_stack->m_Gamma_stack
     };
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
 
     Eigen::Quaterniond m_quaternion_at_point;
 
@@ -99,13 +99,13 @@ struct AngularVelocityIntegrator : public OSNI::ODEAb {
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
 
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_parameterisation_stack->m_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
         m_parameterisation_stack->m_dot_K_stack
     };
 
@@ -127,21 +127,21 @@ struct LinearVelocityIntegrator : public OSNI::ODEAb {
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point);
 
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_parameterisation_stack->m_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
         m_parameterisation_stack->m_Gamma_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
         m_parameterisation_stack->m_dot_Gamma_stack
     };
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
 
 
 
@@ -164,21 +164,21 @@ struct AngularAccelerationIntegrator : public OSNI::ODEAb {
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
 
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_parameterisation_stack->m_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
         m_parameterisation_stack->m_dot_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_K_stack {
         m_parameterisation_stack->m_ddot_K_stack
     };
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
 
 
 };
@@ -206,33 +206,33 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
 
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
         m_parameterisation_stack->m_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
         m_parameterisation_stack->m_dot_K_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
         m_parameterisation_stack->m_Gamma_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack{
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack{
         m_parameterisation_stack->m_dot_Gamma_stack
     };
 
-    const std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack{
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack{
         m_parameterisation_stack->m_ddot_Gamma_stack
     };
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_angular_velocity;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_linear_velocity;
 
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_angular_acceleration;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_angular_acceleration;
 
 
 
@@ -352,9 +352,9 @@ struct GeneralisedForcesIntegrator : public OSNI::ODEb {
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
 
-    const std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_internal_couples_integrator;
-    const std::shared_ptr<const OSNI::ODESolverInterface> m_internal_forces_integrator;
+    std::shared_ptr<const ParameterisationStack> m_parameterisation_stack;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_internal_couples_integrator;
+    std::shared_ptr<const OSNI::ODESolverInterface> m_internal_forces_integrator;
 
 };
 
@@ -384,40 +384,40 @@ struct IDMIntegrators {
 
 
     //  Integrator for the quaternions
-    const std::shared_ptr<OSNI::ODESolverInterface> m_quaternion {
+    std::shared_ptr<OSNI::ODESolverInterface> m_quaternion {
         std::make_shared<QuaternionIntegrator>(m_parameterisation_stack,
                                                m_rod_properties.m_rod_dimensions.m_L)
     };
 
     //  Integrator for the positions
-    const std::shared_ptr<OSNI::ODESolverInterface> m_position {
+    std::shared_ptr<OSNI::ODESolverInterface> m_position {
         std::make_shared<PositionIntegrator>(m_parameterisation_stack,
                                              m_quaternion,
                                              m_rod_properties.m_rod_dimensions.m_L)
     };
 
     //  Integrator for the angular velocities
-    const std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity {
+    std::shared_ptr<OSNI::ODESolverInterface> m_angular_velocity {
         std::make_shared<AngularVelocityIntegrator>(m_parameterisation_stack,
                                                     m_rod_properties.m_rod_dimensions.m_L)
     };
 
     //  Integrator for the linear velocities
-    const std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity {
+    std::shared_ptr<OSNI::ODESolverInterface> m_linear_velocity {
         std::make_shared<LinearVelocityIntegrator>(m_parameterisation_stack,
                                                    m_angular_velocity,
                                                    m_rod_properties.m_rod_dimensions.m_L)
     };
 
     //  Integrator for the angular accelerations
-    const std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration {
+    std::shared_ptr<OSNI::ODESolverInterface> m_angular_acceleration {
         std::make_shared<AngularAccelerationIntegrator>(m_parameterisation_stack,
                                                         m_angular_velocity,
                                                         m_rod_properties.m_rod_dimensions.m_L)
     };
 
     //  Integrator for the linear accelerations
-    const std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration {
+    std::shared_ptr<OSNI::ODESolverInterface> m_linear_acceleration {
         std::make_shared<LinearAccelerationIntegrator>(m_parameterisation_stack,
                                                        m_angular_velocity,
                                                        m_linear_velocity,
@@ -427,7 +427,7 @@ struct IDMIntegrators {
 
 
     //  Integrator for the internal forces
-    const std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces {
+    std::shared_ptr<OSNI::ODESolverInterface> m_internal_forces {
         std::make_shared<InternalForcesIntegrator>(m_parameterisation_stack,
                                                    m_rod_properties,
                                                    m_angular_velocity,
@@ -438,7 +438,7 @@ struct IDMIntegrators {
     };
 
     //  Integrator for the internal couples
-    const std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples {
+    std::shared_ptr<OSNI::ODESolverInterface> m_internal_couples {
         std::make_shared<InternalCouplesIntegrator>(m_parameterisation_stack,
                                                     m_rod_properties,
                                                     m_angular_velocity,
@@ -450,7 +450,7 @@ struct IDMIntegrators {
     };
 
     //  Integrator for the generalised coordinates
-    const std::shared_ptr<OSNI::ODESolverInterface> m_generalised_forces {
+    std::shared_ptr<OSNI::ODESolverInterface> m_generalised_forces {
         std::make_unique<GeneralisedForcesIntegrator>(m_parameterisation_stack,
                                                       m_internal_couples,
                                                       m_internal_forces,
