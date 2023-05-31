@@ -22,7 +22,7 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
-constexpr unsigned int number_of_Chebyshev_points = 21;
+constexpr unsigned int number_of_Chebyshev_points = 17;
 
 
 void benchmarkIDM(::benchmark::State &t_state)
@@ -35,7 +35,8 @@ void benchmarkIDM(::benchmark::State &t_state)
 
     t_state.counters = {
       {"na", na},
-      {"ne", ne}
+      {"ne", ne},
+      {"Nc", number_of_Chebyshev_points}
     };
 
 
@@ -58,16 +59,20 @@ void benchmarkIDM(::benchmark::State &t_state)
 
     while(t_state.KeepRunning()){
 
-        rod.updateParameterisation(q, dot_q, ddot_q);
+//        rod.updateParameterisation(q, dot_q, ddot_q);
+
+        rod.m_idm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+
 
         rod.forwardKinematics();
         rod.backwardDynamics(F1);
 
-        const Eigen::Vector3d r = rod.getKinematicsAtTip().m_pose.m_position;
+//        const Eigen::Vector3d r = rod.getKinematicsAtTip().m_pose.m_position;
 
-        if(std::isnan(r.x()) || std::isnan(r.y()) || std::isnan(r.z())){
-            t_state.SkipWithError("Result is nan!");
-        }
+//        if(std::isnan(r.x()) || std::isnan(r.y()) || std::isnan(r.z())){
+//            t_state.SkipWithError("Result is nan!");
+//        }
     }
 };
 

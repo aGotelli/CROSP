@@ -26,7 +26,7 @@ Config.Nt    = length(Config.time);
 
 
 % longueur de la poutre
-Config.L = 1.0;
+Config.L = 1.5;
 % Pas de discrétisation du corps
 Config.dX = Config.L/101;
 % Construction du corps et de ses paramètres

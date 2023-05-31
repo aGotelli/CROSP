@@ -48,7 +48,9 @@ void benchmarkTIDM(::benchmark::State &t_state)
     Eigen::VectorXd dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
 
-    rod.updateParameterisation(q, dot_q, ddot_q);
+//    rod.updateParameterisation(q, dot_q, ddot_q);
+    rod.m_idm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+    rod.m_tidm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
     rod.forwardKinematics();
     rod.backwardDynamics(F1);
@@ -68,12 +70,19 @@ void benchmarkTIDM(::benchmark::State &t_state)
 
     while(t_state.KeepRunning()){
 
-            rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
+//            rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
+            rod.m_tidm_integrators->m_Delta_strain_parameterisation_stack->updateStrainParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
             rod.forwardTangentKinematics();
             rod.backwardTangentDynamics(Delta_F1);
 
     }
+
+    t_state.counters = {
+      {"na", na},
+      {"ne", ne},
+      {"Nc", number_of_Chebyshev_points}
+    };
 };
 
 
@@ -91,11 +100,11 @@ int main(int argc, char *argv[])
     std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
 
 
-    const std::string benchmark_name = "TIDM_na" + std::to_string(na) + "_ne";
+    const std::string benchmark_name = "TIDM";
 
 
     for(const auto ne : ne_stack)
-        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkTIDM)->Arg(ne)->Repetitions(repetitions);
+        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkTIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
     ::benchmark::Initialize(&argc, argv);

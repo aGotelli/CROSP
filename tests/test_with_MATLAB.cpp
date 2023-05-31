@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
     const std::string path = "../../../MATLAB/test_different_modes/";
 
     std::array<bool, 6> admitted_deformations = {
-            false,
-            false,
+            true,
+            true,
             true,
             false,
             false,
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     writeToFile("deformations_stack", deformations_stack, path);
 
     std::vector<unsigned int> number_of_modes_stack {
-        5
+        5, 2, 3
     };
 
     Eigen::VectorXd ne_stack = Eigen::VectorXd::Zero(6);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
             std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(poly_with_admitted_def_and_modes, number_of_Chebyshev_points);
 
     ::CROSP::rod_properties::CircularCrossSection cs;
-    const double length = 0.284901172870460;
+    const double length = 1.5;
     ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, length);
 
     //  Now use it in rod properties
@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
 //        ddot_q(i) = 0.2*(ne - i);
 //    }
 
-//    q.setRandom();
-//    dot_q.setRandom();
-//    ddot_q.setRandom();
+    q.setRandom();
+    dot_q.setRandom();
+    ddot_q.setRandom();
 
 
     std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
@@ -103,7 +103,9 @@ int main(int argc, char *argv[])
     writeToFile("ddot_q", ddot_q, path);
 
 
-    rod.updateParameterisation(q, dot_q, ddot_q);
+//    rod.updateParameterisation(q, dot_q, ddot_q);
+    rod.m_idm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+    rod.m_tidm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
     rod.forwardKinematics();
@@ -155,7 +157,8 @@ int main(int argc, char *argv[])
         Delta_ddot_q = b * Delta_q;
 
 
-        rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
+//        rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
+        rod.m_tidm_integrators->m_Delta_strain_parameterisation_stack->updateStrainParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
         rod.forwardTangentKinematics();
 

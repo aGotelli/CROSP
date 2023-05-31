@@ -95,6 +95,8 @@ add_library(${PROJECT_NAME} SHARED
                             ${PROJECT_NAME}/cosserat_rod.cpp
                             include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
                             ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
+                            include/${PROJECT_NAME}/strain_parameterisation_stack/strain_parameterisation_stack.hpp
+                            strain_parameterisation_stack/strain_parameterisation_stack.cpp
 #                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
 #                            static_initialiser/static_initialiser.cpp
 #                            include/CROSP/CROSP/internal_actuation.hpp
