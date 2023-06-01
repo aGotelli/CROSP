@@ -392,19 +392,12 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
 
 
 
-TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                 std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+                                 std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
                                  std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
                                  std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
-    : m_strain_parameterisation_stack(
-          std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_strain_parameterisation->m_polynomial_representation,
-                                                        t_strain_parameterisation->m_number_of_Chebyshev_points)),
-      m_Delta_strain_parameterisation_stack(
-                std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_strain_parameterisation->m_polynomial_representation,
-                                                              t_strain_parameterisation->m_number_of_Chebyshev_points,
-                                                              ::CROSP::strain_parameterisation_stack::zero_constrained_strain)),
-//      m_strain_parameterisation(t_strain_parameterisation),
-//      m_strain_parameterisation_Delta(t_strain_parameterisation_Delta),
+    : m_strain_parameterisation_stack( t_strain_parameterisation_stack ),
+      m_Delta_strain_parameterisation_stack( t_Delta_strain_parameterisation_stack ),
       m_idm_integrators(t_idm_integrators),
       m_rod_properties(t_rod_properties)
 {}

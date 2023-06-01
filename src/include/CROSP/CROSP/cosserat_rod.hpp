@@ -429,18 +429,18 @@ protected:
 
 
     //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators {
+    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators /*{
         std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
                                                           m_rod_properties )
-    };
+    }*/;
 
     //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators {
+    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators /*{
         std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
                                                             m_strain_parameterisation_Delta,
                                                             m_idm_integrators,
                                                             m_rod_properties)
-    };
+    }*/;
 
 
 };

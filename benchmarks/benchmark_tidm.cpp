@@ -41,25 +41,26 @@ void benchmarkTIDM(::benchmark::State &t_state)
 
     ::CROSP::CosseratRod rod(strain_param);
 
-    ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
+    ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
 
     Eigen::VectorXd q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
 
-//    rod.updateParameterisation(q, dot_q, ddot_q);
-    rod.m_idm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
-    rod.m_tidm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+    rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
 
-    rod.forwardKinematics();
-    rod.backwardDynamics(F1);
+    rod.m_cosserat_rod_integrators->forwardKinematics();
+
+    rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
+
+
 
     Eigen::VectorXd Delta_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
 
-    ::LieAlgebra::Vector6d Delta_F1 = ::LieAlgebra::Vector6d::Zero();
+    ::LieAlgebra::Vector6d Delta_Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
     Delta_q.setZero();
     Delta_q[0] = 1;
@@ -70,11 +71,12 @@ void benchmarkTIDM(::benchmark::State &t_state)
 
     while(t_state.KeepRunning()){
 
-//            rod.updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
-            rod.m_tidm_integrators->m_Delta_strain_parameterisation_stack->updateStrainParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
+        rod.m_cosserat_rod_integrators->updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
-            rod.forwardTangentKinematics();
-            rod.backwardTangentDynamics(Delta_F1);
+        rod.m_cosserat_rod_integrators->forwardTangentKinematics();
+
+        rod.m_cosserat_rod_integrators->backwardTangentDynamics(Delta_Lambda_X1);
+
 
     }
 

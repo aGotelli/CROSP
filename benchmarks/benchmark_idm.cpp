@@ -49,7 +49,7 @@ void benchmarkIDM(::benchmark::State &t_state)
 
     ::CROSP::CosseratRod rod(strain_param);
 
-    ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
+    ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
 
     Eigen::VectorXd q = Eigen::VectorXd::Zero(coordinated_dimension);
@@ -59,20 +59,12 @@ void benchmarkIDM(::benchmark::State &t_state)
 
     while(t_state.KeepRunning()){
 
-//        rod.updateParameterisation(q, dot_q, ddot_q);
+        rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
 
-        rod.m_cosserat_rod_integrators->m_idm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+        rod.m_cosserat_rod_integrators->forwardKinematics();
 
+        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
 
-
-//        rod.forwardKinematics();
-//        rod.backwardDynamics(F1);
-
-//        const Eigen::Vector3d r = rod.getKinematicsAtTip().m_pose.m_position;
-
-//        if(std::isnan(r.x()) || std::isnan(r.y()) || std::isnan(r.z())){
-//            t_state.SkipWithError("Result is nan!");
-//        }
     }
 };
 
