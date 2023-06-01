@@ -23,7 +23,8 @@
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
-#include "CROSP/spectral_integrators.hpp"
+#include "CROSP/numerical_integrators/cosserat_rod_integrators.hpp"
+#include "CROSP/numerical_integrators/spectral_method/spectral_integrators.hpp"
 
 #include <boost/numeric/odeint.hpp>
 
@@ -357,7 +358,7 @@ public:
      * The rows are ordered so that the first correspond to the initial position at X = 0 and the last contains the position at X = 1.
      *
      */
-    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_idm_integrators->m_position->getStackAsMatrix();}
+    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{/*return m_idm_integrators->m_position->getStackAsMatrix();*/}
 
 
     /*!
@@ -421,26 +422,32 @@ protected:
     };
 
 
-    integrators::spectral_integrators::IntegratorsSPtr m_cosserat_rod_integrators {
-        std::make_shared<integrators::spectral_integrators::SpectralIntegrators>(m_strain_parameterisation,
-                                                                                 m_strain_parameterisation_Delta,
-                                                                                 m_rod_properties)
+    ::CROSP::numerical_integrators::spectral_method::SpectralIntegrators m_cosserat_rod_integrators {
+      ::CROSP::numerical_integrators::spectral_method::SpectralIntegrators(m_strain_parameterisation,
+                                                                                             m_strain_parameterisation_Delta,
+                                                                                             m_rod_properties)
     };
 
+//    integrators::spectral_integrators::IntegratorsSPtr m_cosserat_rod_integrators {
+//        std::make_shared<integrators::spectral_integrators::SpectralIntegrators>(m_strain_parameterisation,
+//                                                                                 m_strain_parameterisation_Delta,
+//                                                                                 m_rod_properties)
+//    };
 
-    //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators /*{
-        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
-                                                          m_rod_properties )
-    }*/;
 
-    //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators /*{
-        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
-                                                            m_strain_parameterisation_Delta,
-                                                            m_idm_integrators,
-                                                            m_rod_properties)
-    }*/;
+//    //  The set of integrators needed for the IDM
+//    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators /*{
+//        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
+//                                                          m_rod_properties )
+//    }*/;
+
+//    //  The set of integrators needed for the TIDM
+//    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators /*{
+//        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
+//                                                            m_strain_parameterisation_Delta,
+//                                                            m_idm_integrators,
+//                                                            m_rod_properties)
+//    }*/;
 
 
 };

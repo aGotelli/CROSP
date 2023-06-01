@@ -29,7 +29,7 @@
 
 
 /// \brief CROSP::idm_integrators is the namespace containing the integrators for the IDM
-namespace CROSP::idm_integrators {
+namespace CROSP::numerical_integrators::spectral_method::idm_integrators {
 
 
 
@@ -463,7 +463,7 @@ struct IDMIntegrators {
 };
 
 
-}   //  namespace CROSP::IDMIntegrators
+}   //  namespace CROSP::numerical_integrators::spectral_method::IDMIntegrators
 
 
 

@@ -10,11 +10,11 @@
  */
 
 
-#include "CROSP/idm_integrators/idm_integrators.hpp"
+#include "CROSP/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp"
 
 
 
-namespace CROSP::idm_integrators {
+namespace CROSP::numerical_integrators::spectral_method::idm_integrators {
 
 
 
@@ -402,4 +402,4 @@ void IDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_l
 
 
 
-}   //  namespace CROSP::IDMIntegrators
+}   //  namespace CROSP::numerical_integrators::spectral_method::IDMIntegrators

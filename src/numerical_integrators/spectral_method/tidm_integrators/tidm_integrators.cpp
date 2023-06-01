@@ -10,9 +10,10 @@
  */
 
 
-#include "CROSP/tidm_integrators/tidm_integrators.hpp"
+#include "CROSP/numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.hpp"
 
-namespace CROSP::tidm_integrators {
+
+namespace CROSP::numerical_integrators::spectral_method::tidm_integrators {
 
 
 
@@ -392,15 +393,15 @@ Eigen::VectorXd DeltaGeneralisedForcesIntegrator::computerParametersVectorAtPoin
 
 
 
-TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                                 std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
-                                 std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                                 std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
-    : m_strain_parameterisation_stack( t_strain_parameterisation_stack ),
-      m_Delta_strain_parameterisation_stack( t_Delta_strain_parameterisation_stack ),
-      m_idm_integrators(t_idm_integrators),
-      m_rod_properties(t_rod_properties)
-{}
+//TIDMIntegrators::TIDMIntegrators(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+//                                 std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
+//                                 std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
+//                                 std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+//    : m_strain_parameterisation_stack( t_strain_parameterisation_stack ),
+//      m_Delta_strain_parameterisation_stack( t_Delta_strain_parameterisation_stack ),
+//      m_idm_integrators(t_idm_integrators),
+//      m_rod_properties(t_rod_properties)
+//{}
 
 
 void TIDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_limit)
@@ -422,4 +423,4 @@ void TIDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_
 
 
 
-}   //  namespace CROSP::tidm_integrators
+}   //  namespace CROSP::numerical_integrators::spectral_method::tidm_integrators

@@ -6,6 +6,7 @@
 
 
 #include <Eigen/Dense>
+#include <memory>
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
@@ -20,7 +21,7 @@ struct CosseratRodIntegrators {
     virtual ~CosseratRodIntegrators()=default;
 
 
-    virtual std::string printIntegratorProperties()const=0;
+//    virtual std::string printIntegratorProperties()const=0;
 
 
     virtual void updateParameterisation(const Eigen::VectorXd &t_qe,
@@ -31,12 +32,12 @@ struct CosseratRodIntegrators {
     virtual void forwardKinematics()=0;
 
 
-    virtual void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
-                                   const Eigen::Vector3d &t_initial_position,
-                                   const Eigen::Vector3d &t_initial_angular_velocity,
-                                   const Eigen::Vector3d &t_initial_linear_velocity,
-                                   const Eigen::Vector3d &t_initial_angular_acceleration,
-                                   const Eigen::Vector3d &t_initial_linear_acceleration)=0;
+//    virtual void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+//                                   const Eigen::Vector3d &t_initial_position,
+//                                   const Eigen::Vector3d &t_initial_angular_velocity,
+//                                   const Eigen::Vector3d &t_initial_linear_velocity,
+//                                   const Eigen::Vector3d &t_initial_angular_acceleration,
+//                                   const Eigen::Vector3d &t_initial_linear_acceleration)=0;
 
 
    virtual void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
@@ -46,17 +47,17 @@ struct CosseratRodIntegrators {
     virtual void forwardTangentKinematics()=0;
 
 
-    virtual void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
-                                          const Eigen::Vector3d &t_initial_Delta_position,
-                                          const Eigen::Vector3d &t_initial_Delta_angular_velocity,
-                                          const Eigen::Vector3d &t_initial_Delta_linear_velocity,
-                                          const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
-                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration)=0;
+//    virtual void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+//                                          const Eigen::Vector3d &t_initial_Delta_position,
+//                                          const Eigen::Vector3d &t_initial_Delta_angular_velocity,
+//                                          const Eigen::Vector3d &t_initial_Delta_linear_velocity,
+//                                          const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
+//                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration)=0;
 
 
-    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const=0;
+//    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const=0;
 
-    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const=0;
+//    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const=0;
 
 
 
@@ -69,28 +70,32 @@ struct CosseratRodIntegrators {
 
 
 
-    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const=0;
+//    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const=0;
 
 
 
-    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const=0;
+//    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const=0;
 
 
-    virtual ::LieAlgebra::Vector6d getQaAtBase()const=0;
+//    virtual ::LieAlgebra::Vector6d getQaAtBase()const=0;
 
 
 
-    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const=0;
+//    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const=0;
 
 
-    virtual void updateIntegrationDomain(const double &t_rod_lenght)=0;
+//    virtual void updateIntegrationDomain(const double &t_rod_lenght)=0;
 
 
-    virtual Eigen::MatrixXd getRodPositions()const=0;
+//    virtual Eigen::MatrixXd getRodPositions()const=0;
 
 
 
 };
+
+typedef std::unique_ptr<CosseratRodIntegrators> CosseratIntegratorUPtr;
+
+typedef std::shared_ptr<CosseratRodIntegrators> CosseratIntegratorSPtr;
 
 
 

@@ -93,11 +93,21 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp
-                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
-                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
+#                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
+#                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
+
+
                             include/${PROJECT_NAME}/strain_parameterisation_stack/strain_parameterisation_stack.hpp
                             strain_parameterisation_stack/strain_parameterisation_stack.cpp
-                            include/CROSP/spectral_integrators.hpp
+
+
+                            include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/spectral_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.hpp
+                            numerical_integrators/spectral_method/spectral_integrators.cpp
+                            numerical_integrators/spectral_method/idm_integrators/idm_integrators.cpp
+                            numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.cpp
 #                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
 #                            static_initialiser/static_initialiser.cpp
 #                            include/CROSP/CROSP/internal_actuation.hpp
@@ -108,10 +118,10 @@ add_library(${PROJECT_NAME} SHARED
                             rod_properties/rod_properties.cpp
                             include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
                             strain_parameterisation/strain_parameterisation.cpp
-                            include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
-                            idm_integrators/idm_integrators.cpp
-                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
-                            tidm_integrators/tidm_integrators.cpp
+#                            include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
+#                            idm_integrators/idm_integrators.cpp
+#                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
+#                            tidm_integrators/tidm_integrators.cpp
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -134,12 +144,12 @@ target_compile_options(${PROJECT_NAME}
 )
 
 
-add_executable(prove prove.cpp)
-target_link_libraries(prove
-    ${PROJECT_NAME}
-    optimized ATORS
-    debug ATORS-debug
-)
+#add_executable(prove prove.cpp)
+#target_link_libraries(prove
+#    ${PROJECT_NAME}
+#    optimized ATORS
+#    debug ATORS-debug
+#)
 
 
 install(

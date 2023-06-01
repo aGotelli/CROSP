@@ -64,22 +64,22 @@ int main(int argc, char *argv[])
 
 
 
-    ::CROSP::CosseratRod rod(strain_par, rod_properties);
-    rod.printProperties();
+//    ::CROSP::CosseratRod rod(strain_par, rod_properties);
+//    rod.printProperties();
 
 
-    writeToFile("Kee", rod.m_rod_properties->m_Kee, path);
-    writeToFile("Dee", rod.m_rod_properties->m_Dee, path);
+//    writeToFile("Kee", rod.m_rod_properties->m_Kee, path);
+//    writeToFile("Dee", rod.m_rod_properties->m_Dee, path);
 
 
-    writeToFile("B", rod.m_strain_parameterisation->m_polynomial_representation->m_B, path);
-    writeToFile("B_bar", rod.m_strain_parameterisation->m_polynomial_representation->m_Bbar, path);
+//    writeToFile("B", rod.m_strain_parameterisation->m_polynomial_representation->m_B, path);
+//    writeToFile("B_bar", rod.m_strain_parameterisation->m_polynomial_representation->m_Bbar, path);
 
 
-    const auto ne = rod.getCoordinatesDimension();
-    Eigen::VectorXd q      = Eigen::VectorXd::Zero(ne);
-    Eigen::VectorXd dot_q  = Eigen::VectorXd::Zero(ne);
-    Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
+//    const auto ne = rod.getCoordinatesDimension();
+//    Eigen::VectorXd q      = Eigen::VectorXd::Zero(ne);
+//    Eigen::VectorXd dot_q  = Eigen::VectorXd::Zero(ne);
+//    Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
 
 
 //    for(unsigned int i=0; i<ne; i++){
@@ -88,147 +88,147 @@ int main(int argc, char *argv[])
 //        ddot_q(i) = 0.2*(ne - i);
 //    }
 
-    q.setRandom();
-    dot_q.setRandom();
-    ddot_q.setRandom();
+//    q.setRandom();
+//    dot_q.setRandom();
+//    ddot_q.setRandom();
 
 
-    std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
-
-
-
-
-    writeToFile("q", q, path);
-    writeToFile("dot_q", dot_q, path);
-    writeToFile("ddot_q", ddot_q, path);
-
-
-    rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
+//    std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
 
 
 
 
-    rod.m_cosserat_rod_integrators->forwardKinematics();
-
-    auto zeros_6x1 = ::LieAlgebra::Vector6d::Zero();
-    rod.m_cosserat_rod_integrators->backwardDynamics(zeros_6x1);
-
+//    writeToFile("q", q, path);
+//    writeToFile("dot_q", dot_q, path);
+//    writeToFile("ddot_q", ddot_q, path);
 
 
-    const auto Q_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
-    const auto r_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_position->getStackAsMatrix();
-    const auto Omega_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_angular_velocity->getStackAsMatrix();
-    const auto V_stack     = rod.m_cosserat_rod_integrators->m_idm_integrators->m_linear_velocity->getStackAsMatrix();
-    const auto dot_Omega_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_angular_acceleration->getStackAsMatrix();
-    const auto dot_V_stack     = rod.m_cosserat_rod_integrators->m_idm_integrators->m_linear_acceleration->getStackAsMatrix();
-
-    const auto N_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_internal_forces->getStackAsMatrix();
-    const auto C_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_internal_couples->getStackAsMatrix();
-    const auto Qa_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_generalised_forces->getStackAsMatrix();
+//    rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
 
 
 
 
+//    rod.m_cosserat_rod_integrators->forwardKinematics();
 
-    writeToFile("Q_stack", Q_stack, path);
-    writeToFile("r_stack", r_stack, path);
-    writeToFile("Omega_stack", Omega_stack, path);
-    writeToFile("V_stack", V_stack, path);
-    writeToFile("dot_Omega_stack", dot_Omega_stack, path);
-    writeToFile("dot_V_stack", dot_V_stack, path);
-    writeToFile("N_stack", N_stack, path);
-    writeToFile("C_stack", C_stack, path);
-    writeToFile("Qa_stack", Qa_stack, path);
+//    auto zeros_6x1 = ::LieAlgebra::Vector6d::Zero();
+//    rod.m_cosserat_rod_integrators->backwardDynamics(zeros_6x1);
 
 
 
-    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
-    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
-    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
+//    const auto Q_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
+//    const auto r_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_position->getStackAsMatrix();
+//    const auto Omega_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_angular_velocity->getStackAsMatrix();
+//    const auto V_stack     = rod.m_cosserat_rod_integrators->m_idm_integrators->m_linear_velocity->getStackAsMatrix();
+//    const auto dot_Omega_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_angular_acceleration->getStackAsMatrix();
+//    const auto dot_V_stack     = rod.m_cosserat_rod_integrators->m_idm_integrators->m_linear_acceleration->getStackAsMatrix();
 
-
-    const unsigned int a = 400;
-    const unsigned int b = 160000;
-
-    for(unsigned int i=0; i<ne; i++){
-
-        Delta_q.setZero();
-        Delta_q[i] = 1;
-
-        Delta_dot_q  = a * Delta_q;
-        Delta_ddot_q = b * Delta_q;
-
-
-        rod.m_cosserat_rod_integrators->updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
-
-        rod.m_cosserat_rod_integrators->forwardTangentKinematics();
-
-        rod.m_cosserat_rod_integrators->backwardTangentDynamics(zeros_6x1);
-
-
-
-        const auto Delta_rotation_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_rotation->getStackAsMatrix();
-        const auto Delta_position_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_position->getStackAsMatrix();
-        const auto Delta_Omega_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix();
-        const auto Delta_V_stack     = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix();
-        const auto Delta_dot_Omega_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix();
-        const auto Delta_dot_V_stack     = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix();
-
-        const auto Delta_N_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_internal_forces->getStackAsMatrix();
-        const auto Delta_C_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_internal_couples->getStackAsMatrix();
-        const auto Delta_Qa_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix();
-
-
-        writeToFile("Delta_rotation_stack" "_Delta" + std::to_string(i), Delta_rotation_stack, path);
-        writeToFile("Delta_position_stack" "_Delta" + std::to_string(i), Delta_position_stack, path);
-        writeToFile("Delta_Omega_stack" "_Delta" + std::to_string(i), Delta_Omega_stack, path);
-        writeToFile("Delta_V_stack" "_Delta" + std::to_string(i), Delta_V_stack, path);
-        writeToFile("Delta_dot_Omega_stack" "_Delta" + std::to_string(i), Delta_dot_Omega_stack, path);
-        writeToFile("Delta_dot_V_stack" "_Delta" + std::to_string(i), Delta_dot_V_stack, path);
-        writeToFile("Delta_N_stack" "_Delta" + std::to_string(i), Delta_N_stack, path);
-        writeToFile("Delta_C_stack" "_Delta" + std::to_string(i), Delta_C_stack, path);
-        writeToFile("Delta_Qa_stack" "_Delta" + std::to_string(i), Delta_Qa_stack, path);
-
-    }
-
-    ::ATORS::tendon_driven_actuation::ActuatedTendons actuated_tendons;
-
-    const double d_tendon = -0.011;
-    ::ATORS::tendon_driven_actuation::Tendon tendon1(Eigen::Vector3d(0, d_tendon, 0));
-
-
-    unsigned int weight = 2000;
-    const double gravity_Toronto = 9.80436;
-
-    ::ATORS::simple_actuator::SimpleActuator motor_tendon_1([&](const double &t)->Eigen::VectorXd{
-        ::LieAlgebra::Vector1d tension;
-        tension << weight*gravity_Toronto/1000;
-
-        return tension;
-    });
+//    const auto N_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_internal_forces->getStackAsMatrix();
+//    const auto C_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_internal_couples->getStackAsMatrix();
+//    const auto Qa_stack = rod.m_cosserat_rod_integrators->m_idm_integrators->m_generalised_forces->getStackAsMatrix();
 
 
 
 
-    actuated_tendons = {
-        { motor_tendon_1, tendon1 }
-    };
+
+//    writeToFile("Q_stack", Q_stack, path);
+//    writeToFile("r_stack", r_stack, path);
+//    writeToFile("Omega_stack", Omega_stack, path);
+//    writeToFile("V_stack", V_stack, path);
+//    writeToFile("dot_Omega_stack", dot_Omega_stack, path);
+//    writeToFile("dot_V_stack", dot_V_stack, path);
+//    writeToFile("N_stack", N_stack, path);
+//    writeToFile("C_stack", C_stack, path);
+//    writeToFile("Qa_stack", Qa_stack, path);
 
 
-    //  Now the internal actuation
-    ::ATORS::tendon_driven_actuation::TendonDrivenActuation tendond_driven_actuation(strain_par->m_K_stack,
-                                                                                    strain_par->m_Gamma_stack,
-                                                                                    strain_par->m_map_to_strain_stack,
-                                                                                    actuated_tendons,
-                                                                                    rod_dimensions.m_L);
 
-    tendond_driven_actuation.updateActuation(0.0);
-    const auto Q_ad_stack = tendond_driven_actuation.getStackAsMatrix();
-    Eigen::VectorXd Q_ad = tendond_driven_actuation.getActuation();
+//    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
+//    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
+//    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
 
-    std::cout << "Q_ad:\n" << Q_ad << "\n\n";
 
-    writeToFile("Q_ad_stack" + std::to_string(weight) + "g", Q_ad_stack, path);
+//    const unsigned int a = 400;
+//    const unsigned int b = 160000;
+
+//    for(unsigned int i=0; i<ne; i++){
+
+//        Delta_q.setZero();
+//        Delta_q[i] = 1;
+
+//        Delta_dot_q  = a * Delta_q;
+//        Delta_ddot_q = b * Delta_q;
+
+
+//        rod.m_cosserat_rod_integrators->updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
+
+//        rod.m_cosserat_rod_integrators->forwardTangentKinematics();
+
+//        rod.m_cosserat_rod_integrators->backwardTangentDynamics(zeros_6x1);
+
+
+
+//        const auto Delta_rotation_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_rotation->getStackAsMatrix();
+//        const auto Delta_position_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_position->getStackAsMatrix();
+//        const auto Delta_Omega_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix();
+//        const auto Delta_V_stack     = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix();
+//        const auto Delta_dot_Omega_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix();
+//        const auto Delta_dot_V_stack     = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix();
+
+//        const auto Delta_N_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_internal_forces->getStackAsMatrix();
+//        const auto Delta_C_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_internal_couples->getStackAsMatrix();
+//        const auto Delta_Qa_stack = rod.m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix();
+
+
+//        writeToFile("Delta_rotation_stack" "_Delta" + std::to_string(i), Delta_rotation_stack, path);
+//        writeToFile("Delta_position_stack" "_Delta" + std::to_string(i), Delta_position_stack, path);
+//        writeToFile("Delta_Omega_stack" "_Delta" + std::to_string(i), Delta_Omega_stack, path);
+//        writeToFile("Delta_V_stack" "_Delta" + std::to_string(i), Delta_V_stack, path);
+//        writeToFile("Delta_dot_Omega_stack" "_Delta" + std::to_string(i), Delta_dot_Omega_stack, path);
+//        writeToFile("Delta_dot_V_stack" "_Delta" + std::to_string(i), Delta_dot_V_stack, path);
+//        writeToFile("Delta_N_stack" "_Delta" + std::to_string(i), Delta_N_stack, path);
+//        writeToFile("Delta_C_stack" "_Delta" + std::to_string(i), Delta_C_stack, path);
+//        writeToFile("Delta_Qa_stack" "_Delta" + std::to_string(i), Delta_Qa_stack, path);
+
+//    }
+
+//    ::ATORS::tendon_driven_actuation::ActuatedTendons actuated_tendons;
+
+//    const double d_tendon = -0.011;
+//    ::ATORS::tendon_driven_actuation::Tendon tendon1(Eigen::Vector3d(0, d_tendon, 0));
+
+
+//    unsigned int weight = 2000;
+//    const double gravity_Toronto = 9.80436;
+
+//    ::ATORS::simple_actuator::SimpleActuator motor_tendon_1([&](const double &t)->Eigen::VectorXd{
+//        ::LieAlgebra::Vector1d tension;
+//        tension << weight*gravity_Toronto/1000;
+
+//        return tension;
+//    });
+
+
+
+
+//    actuated_tendons = {
+//        { motor_tendon_1, tendon1 }
+//    };
+
+
+//    //  Now the internal actuation
+//    ::ATORS::tendon_driven_actuation::TendonDrivenActuation tendond_driven_actuation(strain_par->m_K_stack,
+//                                                                                    strain_par->m_Gamma_stack,
+//                                                                                    strain_par->m_map_to_strain_stack,
+//                                                                                    actuated_tendons,
+//                                                                                    rod_dimensions.m_L);
+
+//    tendond_driven_actuation.updateActuation(0.0);
+//    const auto Q_ad_stack = tendond_driven_actuation.getStackAsMatrix();
+//    Eigen::VectorXd Q_ad = tendond_driven_actuation.getActuation();
+
+//    std::cout << "Q_ad:\n" << Q_ad << "\n\n";
+
+//    writeToFile("Q_ad_stack" + std::to_string(weight) + "g", Q_ad_stack, path);
 
 
     std::cout << "Ok saved all the data\n\n\n";
