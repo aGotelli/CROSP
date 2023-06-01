@@ -61,12 +61,12 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 //        rod.updateParameterisation(q, dot_q, ddot_q);
 
-        rod.m_idm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+        rod.m_cosserat_rod_integrators->m_idm_integrators->m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
 
-        rod.forwardKinematics();
-        rod.backwardDynamics(F1);
+//        rod.forwardKinematics();
+//        rod.backwardDynamics(F1);
 
 //        const Eigen::Vector3d r = rod.getKinematicsAtTip().m_pose.m_position;
 

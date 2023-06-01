@@ -23,9 +23,7 @@
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
-#include "CROSP/idm_integrators/idm_integrators.hpp"
-#include "CROSP/tidm_integrators/tidm_integrators.hpp"
-
+#include "CROSP/spectral_integrators.hpp"
 
 #include <boost/numeric/odeint.hpp>
 
@@ -420,6 +418,13 @@ protected:
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
         std::make_shared<strain_parameterisation::StrainParameterisation>(m_strain_parameterisation,
                                                                           ::LieAlgebra::Vector6d::Zero())
+    };
+
+
+    integrators::spectral_integrators::IntegratorsSPtr m_cosserat_rod_integrators {
+        std::make_shared<integrators::spectral_integrators::SpectralIntegrators>(m_strain_parameterisation,
+                                                                                 m_strain_parameterisation_Delta,
+                                                                                 m_rod_properties)
     };
 
 
