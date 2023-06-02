@@ -23,7 +23,7 @@ public:
     RungeKuttaIntegrator(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
                          const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
                          const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                         const rod_properties::RodProperties t_rod_properties,
+                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                          const unsigned int t_number_of_Chebyshev_points);
 
 
@@ -100,14 +100,14 @@ private:
     strain_parameterisation::StrainParameterisation m_strain_parameterisation;
     strain_parameterisation::StrainParameterisation m_strain_parameterisation_Delta;
     polynomial_representation::PolynomialRepresentation m_polynomial_representation;
-    rod_properties::RodProperties m_rod_properties;
+    std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
     double m_dX { 0.005 };
 
     unsigned int m_ne { m_polynomial_representation.getCoordinatesDimension() };
 
 
-    double m_rod_length { m_rod_properties.m_rod_dimensions.m_L };
+    double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
 
 
     unsigned int m_number_of_Chebyshev_points { 31 };

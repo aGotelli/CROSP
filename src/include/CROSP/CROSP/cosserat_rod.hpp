@@ -425,31 +425,19 @@ protected:
 
 
     ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
-      std::make_unique<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(m_strain_parameterisation,
-                                                                                             m_strain_parameterisation_Delta,
-                                                                                             m_rod_properties)
+      std::make_unique<::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator>(*m_strain_parameterisation,
+                                                                                             *m_strain_parameterisation_Delta,
+                                                                                          *m_strain_parameterisation->m_polynomial_representation,
+                                                                                             m_rod_properties,
+                                                                                          m_strain_parameterisation->m_number_of_Chebyshev_points)
     };
 
-//    integrators::spectral_integrators::IntegratorsSPtr m_cosserat_rod_integrators {
-//        std::make_shared<integrators::spectral_integrators::SpectralIntegrators>(m_strain_parameterisation,
-//                                                                                 m_strain_parameterisation_Delta,
-//                                                                                 m_rod_properties)
+//    ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
+//      std::make_unique<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(m_strain_parameterisation,
+//                                                                                             m_strain_parameterisation_Delta,
+//                                                                                             m_rod_properties)
 //    };
 
-
-//    //  The set of integrators needed for the IDM
-//    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators /*{
-//        std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation,
-//                                                          m_rod_properties )
-//    }*/;
-
-//    //  The set of integrators needed for the TIDM
-//    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators /*{
-//        std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation,
-//                                                            m_strain_parameterisation_Delta,
-//                                                            m_idm_integrators,
-//                                                            m_rod_properties)
-//    }*/;
 
 
 };

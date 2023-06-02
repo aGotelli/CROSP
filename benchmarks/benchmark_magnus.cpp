@@ -22,6 +22,8 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
 
         return m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+//        return Eigen::Matrix<double, 3, 3>::Zero();
+
     }
 
 
@@ -96,7 +98,9 @@ struct PositionIntegrator : public OSNI::ODEb {
     {
         const unsigned int stack_index = t_point*4;
 
-        return m_rotation_matrix_integrator->getStateAtPoint(t_point+1) * m_Gamma_stack->at(stack_index);
+        return m_rotation_matrix_integrator->getStateAtPoint(t_point) * m_Gamma_stack->at(stack_index);
+//        return Eigen::Matrix<double, 3, 1>::Zero();
+
     }
 
 
@@ -131,6 +135,8 @@ struct IntegratorOmega : public ::OMNI::ODEAb<3>{
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
         return -m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+//        return Eigen::Matrix<double, 3, 3>::Zero();
+
     }
 
 
@@ -140,6 +146,8 @@ struct IntegratorOmega : public ::OMNI::ODEAb<3>{
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
 
         return m_strain_parameterisation_stack->m_dot_K_stack->at(stack_index);
+//        return Eigen::Matrix<double, 3, 1>::Zero();
+
     }
 
 
@@ -193,6 +201,8 @@ struct IntegratorV : public ::OMNI::ODEAb<3>{
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
         return -m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+//        return Eigen::Matrix<double, 3, 3>::Zero();
+
     }
 
 
@@ -206,6 +216,8 @@ struct IntegratorV : public ::OMNI::ODEAb<3>{
         Eigen::Vector3d Omega = m_angular_velocity->getStateAtQuadraturePoint(quadrature_index);
 
         return dot_Gamma - m_hat_Gamma_stack->at(stack_index)*Omega;
+//        return Eigen::Matrix<double, 3, 1>::Zero();
+
 
     }
 
@@ -277,6 +289,8 @@ struct IntegratordotOmega : public ::OMNI::ODEAb<3>{
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
         return -m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+//        return Eigen::Matrix<double, 3, 3>::Zero();
+
     }
 
 
@@ -289,6 +303,8 @@ struct IntegratordotOmega : public ::OMNI::ODEAb<3>{
 
         return m_ddot_K_stack->at(stack_index)
                 - m_hat_dot_K_stack->at(stack_index) * m_angular_velocity->getStateAtQuadraturePoint(quadrature_index);
+//        return Eigen::Matrix<double, 3, 1>::Zero();
+
     }
 
 
@@ -360,6 +376,9 @@ struct IntegratordotV : public ::OMNI::ODEAb<3>{
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
         return -m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+
+//        return Eigen::Matrix<double, 3, 3>::Zero();
+
     }
 
 
@@ -381,6 +400,8 @@ struct IntegratordotV : public ::OMNI::ODEAb<3>{
                 - hat_Gamma * dot_Omega
                 - hat_dot_Gamma * Omega
                 - hat_dot_K * V;
+
+//        return Eigen::Matrix<double, 3, 1>::Zero();
 
     }
 
@@ -666,7 +687,7 @@ int main(int argc, char *argv[])
 
     ::benchmark::Initialize(&argc, argv);
 
-    //::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RunSpecifiedBenchmarks();
 
 
     return 0;

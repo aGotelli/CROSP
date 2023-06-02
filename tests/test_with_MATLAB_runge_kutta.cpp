@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     ::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator m_integrators(*strain_parameterisation,
                                                                                *strain_parameterisation_Delta,
                                                                                *strain_parameterisation->m_polynomial_representation,
-                                                                               *rod_properties,
+                                                                               rod_properties,
                                                                                number_of_Chebyshev_points);
 
 

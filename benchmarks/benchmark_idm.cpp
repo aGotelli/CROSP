@@ -9,9 +9,9 @@
 
 
 static constexpr std::array<bool, 6> admitted_deformations = {
-    false,
     true,
-    false,
+    true,
+    true,
 
     false,
     false,
@@ -63,7 +63,7 @@ void benchmarkIDM(::benchmark::State &t_state)
 
         rod.m_cosserat_rod_integrators->forwardKinematics();
 
-//        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
+        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
 
     }
 };

@@ -26,7 +26,7 @@ Eigen::Matrix4d getA(const Eigen::Vector3d t_k){
 RungeKuttaIntegrator::RungeKuttaIntegrator(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
                                            const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
                                            const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                                           const rod_properties::RodProperties t_rod_properties,
+                                           std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                                            const unsigned int t_number_of_Chebyshev_points)
     :
       m_strain_parameterisation(t_strain_parameterisation),
@@ -573,10 +573,10 @@ RungeKuttaIntegrator::ForwardKinematicState RungeKuttaIntegrator::forwardODEs(co
     //  Some needed variables
     const Eigen::Matrix3d R = t_Q.toRotationMatrix();
     ::LieAlgebra::Vector6d F_bar = ::LieAlgebra::Vector6d::Zero();
-    F_bar.block<3, 1>(3, 0) = R.transpose() * m_rod_properties.distributedGravitationalForce();
+    F_bar.block<3, 1>(3, 0) = R.transpose() * m_rod_properties->distributedGravitationalForce();
 
 
-    const auto M = m_rod_properties.m_M;
+    const auto M = m_rod_properties->m_M;
 
     const Eigen::VectorXd Lambda_prime = t_ad_Xi.transpose()*t_Lambda
                                             + M*t_dot_eta
@@ -745,7 +745,7 @@ Eigen::VectorXd RungeKuttaIntegrator::tangentDynamicsODEs(const Eigen::VectorXd 
     const auto ad_eta = ::LieAlgebra::ad(eta);
     const auto ad_Delta_eta = ::LieAlgebra::ad(Delta_eta);
 
-    const auto M = m_rod_properties.m_M;
+    const auto M = m_rod_properties->m_M;
 
 
 
@@ -760,7 +760,7 @@ Eigen::VectorXd RungeKuttaIntegrator::tangentDynamicsODEs(const Eigen::VectorXd 
 
     Eigen::Vector3d Delta_N_bar = ::LieAlgebra::skew( Delta_rotation ).transpose()
                                     *R.transpose()
-                                    *m_rod_properties.distributedGravitationalForce();
+                                    *m_rod_properties->distributedGravitationalForce();
 
     ::LieAlgebra::Vector6d Delta_F_bar = ::LieAlgebra::Vector6d::Zero();
     Delta_F_bar.block<3,1>(3, 0) = Delta_N_bar;
