@@ -21,7 +21,7 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
 
-        return -m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+        return m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
     }
 
 
@@ -96,7 +96,7 @@ struct PositionIntegrator : public OSNI::ODEb {
     {
         const unsigned int stack_index = t_point*4;
 
-        return m_rotation_matrix_integrator->getStateAtPoint(t_point) * m_Gamma_stack->at(stack_index);
+        return m_rotation_matrix_integrator->getStateAtPoint(t_point+1) * m_Gamma_stack->at(stack_index);
     }
 
 
@@ -619,8 +619,24 @@ int main(int argc, char *argv[])
 
     m_cosserat_rod_integrators->forwardKinematics();
 
+
+    const Eigen::MatrixXd Q_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
+    const Eigen::MatrixXd R_magnus   = integrate_rotation_matrix->getStackAsMatrix();
+
+    Eigen::MatrixXd Q_magnus = Eigen::MatrixXd::Zero(4, R_magnus.cols()/3);
+    for(unsigned int i=0; i<Q_magnus.cols(); i++){
+        Eigen::Quaterniond q(R_magnus.block<3, 3>(0,i*3));
+        Q_magnus.col(i) << q.w(), q.x(), q.y(), q.z();
+    }
+    std::cout << "Q_spectral:\n" << Q_spectral << "\n\n";
+    std::cout << "Q_magnus:\n" << Q_magnus << "\n\n";
+    std::cout << "error orientation : \n" << (Q_spectral - Q_magnus).norm() << "\n\n";
+
+
     const Eigen::MatrixXd r_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_position->getStackAsMatrix();
     const Eigen::MatrixXd r_magnus   = integrate_position->getStackAsMatrix();
+    std::cout << "r_spectral:\n" << r_spectral << "\n\n";
+    std::cout << "r_magnus:\n" << r_magnus << "\n\n";
     std::cout << "error position : \n" << (r_spectral - r_magnus).norm() << "\n\n";
     std::cout.flush();
 
