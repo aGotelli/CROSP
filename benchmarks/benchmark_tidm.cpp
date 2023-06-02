@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 //        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkTIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
-    ::benchmark::RegisterBenchmark("TIDM", benchmarkTIDM)->Unit(::benchmark::kMicrosecond);
+    ::benchmark::RegisterBenchmark("TIDM", benchmarkTIDM)->Unit(::benchmark::kMicrosecond)->Repetitions(10);
 
 
     ::benchmark::Initialize(&argc, argv);

@@ -56,8 +56,8 @@ struct DeltaRotation : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-            m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+            m_strain_parameterisation_stack->m_hat_K_stack
         };
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
         m_Delta_strain_parameterisation_stack->m_K_stack
@@ -87,11 +87,11 @@ struct DeltaPosition : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Gamma_stack {
+        m_strain_parameterisation_stack->m_hat_Gamma_stack
     };
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
         m_Delta_strain_parameterisation_stack->m_Gamma_stack
@@ -126,11 +126,11 @@ struct DeltaAngularVelocity : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_Delta_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_K_stack
     };
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack {
         m_Delta_strain_parameterisation_stack->m_dot_K_stack
@@ -171,17 +171,17 @@ struct DeltaLinearVelocity : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_Delta_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Gamma_stack {
+        m_strain_parameterisation_stack->m_hat_Gamma_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
-        m_Delta_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_Gamma_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_Gamma_stack
     };
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Gamma_stack {
         m_Delta_strain_parameterisation_stack->m_dot_Gamma_stack
@@ -228,17 +228,17 @@ struct DeltaAngularAccelerations : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
         m_strain_parameterisation_stack->m_dot_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_Delta_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack {
-        m_Delta_strain_parameterisation_stack->m_dot_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_dot_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_dot_K_stack
     };
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_ddot_K_stack {
         m_Delta_strain_parameterisation_stack->m_ddot_K_stack
@@ -287,30 +287,30 @@ struct DeltaLinearAccelerations : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        m_strain_parameterisation_stack->m_dot_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_dot_K_stack {
+        m_strain_parameterisation_stack->m_hat_dot_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_Delta_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_K_stack {
-        m_Delta_strain_parameterisation_stack->m_dot_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_dot_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_dot_K_stack
     };
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Gamma_stack {
+        m_strain_parameterisation_stack->m_hat_Gamma_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
-        m_strain_parameterisation_stack->m_dot_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_dot_Gamma_stack {
+        m_strain_parameterisation_stack->m_hat_dot_Gamma_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
-        m_Delta_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_Gamma_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_Gamma_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_dot_Gamma_stack {
-        m_Delta_strain_parameterisation_stack->m_dot_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_dot_Gamma_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_dot_Gamma_stack
     };
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_ddot_Gamma_stack {
         m_Delta_strain_parameterisation_stack->m_ddot_Gamma_stack
@@ -375,11 +375,11 @@ struct DeltaInternalForcesIntegrator : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_Delta_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_K_stack
     };
 
 
@@ -455,17 +455,17 @@ struct DeltaInternalCouplesIntegrator : public OSNI::ODEAb {
 
 
     //  Storing pointers to direct access to the needed stacks
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_K_stack {
-        m_Delta_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_K_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Gamma_stack {
+        m_strain_parameterisation_stack->m_hat_Gamma_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Delta_Gamma_stack {
-        m_Delta_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_Gamma_stack {
+        m_Delta_strain_parameterisation_stack->m_hat_Gamma_stack
     };
 
 
