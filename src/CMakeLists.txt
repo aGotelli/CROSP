@@ -108,6 +108,11 @@ add_library(${PROJECT_NAME} SHARED
                             numerical_integrators/spectral_method/spectral_integrators.cpp
                             numerical_integrators/spectral_method/idm_integrators/idm_integrators.cpp
                             numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.cpp
+
+
+                            include/${PROJECT_NAME}/numerical_integrators/runge_kutta/runge_kutta_integrator.hpp
+                            numerical_integrators/runge_kutta/runge_kutta_integrator.cpp
+
 #                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
 #                            static_initialiser/static_initialiser.cpp
 #                            include/CROSP/CROSP/internal_actuation.hpp
@@ -142,6 +147,7 @@ target_compile_options(${PROJECT_NAME}
         -Wall
         -Wextra
 )
+target_compile_definitions(${PROJECT_NAME} PRIVATE TESTING)
 
 
 #add_executable(prove prove.cpp)

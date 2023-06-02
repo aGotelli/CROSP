@@ -103,8 +103,8 @@ struct AngularVelocityIntegrator : public OSNI::ODEAb {
 
     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
@@ -131,12 +131,12 @@ struct LinearVelocityIntegrator : public OSNI::ODEAb {
 
     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Gamma_stack {
+        m_strain_parameterisation_stack->m_hat_Gamma_stack
     };
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
@@ -168,12 +168,12 @@ struct AngularAccelerationIntegrator : public OSNI::ODEAb {
 
     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        m_strain_parameterisation_stack->m_dot_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_dot_K_stack {
+        m_strain_parameterisation_stack->m_hat_dot_K_stack
     };
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_K_stack {
@@ -210,20 +210,20 @@ struct LinearAccelerationIntegrator : public OSNI::ODEAb {
 
     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        m_strain_parameterisation_stack->m_dot_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_dot_K_stack {
+        m_strain_parameterisation_stack->m_hat_dot_K_stack
     };
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation_stack->m_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Gamma_stack {
+        m_strain_parameterisation_stack->m_hat_Gamma_stack
     };
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_Gamma_stack{
-        m_strain_parameterisation_stack->m_dot_Gamma_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_dot_Gamma_stack{
+        m_strain_parameterisation_stack->m_hat_dot_Gamma_stack
     };
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack{
@@ -270,8 +270,8 @@ struct InternalForcesIntegrator : public OSNI::ODEAb {
 
     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
 
     std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
@@ -316,8 +316,8 @@ struct InternalCouplesIntegrator : public OSNI::ODEAb {
 
     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_K_stack {
-        m_strain_parameterisation_stack->m_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
+        m_strain_parameterisation_stack->m_hat_K_stack
     };
 
     std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
