@@ -102,16 +102,28 @@ add_library(${PROJECT_NAME} SHARED
 
 
                             include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
+
+
                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/spectral_integrators.hpp
+#                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_odes.hpp
                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp
                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.hpp
                             numerical_integrators/spectral_method/spectral_integrators.cpp
+#                            numerical_integrators/spectral_method/idm_integrators/idm_odes.cpp
                             numerical_integrators/spectral_method/idm_integrators/idm_integrators.cpp
                             numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.cpp
 
 
                             include/${PROJECT_NAME}/numerical_integrators/runge_kutta/runge_kutta_integrator.hpp
                             numerical_integrators/runge_kutta/runge_kutta_integrator.cpp
+
+
+                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_integrators.hpp
+                            numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.cpp
+                            numerical_integrators/magnus_expansion/magnus_integrators.cpp
+
+
 
 #                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
 #                            static_initialiser/static_initialiser.cpp

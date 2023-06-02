@@ -401,4 +401,4 @@ void IDMIntegrators::updateIntegrationDomain(const double &t_upper_integration_l
 
 
 
-}   //  namespace CROSP::numerical_integrators::spectral_method::IDMIntegrators
+}   //  namespace CROSP::numerical_integrators::spectral_method::idm_integrators

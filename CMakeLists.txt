@@ -15,6 +15,8 @@ find_package(math_tools REQUIRED)
 
 find_package(OSNI REQUIRED)
 
+find_package(OMNI REQUIRED)
+
 find_package(ATORS REQUIRED)
 
 find_package(Qt5Charts REQUIRED)

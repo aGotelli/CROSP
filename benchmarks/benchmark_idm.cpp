@@ -22,7 +22,7 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
-constexpr unsigned int number_of_Chebyshev_points = 17;
+constexpr unsigned int number_of_Chebyshev_points = 21;
 
 
 void benchmarkIDM(::benchmark::State &t_state)
@@ -63,12 +63,35 @@ void benchmarkIDM(::benchmark::State &t_state)
 
         rod.m_cosserat_rod_integrators->forwardKinematics();
 
-        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
+//        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
 
     }
 };
 
 
+
+struct PositionIntegrator : public OSNI::ODEb {
+
+    PositionIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+                       std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
+                       const double &t_upper_integration_limit=1.0f,
+                       const Eigen::Vector3d &t_initial_condition=Eigen::Vector3d::Zero());
+
+
+    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
+
+
+    std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
+
+    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
+        m_strain_parameterisation_stack->m_Gamma_stack
+    };
+
+    std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
+
+    Eigen::Quaterniond m_quaternion_at_point;
+
+};
 
 
 

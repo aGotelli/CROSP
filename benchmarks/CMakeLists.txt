@@ -26,6 +26,18 @@ target_link_libraries(benchmark_tidm
 target_compile_definitions(benchmark_tidm PRIVATE DEVELOPER)
 
 
+add_executable(benchmark_magnus benchmark_magnus.cpp
+)
+target_link_libraries(benchmark_magnus
+    PRIVATE
+        ${PROJECT_NAME}
+        utilities
+        benchmark::benchmark
+        optimized OMNI
+        debug OMNI-debug
+)
+target_compile_definitions(benchmark_magnus PRIVATE DEVELOPER)
+
 #add_executable(benchmark_jacobian_tidm benchmark_jacobian_tidm.cpp
 #)
 #target_link_libraries(benchmark_jacobian_tidm

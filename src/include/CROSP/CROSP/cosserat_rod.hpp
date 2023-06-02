@@ -26,6 +26,7 @@
 #include "CROSP/numerical_integrators/cosserat_rod_integrators.hpp"
 #include "CROSP/numerical_integrators/spectral_method/spectral_integrators.hpp"
 #include "CROSP/numerical_integrators/runge_kutta/runge_kutta_integrator.hpp"
+#include "CROSP/numerical_integrators/magnus_expansion/magnus_integrators.hpp"
 
 #include <boost/numeric/odeint.hpp>
 

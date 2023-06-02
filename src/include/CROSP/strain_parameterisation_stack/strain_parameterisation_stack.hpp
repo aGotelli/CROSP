@@ -24,6 +24,10 @@ struct StrainParameterisationStack {
                                 const unsigned int t_number_of_Chebyshev_point,
                                 const StrainFunction &t_Xi_c=default_constrained_strain);
 
+    StrainParameterisationStack(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation,
+                                const std::vector<double> &t_observation_points,
+                                const StrainFunction &t_Xi_c=default_constrained_strain);
+
 
     void updateStrainParameterisation(const Eigen::VectorXd &t_q,
                                       const Eigen::VectorXd &t_dot_q,

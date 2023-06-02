@@ -463,7 +463,7 @@ struct IDMIntegrators {
 };
 
 
-}   //  namespace CROSP::numerical_integrators::spectral_method::IDMIntegrators
+}   //  namespace CROSP::numerical_integrators::spectral_method::idm_integrators
 
 
 

@@ -75,6 +75,73 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
 
 }
 
+StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation,
+                                                         const std::vector<double> &t_observation_points,
+                                                         const StrainFunction &t_Xi_c)
+    : m_number_of_points(t_observation_points.size()),
+      m_Xi_c(t_Xi_c)
+{
+
+    const Eigen::MatrixXd B = t_polynomial_representation->m_B;
+    Eigen::MatrixXd Phi = t_polynomial_representation->getPhi( 0 );
+    Eigen::MatrixXd BPhi = B*Phi;
+
+
+    m_B_Phi_stack =
+            Eigen::MatrixXd(m_number_of_points*BPhi.rows(), BPhi.cols());
+
+    m_Xi_stack =
+            Eigen::MatrixXd(m_number_of_points*6, 1);
+
+    m_dot_Xi_stack =
+            Eigen::MatrixXd(m_number_of_points*6, 1);
+
+    m_ddot_Xi_stack =
+            Eigen::MatrixXd(m_number_of_points*6, 1);
+
+    m_Xi_c_stack =
+            Eigen::MatrixXd(m_number_of_points*6, 1);
+
+
+    ::LieAlgebra::Vector6d Xi_c = ::LieAlgebra::Vector6d::Zero();
+    Xi_c(3) = 1;
+
+    unsigned int row;
+    for(unsigned int step=0; const auto point : t_observation_points){
+            Phi = t_polynomial_representation->getPhi( point );
+
+            row = step * BPhi.rows();
+
+            m_B_Phi_stack.block(row, 0, BPhi.rows(), BPhi.cols()) = B*Phi;
+
+            m_Xi_c_stack.block(row, 0, BPhi.rows(), 1) = m_Xi_c(point);
+
+
+            m_K_stack->push_back( Eigen::Vector3d::Zero() );
+            m_dot_K_stack->push_back( Eigen::Vector3d::Zero() );
+            m_ddot_K_stack->push_back( Eigen::Vector3d::Zero() );
+
+            m_Gamma_stack->push_back( Eigen::Vector3d::Zero() );
+            m_dot_Gamma_stack->push_back( Eigen::Vector3d::Zero() );
+            m_ddot_Gamma_stack->push_back( Eigen::Vector3d::Zero() );
+
+
+
+
+            m_hat_K_stack->push_back( Eigen::Matrix3d::Zero() );
+            m_hat_dot_K_stack->push_back( Eigen::Matrix3d::Zero() );
+            m_hat_ddot_K_stack->push_back( Eigen::Matrix3d::Zero() );
+
+            m_hat_Gamma_stack->push_back( Eigen::Matrix3d::Zero() );
+            m_hat_dot_Gamma_stack->push_back( Eigen::Matrix3d::Zero() );
+            m_hat_ddot_Gamma_stack->push_back( Eigen::Matrix3d::Zero() );
+
+            step++;
+    }
+
+
+}
+
 
 void StrainParameterisationStack::updateStrainParameterisation(const Eigen::VectorXd &t_q,
                                                                const Eigen::VectorXd &t_dot_q,
