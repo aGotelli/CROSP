@@ -24,9 +24,11 @@
 #include "CROSP/rod_properties/rod_properties.hpp"
 
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
-#include "CROSP/idm_integrators/idm_integrators.hpp"
 
 #include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
+
+
+#include "CROSP/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp"
 
 
 
@@ -533,20 +535,12 @@ struct DeltaGeneralisedForcesIntegrator : public OSNI::ODEb {
 
 struct TIDMIntegrators{
 
-//    TIDMIntegrators(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-//                    std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
-//                    std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-//                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
-
     TIDMIntegrators(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                                     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
-                                     std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
-                                     std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
-        : m_strain_parameterisation_stack( t_strain_parameterisation_stack ),
-          m_Delta_strain_parameterisation_stack( t_Delta_strain_parameterisation_stack ),
-          m_idm_integrators(t_idm_integrators),
-          m_rod_properties(t_rod_properties)
-    {}
+                    std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
+                    std::shared_ptr<const idm_integrators::IDMIntegrators> t_idm_integrators,
+                    std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+
+
 
     std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 

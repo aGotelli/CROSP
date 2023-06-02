@@ -358,7 +358,7 @@ public:
      * The rows are ordered so that the first correspond to the initial position at X = 0 and the last contains the position at X = 1.
      *
      */
-    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{/*return m_idm_integrators->m_position->getStackAsMatrix();*/}
+    inline Eigen::MatrixXd getRodPositionsAtChebyshevPoints()const{return m_cosserat_rod_integrators->getRodPositions();}
 
 
     /*!
@@ -369,7 +369,7 @@ public:
      * This function makes an internal call to the function getRodPositionsAtChebyshevPoints() and shares the same return type.
      *
      */
-    Eigen::MatrixXd getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)const;
+    Eigen::MatrixXd getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe);
 
 
     /*!
@@ -422,8 +422,8 @@ protected:
     };
 
 
-    ::CROSP::numerical_integrators::spectral_method::SpectralIntegrators m_cosserat_rod_integrators {
-      ::CROSP::numerical_integrators::spectral_method::SpectralIntegrators(m_strain_parameterisation,
+    ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
+      std::make_unique<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(m_strain_parameterisation,
                                                                                              m_strain_parameterisation_Delta,
                                                                                              m_rod_properties)
     };

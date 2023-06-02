@@ -28,7 +28,7 @@ constexpr unsigned int number_of_Chebyshev_points = 17;
 void benchmarkIDM(::benchmark::State &t_state)
 {
 
-    const unsigned int ne = t_state.range(0);
+    const unsigned int ne =/* t_state.range(0)*/5;
 
     const unsigned int coordinated_dimension = na * ne;
 
@@ -77,17 +77,20 @@ int main(int argc, char *argv[])
 {
 
 
-    const unsigned int repetitions = 20;
+//    const unsigned int repetitions = 20;
 
 
-    std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
+//    std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
 
 
-    const std::string benchmark_name = "IDM";
+//    const std::string benchmark_name = "IDM";
 
 
-    for(const auto ne : ne_stack)
-        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
+//    for(const auto ne : ne_stack)
+//        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
+
+
+    ::benchmark::RegisterBenchmark("IDM", benchmarkIDM)->Unit(::benchmark::kMicrosecond);
 
 
 

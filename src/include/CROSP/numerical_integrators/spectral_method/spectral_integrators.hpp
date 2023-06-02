@@ -17,24 +17,44 @@ struct SpectralIntegrators : public CosseratRodIntegrators {
                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
+
+    virtual std::string printIntegratorProperties()const final;
+
+
     virtual void updateParameterisation(const Eigen::VectorXd &t_qe,
-                                    const Eigen::VectorXd &t_dot_qe,
-                                    const Eigen::VectorXd &t_ddot_qe) final;
+                                        const Eigen::VectorXd &t_dot_qe,
+                                        const Eigen::VectorXd &t_ddot_qe) final;
 
 
     virtual void forwardKinematics() final;
 
 
+    virtual void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+                                   const Eigen::Vector3d &t_initial_position,
+                                   const Eigen::Vector3d &t_initial_angular_velocity,
+                                   const Eigen::Vector3d &t_initial_linear_velocity,
+                                   const Eigen::Vector3d &t_initial_angular_acceleration,
+                                   const Eigen::Vector3d &t_initial_linear_acceleration) final;
 
-    virtual void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
-                                             const Eigen::VectorXd &t_Delta_dot_qe,
-                                             const Eigen::VectorXd &t_Delta_ddot_qe) final;
 
+   virtual void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+                                            const Eigen::VectorXd &t_Delta_dot_qe,
+                                            const Eigen::VectorXd &t_Delta_ddot_qe) final;
 
     virtual void forwardTangentKinematics() final;
 
 
+    virtual void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+                                          const Eigen::Vector3d &t_initial_Delta_position,
+                                          const Eigen::Vector3d &t_initial_Delta_angular_velocity,
+                                          const Eigen::Vector3d &t_initial_Delta_linear_velocity,
+                                          const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
+                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration) final;
 
+
+    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const final;
+
+    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const final;
 
 
 
@@ -43,6 +63,28 @@ struct SpectralIntegrators : public CosseratRodIntegrators {
 
 
     virtual void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1) final;
+
+
+
+
+    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const final;
+
+
+
+    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const final;
+
+
+    virtual ::LieAlgebra::Vector6d getQaAtBase()const final;
+
+
+
+    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const final;
+
+
+    virtual void updateIntegrationDomain(const double &t_rod_lenght) final;
+
+
+    virtual Eigen::MatrixXd getRodPositions()const final;
 
 
     std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
@@ -56,7 +98,7 @@ struct SpectralIntegrators : public CosseratRodIntegrators {
     std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators;
 
     //  The set of integrators needed for the TIDM
-    /*std::shared_ptr<*/tidm_integrators::TIDMIntegrators/*>*/ m_tidm_integrators;
+    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators;
 
 
 
