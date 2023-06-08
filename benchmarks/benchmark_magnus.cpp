@@ -98,7 +98,13 @@ struct PositionIntegrator : public OSNI::ODEb {
     {
         const unsigned int stack_index = t_point*4;
 
-        return m_rotation_matrix_integrator->getStateAtPoint(t_point) * m_Gamma_stack->at(stack_index);
+        const auto Nc = m_rotation_matrix_integrator->getChebyshevPointsNumber();
+
+        const auto R = m_rotation_matrix_integrator->getStateAtPoint(Nc - 1 - t_point);
+
+//        std::cout << "R at point : " << t_point << "\n" << R << "\n\n";
+
+        return R * m_Gamma_stack->at(stack_index);
 //        return Eigen::Matrix<double, 3, 1>::Zero();
 
     }
@@ -210,10 +216,15 @@ struct IntegratorV : public ::OMNI::ODEAb<3>{
                                                                                   const unsigned int t_quadrature_point)override
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
-        const auto quadrature_index = t_Chebyshev_point*m_number_of_quadrature_points + t_quadrature_point;
+        const auto Nc = m_angular_velocity->getChebyshevPointsNumber();
+        const auto offset = (Nc-1)*3 - 1;
+        const auto quadrature_index = offset - (t_Chebyshev_point*m_number_of_quadrature_points + t_quadrature_point);
 
         Eigen::Vector3d dot_Gamma = m_dot_Gamma_stack->at(stack_index);
         Eigen::Vector3d Omega = m_angular_velocity->getStateAtQuadraturePoint(quadrature_index);
+
+//        std::cout << "Omega at Chebyshev point : " << t_Chebyshev_point << ", quadrature point : " << t_quadrature_point << "\n" << Omega << "\n\n";
+
 
         return dot_Gamma - m_hat_Gamma_stack->at(stack_index)*Omega;
 //        return Eigen::Matrix<double, 3, 1>::Zero();
@@ -299,7 +310,9 @@ struct IntegratordotOmega : public ::OMNI::ODEAb<3>{
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
 
-        const auto quadrature_index = t_Chebyshev_point*m_number_of_quadrature_points + t_quadrature_point;
+        const auto Nc = m_angular_velocity->getChebyshevPointsNumber();
+        const auto offset = (Nc-1)*3 - 1;
+        const auto quadrature_index = offset - (t_Chebyshev_point*m_number_of_quadrature_points + t_quadrature_point);
 
         return m_ddot_K_stack->at(stack_index)
                 - m_hat_dot_K_stack->at(stack_index) * m_angular_velocity->getStateAtQuadraturePoint(quadrature_index);
@@ -386,7 +399,10 @@ struct IntegratordotV : public ::OMNI::ODEAb<3>{
                                                                                   const unsigned int t_quadrature_point)override
     {
         const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
-        const auto quadrature_index = t_Chebyshev_point*m_number_of_quadrature_points + t_quadrature_point;
+
+        const auto Nc = m_angular_velocity->getChebyshevPointsNumber();
+        const auto offset = (Nc-1)*3 - 1;
+        const auto quadrature_index = offset - (t_Chebyshev_point*m_number_of_quadrature_points + t_quadrature_point);
 
         const Eigen::Vector3d ddot_Gamma = m_ddot_Gamma_stack->at(stack_index);
         const Eigen::Matrix3d hat_Gamma = m_hat_Gamma_stack->at(stack_index);
@@ -483,7 +499,7 @@ int main(int argc, char *argv[])
                                                   admitted_deformations.end(),
                                                   true);
 
-    constexpr unsigned int number_of_Chebyshev_points = 21;
+    constexpr unsigned int number_of_Chebyshev_points = 31;
 
 
     const unsigned int coordinated_dimension = na * ne;
@@ -687,7 +703,7 @@ int main(int argc, char *argv[])
 
     ::benchmark::Initialize(&argc, argv);
 
-    ::benchmark::RunSpecifiedBenchmarks();
+    //::benchmark::RunSpecifiedBenchmarks();
 
 
     return 0;

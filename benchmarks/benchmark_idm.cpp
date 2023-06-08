@@ -9,9 +9,9 @@
 
 
 static constexpr std::array<bool, 6> admitted_deformations = {
+    false,
     true,
-    true,
-    true,
+    false,
 
     false,
     false,
@@ -22,7 +22,7 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
-constexpr unsigned int number_of_Chebyshev_points = 21;
+constexpr unsigned int number_of_Chebyshev_points = 31;
 
 
 void benchmarkIDM(::benchmark::State &t_state)
@@ -63,7 +63,7 @@ void benchmarkIDM(::benchmark::State &t_state)
 
         rod.m_cosserat_rod_integrators->forwardKinematics();
 
-        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
+//        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
 
     }
 };

@@ -424,19 +424,19 @@ protected:
     };
 
 
-    ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
-      std::make_unique<::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator>(*m_strain_parameterisation,
-                                                                                             *m_strain_parameterisation_Delta,
-                                                                                          *m_strain_parameterisation->m_polynomial_representation,
-                                                                                             m_rod_properties,
-                                                                                          m_strain_parameterisation->m_number_of_Chebyshev_points)
-    };
-
 //    ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
-//      std::make_unique<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(m_strain_parameterisation,
-//                                                                                             m_strain_parameterisation_Delta,
-//                                                                                             m_rod_properties)
+//      std::make_unique<::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator>(*m_strain_parameterisation,
+//                                                                                             *m_strain_parameterisation_Delta,
+//                                                                                          *m_strain_parameterisation->m_polynomial_representation,
+//                                                                                             m_rod_properties,
+//                                                                                          m_strain_parameterisation->m_number_of_Chebyshev_points)
 //    };
+
+    ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
+      std::make_unique<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(m_strain_parameterisation,
+                                                                                             m_strain_parameterisation_Delta,
+                                                                                             m_rod_properties)
+    };
 
 
 
