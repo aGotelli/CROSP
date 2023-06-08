@@ -19,10 +19,10 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
     virtual Eigen::Matrix3d computeCofficientsMatrixAtQuadraturePoint(const unsigned int t_Chebyshev_point,
                                                                       const unsigned int t_quadrature_point)override
     {
-//        const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
+        const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
 
-//        return m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
-        return Eigen::Matrix<double, 3, 3>::Zero();
+        return m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+//        return Eigen::Matrix<double, 3, 3>::Zero();
 
     }
 
@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
                                                   admitted_deformations.end(),
                                                   true);
 
-    constexpr unsigned int number_of_Chebyshev_points = 90;
+    constexpr unsigned int number_of_Chebyshev_points = 31;
 
 
     const unsigned int coordinated_dimension = na * ne;
@@ -507,7 +507,7 @@ int main(int argc, char *argv[])
 
     const auto Chebyshev_points = ::Chebyshev::ComputeChebyshevPoints(number_of_Chebyshev_points);
     auto quadrature_points = ::OMNI::defineQuadrarturePoints(Chebyshev_points);
-    auto double_quadrature_points = ::OMNI::defineQuadrarturePoints(Chebyshev_points);
+    auto double_quadrature_points = ::OMNI::defineQuadrarturePoints(quadrature_points);
 
     std::vector<double> obervation_points = Chebyshev_points;
 
@@ -575,7 +575,7 @@ int main(int argc, char *argv[])
 
 
 
-//        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
 
@@ -585,8 +585,8 @@ int main(int argc, char *argv[])
             m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
-            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-            integrate_rotation_matrix->integrate(R_X0);
+//            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+//            integrate_rotation_matrix->integrate(R_X0);
 
 //            integrate_position->integrate(r_X0);
 
