@@ -19,10 +19,10 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
     virtual Eigen::Matrix3d computeCofficientsMatrixAtQuadraturePoint(const unsigned int t_Chebyshev_point,
                                                                       const unsigned int t_quadrature_point)override
     {
-        const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
+//        const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
 
-        return m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
-//        return Eigen::Matrix<double, 3, 3>::Zero();
+//        return m_strain_parameterisation_stack->m_hat_K_stack->at(stack_index);
+        return Eigen::Matrix<double, 3, 3>::Zero();
 
     }
 
@@ -41,17 +41,17 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
         return ::LieAlgebra::expRodigues( t_Omega );
     }
 
-    virtual void postProcessInterpolation()override
-    {
+//    virtual void postProcessInterpolation()override
+//    {
 
-        Eigen::Quaterniond q;
-        for(unsigned int point=0; point<this->m_number_of_Chebyshev_points; point++){
-            q = Eigen::Quaterniond(m_states_stack[point]);
-            m_quaternion_stack.col(point) << q.w(), q.x(), q.y(), q.z();
-        }
+//        Eigen::Quaterniond q;
+//        for(unsigned int point=0; point<this->m_number_of_Chebyshev_points; point++){
+//            q = Eigen::Quaterniond(m_states_stack[point]);
+//            m_quaternion_stack.col(point) << q.w(), q.x(), q.y(), q.z();
+//        }
 
-        m_quaternions_at_quadrature_points = m_interpolator(m_quaternion_stack);
-    }
+//        m_quaternions_at_quadrature_points = m_interpolator(m_quaternion_stack);
+//    }
 
     virtual Eigen::MatrixXd getStateAtQuadraturePoint(const unsigned int t_quadrature_point)const override
     {
@@ -279,9 +279,6 @@ struct IntegratorV : public ::OMNI::ODEAb<3>{
 };
 
 
-
-
-
 struct IntegratordotOmega : public ::OMNI::ODEAb<3>{
 
     IntegratordotOmega(const unsigned int t_number_of_Chebyshev_points,
@@ -366,6 +363,7 @@ struct IntegratordotOmega : public ::OMNI::ODEAb<3>{
 
     Eigen::MatrixXd m_states_at_quadrature_points { Eigen::MatrixXd::Zero(3, m_interpolator.getNumberOfInterpolationPoints()) };
 };
+
 
 struct IntegratordotV : public ::OMNI::ODEAb<3>{
 
@@ -499,7 +497,7 @@ int main(int argc, char *argv[])
                                                   admitted_deformations.end(),
                                                   true);
 
-    constexpr unsigned int number_of_Chebyshev_points = 31;
+    constexpr unsigned int number_of_Chebyshev_points = 90;
 
 
     const unsigned int coordinated_dimension = na * ne;
@@ -509,10 +507,14 @@ int main(int argc, char *argv[])
 
     const auto Chebyshev_points = ::Chebyshev::ComputeChebyshevPoints(number_of_Chebyshev_points);
     auto quadrature_points = ::OMNI::defineQuadrarturePoints(Chebyshev_points);
+    auto double_quadrature_points = ::OMNI::defineQuadrarturePoints(Chebyshev_points);
 
-    quadrature_points.insert( quadrature_points.end(), Chebyshev_points.begin(), Chebyshev_points.end() );
+    std::vector<double> obervation_points = Chebyshev_points;
 
-    std::sort(quadrature_points.begin(), quadrature_points.end());
+    obervation_points.insert( obervation_points.end(), quadrature_points.begin(), quadrature_points.end() );
+    obervation_points.insert( obervation_points.end(), double_quadrature_points.begin(), double_quadrature_points.end() );
+
+    std::sort(obervation_points.begin(), obervation_points.end());
 
 
 
@@ -522,7 +524,7 @@ int main(int argc, char *argv[])
 
 
     std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack =
-            std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(polynomial_representation, quadrature_points);
+            std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(polynomial_representation, obervation_points);
 
 
 
@@ -573,29 +575,32 @@ int main(int argc, char *argv[])
 
 
 
+//        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+
 
         while(t_state.KeepRunning()){
 
-            m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
+            m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
             integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
             integrate_rotation_matrix->integrate(R_X0);
 
-            integrate_position->integrate(r_X0);
+//            integrate_position->integrate(r_X0);
 
-            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            Omega_integrator->integrate(Omega);
+//            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            Omega_integrator->integrate(Omega);
 
-            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            V_integrator->integrate(V_X0);
+//            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            V_integrator->integrate(V_X0);
 
-            dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            dot_Omega_integrator->integrate(dot_Omega);
+//            dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            dot_Omega_integrator->integrate(dot_Omega);
 
-            dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            dot_V_integrator->integrate(dot_V_X0);
+//            dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            dot_V_integrator->integrate(dot_V_X0);
         }
     })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
 
@@ -703,7 +708,7 @@ int main(int argc, char *argv[])
 
     ::benchmark::Initialize(&argc, argv);
 
-    //::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::RunSpecifiedBenchmarks();
 
 
     return 0;
