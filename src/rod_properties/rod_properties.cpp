@@ -4,27 +4,16 @@
 
 namespace CROSP::rod_properties {
 
-RodDimensions::RodDimensions(CrossSection* t_cross_section, const double &t_L)
-    : m_cross_section( t_cross_section ),
-      m_L(t_L)
-{}
-
-
-
-RodDimensions::~RodDimensions()
-{
-    delete m_cross_section;
-}
 
 
 
 
 
-RodProperties::RodProperties(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
-                             const RodDimensions &t_rod_dimensions,
-                             const MaterialProperties &t_material_properties)
+RodProperties::RodProperties(polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                             RodDimensions t_rod_dimensions,
+                             MaterialProperties t_material_properties)
     : m_material_properties(t_material_properties),
-      m_rod_dimensions(t_rod_dimensions),
+      m_rod_dimensions( t_rod_dimensions ),
       m_Kee( defineKee( t_polynomial_representation ) )
 {}
 
@@ -75,9 +64,9 @@ Eigen::Matrix3d RodProperties::getHLinear()const
 }
 
 
-void RodProperties::updateRodProperties(const RodDimensions &t_rod_dimensions,
-                                        const MaterialProperties &t_material_properties,
-                                        const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)
+void RodProperties::updateRodProperties(RodDimensions t_rod_dimensions,
+                                        MaterialProperties t_material_properties,
+                                        polynomial_representation::PolynomialRepresentation t_polynomial_representation)
 {
     m_rod_dimensions = t_rod_dimensions;
 

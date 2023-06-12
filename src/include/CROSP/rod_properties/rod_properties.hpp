@@ -69,6 +69,10 @@ struct CrossSection{
     virtual std::string printProperties() const=0;
 };
 
+
+typedef std::unique_ptr<CrossSection> CrossSectionUPtr;
+
+
 struct CircularCrossSection : public CrossSection {
 
     CircularCrossSection(const double &t_radius=0.001)
@@ -104,6 +108,8 @@ struct CircularCrossSection : public CrossSection {
 
     double m_radius;
 };
+
+typedef std::unique_ptr<CircularCrossSection> CircularCrossSectionUPtr;
 
 
 struct RectangularCrossSection : public CrossSection {
@@ -146,6 +152,22 @@ struct RectangularCrossSection : public CrossSection {
     double m_height;
 };
 
+typedef std::unique_ptr<RectangularCrossSection> RectangularCrossSectionUPtr;
+
+
+template <class CrossSectionGeometry>
+concept CosseratCrossSection = requires(CrossSectionGeometry geometry){
+    double() = geometry.Area();
+
+    double() = geometry.Ixx();
+
+    double() = geometry.Iyy();
+
+    double() = geometry.Izz();
+
+    std::string() = geometry.printProperties();
+
+};
 
 
 /*!
@@ -154,11 +176,12 @@ struct RectangularCrossSection : public CrossSection {
  * This object contains the geometrical foundamentals like radius and length.
  * It also computes the corresponding derived properties such as area and inertia modules.
  */
+template <CosseratCrossSection CrossSectionGeometry=CircularCrossSection>
 struct RodDimensions {
 
     RodDimensions()=default;
 
-    ~RodDimensions();
+    ~RodDimensions()=default;
 
 
     /*!
@@ -166,12 +189,14 @@ struct RodDimensions {
      * \param t_r   Radius of the section [m]
      * \param t_L   Length of the rod [m]
      */
-    RodDimensions(CrossSection* t_cross_section, const double &t_L);
+    template<CosseratCrossSection cross_section>
+    RodDimensions(const double &t_L)
+        : m_L(t_L)
+    {}
 
 
-    CrossSection* m_cross_section {
-        new CircularCrossSection()
-    };
+
+    CrossSectionGeometry m_cross_section;
 
     /// \brief m_L  Length of the rod [m]
     double m_L { 1.0 };
@@ -189,9 +214,9 @@ class RodProperties {
 public:
 
 
-    RodProperties(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
-                  const RodDimensions &t_rod_dimensions,
-                  const MaterialProperties &t_material_properties);
+    RodProperties(polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                  RodDimensions t_rod_dimensions,
+                  MaterialProperties t_material_properties);
 
 
     /*!
@@ -252,9 +277,9 @@ public:
     Eigen::Matrix3d getHLinear()const;
 
 
-    void updateRodProperties(const RodDimensions &t_rod_dimensions,
-                             const MaterialProperties &t_material_properties,
-                             const polynomial_representation::PolynomialRepresentation &t_polynomial_representation);
+    void updateRodProperties(RodDimensions t_rod_dimensions,
+                             MaterialProperties t_material_properties,
+                             polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
 
     void updateRodProperties(const double &t_EI,
