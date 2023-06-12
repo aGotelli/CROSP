@@ -640,10 +640,10 @@ int main(int argc, char *argv[])
     ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, length);
 
     //  Now use it in rod properties
-    auto rod_properties =
+    ::CROSP::rod_properties::RodPropertiesSPtr rod_properties /*=
             std::make_shared<::CROSP::rod_properties::RodProperties>(strain_parameterisation,
                                                                      rod_dimensions,
-                                                                     ::CROSP::rod_properties::MaterialProperties());
+                                                                     ::CROSP::rod_properties::MaterialProperties())*/;
 
 
 
