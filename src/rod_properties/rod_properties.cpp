@@ -13,7 +13,8 @@ RodProperties::RodProperties(polynomial_representation::PolynomialRepresentation
                              RodDimensions t_rod_dimensions,
                              MaterialProperties t_material_properties)
     : m_material_properties(t_material_properties),
-      m_rod_dimensions( t_rod_dimensions ),
+      m_rod_dimensions( RodDimensions(std::move(t_rod_dimensions.m_cross_section),
+                                      t_rod_dimensions.m_L)),
       m_Kee( defineKee( t_polynomial_representation ) )
 {}
 
@@ -64,24 +65,6 @@ Eigen::Matrix3d RodProperties::getHLinear()const
 }
 
 
-void RodProperties::updateRodProperties(RodDimensions t_rod_dimensions,
-                                        MaterialProperties t_material_properties,
-                                        polynomial_representation::PolynomialRepresentation t_polynomial_representation)
-{
-    m_rod_dimensions = t_rod_dimensions;
-
-    m_material_properties = t_material_properties;
-
-    m_H = computeHookTensorMatrix();
-
-    m_M = computeCrossSectionalInertiaMatrix();
-
-
-    m_Kee = defineKee(t_polynomial_representation);
-
-    m_Dee = m_material_properties.m_mu*m_Kee;
-
-}
 
 
 void RodProperties::updateRodProperties(const double &t_EI,

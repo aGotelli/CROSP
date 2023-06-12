@@ -46,36 +46,47 @@ public:
      */
     CosseratRod()=default;
 
-    /*!
-     * \brief CosseratRod initialised the rod by giving its properties anly
-     * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
-     *
-     * In this constructo the strain parameterisation is initialised by its defaul value
-     */
-    CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
+//    /*!
+//     * \brief CosseratRod initialised the rod by giving its properties anly
+//     * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
+//     *
+//     * In this constructo the strain parameterisation is initialised by its defaul value
+//     */
+//    CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
 
 
-    /*!
-     * \brief CosseratRod initialised the rod by giving its strain parameterisation
-     * \param t_strain_parameterisation is the sef of desiderd parameterisation of the rod strain field as a ::CROSP::strain_parameterisation::StrainParameterisation object
-     *
-     * In this constructo the rod properties is initialised by its defaul value
-     */
-    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
+//    /*!
+//     * \brief CosseratRod initialised the rod by giving its strain parameterisation
+//     * \param t_strain_parameterisation is the sef of desiderd parameterisation of the rod strain field as a ::CROSP::strain_parameterisation::StrainParameterisation object
+//     *
+//     * In this constructo the rod properties is initialised by its defaul value
+//     */
+//    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
 
 
-    /*!
-     * \brief CosseratRod this constructor requires both argument to initialise a custom Cosserat rod
-     * \param t_strain_parameterisation is the sef of desiderd parameterisation of the rod strain field as a ::CROSP::strain_parameterisation::StrainParameterisation object
-     * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
-     */
-    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
+//    /*!
+//     * \brief CosseratRod this constructor requires both argument to initialise a custom Cosserat rod
+//     * \param t_strain_parameterisation is the sef of desiderd parameterisation of the rod strain field as a ::CROSP::strain_parameterisation::StrainParameterisation object
+//     * \param t_rod_properties is the sef of desiderd properties as a ::CROSP::rod_properties::RodProperties object
+//     */
+//    CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+//                const std::shared_ptr<rod_properties::RodProperties> t_rod_properties);
 
 
 
 
-
+    CosseratRod(const polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
+                const rod_properties::RodDimensions t_rod_dimensions,
+                const rod_properties::MaterialProperties t_material_properties,
+                const strain_parameterisation_stack::StrainFunction t_constrained_strain=strain_parameterisation_stack::default_constrained_strain)
+        : m_polynomial_representation(t_polynomial_represenation),
+          m_constrained_strain(t_constrained_strain),
+          m_rod_properties(
+              std::make_shared<rod_properties::RodProperties>(t_polynomial_represenation,
+                                                              t_rod_dimensions,
+                                                              t_material_properties)
+              )
+{}
 
 
     /*!
@@ -407,26 +418,6 @@ protected:
     strain_parameterisation_stack::StrainFunction m_constrained_strain {
         strain_parameterisation_stack::default_constrained_strain
     };
-
-
-    rod_properties::MaterialProperties m_material_properties;
-
-    rod_properties::RodDimensions m_rod_dimensions;
-
-
-    Eigen::MatrixXd m_H;
-    Eigen::MatrixXd m_M;
-
-
-    Eigen::MatrixXd m_Kee;
-    Eigen::MatrixXd m_Dee;
-
-
-
-
-
-
-
 
 
 

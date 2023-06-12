@@ -176,7 +176,6 @@ concept CosseratCrossSection = requires(CrossSectionGeometry geometry){
  * This object contains the geometrical foundamentals like radius and length.
  * It also computes the corresponding derived properties such as area and inertia modules.
  */
-template <CosseratCrossSection CrossSectionGeometry=CircularCrossSection>
 struct RodDimensions {
 
     RodDimensions()=default;
@@ -189,14 +188,17 @@ struct RodDimensions {
      * \param t_r   Radius of the section [m]
      * \param t_L   Length of the rod [m]
      */
-    template<CosseratCrossSection cross_section>
-    RodDimensions(const double &t_L)
-        : m_L(t_L)
+    RodDimensions(CrossSectionUPtr t_cross_section,
+                  const double &t_L)
+        : m_cross_section( std::move(t_cross_section) ),
+          m_L(t_L)
     {}
 
 
 
-    CrossSectionGeometry m_cross_section;
+    CrossSectionUPtr m_cross_section {
+        std::make_unique<CircularCrossSection>()
+    };
 
     /// \brief m_L  Length of the rod [m]
     double m_L { 1.0 };
@@ -275,11 +277,6 @@ public:
      * \return the linear subset of the Hookean matrix
      */
     Eigen::Matrix3d getHLinear()const;
-
-
-    void updateRodProperties(RodDimensions t_rod_dimensions,
-                             MaterialProperties t_material_properties,
-                             polynomial_representation::PolynomialRepresentation t_polynomial_representation);
 
 
     void updateRodProperties(const double &t_EI,
