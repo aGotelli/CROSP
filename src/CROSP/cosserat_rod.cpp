@@ -416,16 +416,16 @@ void CosseratRod::updateRodLength(const double &t_rod_lenght)
 void CosseratRod::updateRodProperties(const rod_properties::RodDimensions &t_rod_dimensions,
                                            const rod_properties::MaterialProperties &t_material_properties)
 {
-    m_rod_properties->updateRodProperties(t_rod_dimensions,
-                                          t_material_properties,
-                                          m_strain_parameterisation->m_polynomial_representation);
+//    m_rod_properties->updateRodProperties(t_rod_dimensions,
+//                                          t_material_properties,
+//                                          m_strain_parameterisation->m_polynomial_representation);
 }
 
 
 void CosseratRod::updateRodProperties(const double &t_EI)
 {
-    m_rod_properties->updateRodProperties(t_EI,
-                                          m_strain_parameterisation->m_polynomial_representation);
+//    m_rod_properties->updateRodProperties(t_EI,
+//                                          m_strain_parameterisation->m_polynomial_representation);
 }
 
 

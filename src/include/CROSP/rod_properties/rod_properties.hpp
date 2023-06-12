@@ -18,7 +18,9 @@
 #include <math.h>
 
 
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
+
+#include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
 
 /// \brief CROSP::rod_properties namespace contains the definition of the rod properties
@@ -187,10 +189,7 @@ class RodProperties {
 public:
 
 
-    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
-
-
-    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+    RodProperties(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                   const RodDimensions &t_rod_dimensions,
                   const MaterialProperties &t_material_properties);
 
@@ -255,11 +254,11 @@ public:
 
     void updateRodProperties(const RodDimensions &t_rod_dimensions,
                              const MaterialProperties &t_material_properties,
-                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
+                             const polynomial_representation::PolynomialRepresentation &t_polynomial_representation);
 
 
     void updateRodProperties(const double &t_EI,
-                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
+                             const polynomial_representation::PolynomialRepresentation &t_polynomial_representation);
 
 
 
@@ -291,13 +290,18 @@ private:
      * \param t_B the map matrix to map the allowed strains in the space of the full strain
      * \return
      */
-    Eigen::MatrixXd defineKee(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)const;
+    Eigen::MatrixXd defineKee(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)const;
 
 
     double gamma = 9.81;
 public : Eigen::Vector3d m_gravity { Eigen::Vector3d(0, 0, -gamma) };
 
 };
+
+
+typedef std::shared_ptr<RodProperties> RodPropertiesSPtr;
+
+typedef std::unique_ptr<RodProperties> RodPropertiesUPtr;
 
 
 

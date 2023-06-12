@@ -20,18 +20,12 @@ RodDimensions::~RodDimensions()
 
 
 
-
-RodProperties::RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
-    : m_Kee( defineKee(t_strain_parameterisation->m_polynomial_representation) )
-{}
-
-
-RodProperties::RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
+RodProperties::RodProperties(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation,
                              const RodDimensions &t_rod_dimensions,
                              const MaterialProperties &t_material_properties)
     : m_material_properties(t_material_properties),
       m_rod_dimensions(t_rod_dimensions),
-      m_Kee( defineKee(t_strain_parameterisation->m_polynomial_representation) )
+      m_Kee( defineKee( t_polynomial_representation ) )
 {}
 
 
@@ -83,7 +77,7 @@ Eigen::Matrix3d RodProperties::getHLinear()const
 
 void RodProperties::updateRodProperties(const RodDimensions &t_rod_dimensions,
                                         const MaterialProperties &t_material_properties,
-                                        const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)
+                                        const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)
 {
     m_rod_dimensions = t_rod_dimensions;
 
@@ -102,7 +96,7 @@ void RodProperties::updateRodProperties(const RodDimensions &t_rod_dimensions,
 
 
 void RodProperties::updateRodProperties(const double &t_EI,
-                                        const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)
+                                        const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)
 {
     m_H(2, 2) = t_EI;
 
@@ -137,12 +131,12 @@ void RodProperties::updateRodProperties(const double &t_EI,
     return M;
 }
 
-Eigen::MatrixXd RodProperties::defineKee(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)const
+Eigen::MatrixXd RodProperties::defineKee(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)const
 {
 
-    const unsigned int n = t_polynomial_representation->getCoordinatesDimension();
+    const unsigned int n = t_polynomial_representation.getCoordinatesDimension();
 
-    const Eigen::MatrixXd Ha = t_polynomial_representation->m_B.transpose() * m_H * t_polynomial_representation->m_B;
+    const Eigen::MatrixXd Ha = t_polynomial_representation.m_B.transpose() * m_H * t_polynomial_representation.m_B;
 
 
     typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::MatrixXd, double,
@@ -155,7 +149,7 @@ Eigen::MatrixXd RodProperties::defineKee(const std::shared_ptr<const polynomial_
     const double dX = 0.0005;
 
     boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Eigen::MatrixXd &, Eigen::MatrixXd &t_dKeeds, const double t_X){
-        const auto Phi = t_polynomial_representation->getPhi( t_X );
+        const auto Phi = t_polynomial_representation.getPhi( t_X );
 
         t_dKeeds = Phi.transpose()*Ha*Phi;
     }, Kee, X0, X1, dX);

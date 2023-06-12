@@ -401,19 +401,51 @@ protected:
 #endif
 
 
+    polynomial_representation::PolynomialRepresentation m_polynomial_representation;
+
+
+    strain_parameterisation_stack::StrainFunction m_constrained_strain {
+        strain_parameterisation_stack::default_constrained_strain
+    };
+
+
+    rod_properties::MaterialProperties m_material_properties;
+
+    rod_properties::RodDimensions m_rod_dimensions;
+
+
+    Eigen::MatrixXd m_H;
+    Eigen::MatrixXd m_M;
+
+
+    Eigen::MatrixXd m_Kee;
+    Eigen::MatrixXd m_Dee;
+
+
+
+
+
+
+
+
+
+
     //  Representation of the rod via strain
     std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
         std::make_shared<strain_parameterisation::StrainParameterisation>()
     };
+
+
+
 
 //#ifndef DEVELOPER
 //private:
 //#endif
 
     //  The set of rod properties
-    std::shared_ptr<rod_properties::RodProperties> m_rod_properties {
+    std::shared_ptr<rod_properties::RodProperties> m_rod_properties/* {
         std::make_shared<rod_properties::RodProperties>(m_strain_parameterisation)
-    };
+    }*/;
 
 
 

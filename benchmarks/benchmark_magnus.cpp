@@ -549,9 +549,12 @@ int main(int argc, char *argv[])
             std::make_shared<IntegratordotV>(number_of_Chebyshev_points, m_strain_parameterisation_stack, Omega_integrator, V_integrator, dot_Omega_integrator);
 
 
-    const Eigen::VectorXd q      = Eigen::VectorXd::Random(coordinated_dimension);
+    /*const*/ Eigen::VectorXd q      = Eigen::VectorXd::Random(coordinated_dimension);
     const Eigen::VectorXd dot_q  = Eigen::VectorXd::Random(coordinated_dimension);
     const Eigen::VectorXd ddot_q = Eigen::VectorXd::Random(coordinated_dimension);
+
+    q << 3, -0.25, 0, 0, 0;
+//    q << 3, -1.5, 0.33333333333333, 0.125, -0.621;
 
 
     const Eigen::Matrix3d R_X0 = Eigen::Matrix3d::Identity();
@@ -660,6 +663,16 @@ int main(int argc, char *argv[])
     m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
 
     m_cosserat_rod_integrators->forwardKinematics();
+
+
+    for(unsigned int point=0; point<number_of_Chebyshev_points; point++){
+        unsigned int step = number_of_Chebyshev_points -1 - point;
+        std::cout << "point : " << point << " R : \n" << integrate_rotation_matrix->getStateAtPoint(point) << "\n\n";
+    }
+    std::cout.flush();
+
+return - 68;
+
 
 
     const Eigen::MatrixXd Q_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
