@@ -19,26 +19,18 @@
 
 namespace CROSP {
 
-
-//CosseratRod::CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties)
-//    : m_rod_properties( t_rod_properties )
-//{}
-
-
-
-//CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
-//    : m_strain_parameterisation( t_strain_parameterisation )
-//{}
-
-
-
-//CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-//                         const std::shared_ptr<rod_properties::RodProperties> t_rod_properties)
-//    : m_strain_parameterisation( t_strain_parameterisation ),
-//      m_rod_properties( t_rod_properties )
-//{}
-
-
+CosseratRod::CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
+                         rod_properties::RodDimensions t_rod_dimensions,
+                         rod_properties::MaterialProperties t_material_properties,
+                         strain_parameterisation_stack::StrainFunction t_constrained_strain)
+    : m_polynomial_representation(t_polynomial_represenation),
+      m_constrained_strain(t_constrained_strain),
+      m_rod_properties(
+          std::make_shared<rod_properties::RodProperties>(t_polynomial_represenation,
+                                                          t_rod_dimensions,
+                                                          t_material_properties)
+          )
+{}
 
 
 void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,

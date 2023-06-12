@@ -183,6 +183,12 @@ struct RodDimensions {
     ~RodDimensions()=default;
 
 
+    RodDimensions(RodDimensions &t_other)
+        : m_cross_section( std::move(t_other.m_cross_section) ),
+          m_L(t_other.m_L)
+    {}
+
+
     /*!
      * \brief RodDimensions construct the object given the properties
      * \param t_r   Radius of the section [m]
@@ -215,10 +221,9 @@ class RodProperties {
 
 public:
 
-
     RodProperties(polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                  RodDimensions t_rod_dimensions,
-                  MaterialProperties t_material_properties);
+                  RodDimensions t_rod_dimensions=rod_properties::RodDimensions(),
+                  MaterialProperties t_material_properties=rod_properties::MaterialProperties());
 
 
     /*!

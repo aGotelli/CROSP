@@ -51,9 +51,10 @@ int main(int argc, char *argv[])
     auto strain_parameterisation =
             std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(poly_with_admitted_def_and_modes, number_of_Chebyshev_points);
 
-    ::CROSP::rod_properties::CircularCrossSection cs;
+    ::CROSP::rod_properties::CrossSectionUPtr cs =
+            std::make_unique<::CROSP::rod_properties::CircularCrossSection>();
     const double length = 1.5;
-    ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, length);
+    ::CROSP::rod_properties::RodDimensions rod_dimensions(std::move(cs), length);
 
     //  Now use it in rod properties
     ::CROSP::rod_properties::RodPropertiesSPtr rod_properties /*=

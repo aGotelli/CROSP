@@ -39,7 +39,7 @@ void benchmarkTIDM(::benchmark::State &t_state)
     auto strain_param =
             std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-    ::CROSP::CosseratRod rod(strain_param);
+    ::CROSP::CosseratRod rod;
 
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
