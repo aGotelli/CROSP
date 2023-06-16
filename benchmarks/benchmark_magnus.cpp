@@ -1,4 +1,4 @@
-#include "OMNI/OMNI.hpp"
+ #include "OMNI/OMNI.hpp"
 #include "memory"
 
 #include "CROSP/CROSP/cosserat_rod.hpp"
@@ -481,12 +481,12 @@ struct IntegratordotV : public ::OMNI::ODEAb<3>{
 int main(int argc, char *argv[])
 {
 
-    const unsigned int ne = 5;
+    const unsigned int ne = 4;
 
     static constexpr std::array<bool, 6> admitted_deformations = {
-        false,
         true,
-        false,
+        true,
+        true,
 
         false,
         false,
@@ -549,9 +549,14 @@ int main(int argc, char *argv[])
             std::make_shared<IntegratordotV>(number_of_Chebyshev_points, m_strain_parameterisation_stack, Omega_integrator, V_integrator, dot_Omega_integrator);
 
 
-    const Eigen::VectorXd q      = Eigen::VectorXd::Random(coordinated_dimension);
+    Eigen::VectorXd q      = Eigen::VectorXd::Random(coordinated_dimension);
     const Eigen::VectorXd dot_q  = Eigen::VectorXd::Random(coordinated_dimension);
     const Eigen::VectorXd ddot_q = Eigen::VectorXd::Random(coordinated_dimension);
+
+
+    q << 0, 0, 0, 0,
+          0, 0, 0, 0,
+          1, 1, 1, 1;
 
 
     const Eigen::Matrix3d R_X0 = Eigen::Matrix3d::Identity();
@@ -612,6 +617,15 @@ int main(int argc, char *argv[])
 
     integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
     integrate_rotation_matrix->integrate(R_X0);
+
+
+    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
+        std::cout << "c" << i << ", point X=" << Chebyshev_points[i] << "\n";
+        std::cout << "R : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n\n";
+
+    }
+
+    return -64;
 
     integrate_position->integrate(r_X0);
 
