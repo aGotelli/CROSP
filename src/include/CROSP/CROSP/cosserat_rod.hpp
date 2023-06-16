@@ -46,6 +46,12 @@ public:
      */
     CosseratRod()=default;
 
+    CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
+                unsigned int t_number_of_Chebyshev_points)
+        : m_polynomial_representation(t_polynomial_represenation),
+          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    {}
+
 
 
     CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
@@ -378,6 +384,8 @@ protected:
 
     polynomial_representation::PolynomialRepresentation m_polynomial_representation;
 
+    unsigned int m_number_of_Chebyshev_points { 21 };
+
 
     strain_parameterisation_stack::StrainFunction m_constrained_strain {
         strain_parameterisation_stack::default_constrained_strain
@@ -420,8 +428,8 @@ protected:
 //    };
 
     ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
-      std::make_unique<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(m_strain_parameterisation,
-                                                                                             m_strain_parameterisation_Delta,
+      std::make_unique<::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator>(m_polynomial_representation,
+                                                                                             m_number_of_Chebyshev_points,
                                                                                              m_rod_properties)
     };
 

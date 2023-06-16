@@ -23,15 +23,10 @@ Eigen::Matrix4d getA(const Eigen::Vector3d t_k){
 
 
 
-RungeKuttaIntegrator::RungeKuttaIntegrator(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
-                                           const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
-                                           const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                                           std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
-                                           const unsigned int t_number_of_Chebyshev_points)
-    :
-      m_strain_parameterisation(t_strain_parameterisation),
-      m_strain_parameterisation_Delta(t_strain_parameterisation_Delta),
-      m_polynomial_representation(t_polynomial_representation),
+RungeKuttaIntegrator::RungeKuttaIntegrator(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                                           const unsigned int t_number_of_Chebyshev_points,
+                                           std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+    : m_polynomial_representation(t_polynomial_representation),
       m_rod_properties(t_rod_properties),
       m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
 {}
@@ -106,7 +101,7 @@ void RungeKuttaIntegrator::forwardKinematics(const Eigen::Vector4d &t_initial_qu
         Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
         //  Get the strains for the rod
-        const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_strain_parameterisation.m_constant_strain;
+        const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
         const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
         const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
@@ -188,7 +183,7 @@ void RungeKuttaIntegrator::forwardTangentKinematics(const Eigen::Vector3d &t_ini
         Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
         //  Get the strains for the rod
-        const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_strain_parameterisation.m_constant_strain;
+        const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
         const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
         const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
@@ -303,7 +298,7 @@ void RungeKuttaIntegrator::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lamb
         Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
         //  Get the strains for the rod
-        const Eigen::VectorXd Xi      = BPhi*m_qe + m_strain_parameterisation.m_constant_strain;
+        const Eigen::VectorXd Xi      = BPhi*m_qe + m_constant_strain;
         const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
         const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
 
@@ -370,7 +365,7 @@ void RungeKuttaIntegrator::backwardTangentDynamics(const ::LieAlgebra::Vector6d 
         Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
         //  Get the strains for the rod
-        const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_strain_parameterisation.m_constant_strain;
+        const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
         const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
         const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
@@ -451,7 +446,7 @@ Eigen::MatrixXd RungeKuttaIntegrator::getRodPositions() const
         Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_s);
 
         //  Get the strains for the rod
-        const Eigen::VectorXd Xi = BPhi*m_qe + m_strain_parameterisation.m_constant_strain;
+        const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain;
 
 
         t_dydX = this->forwardStaticODEs(t_y, Xi);

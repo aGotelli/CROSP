@@ -159,7 +159,7 @@ target_compile_options(${PROJECT_NAME}
         -Wall
         -Wextra
 )
-target_compile_definitions(${PROJECT_NAME} PRIVATE TESTING)
+#target_compile_definitions(${PROJECT_NAME} PRIVATE TESTING)
 
 
 #add_executable(prove prove.cpp)

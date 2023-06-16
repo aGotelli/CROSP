@@ -6,15 +6,15 @@ namespace CROSP::strain_parameterisation_stack {
 
 
 
-StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation,
+StrainParameterisationStack::StrainParameterisationStack(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                                                          const unsigned int t_number_of_Chebyshev_point,
                                                          const StrainFunction &t_Xi_c)
     : m_number_of_points(t_number_of_Chebyshev_point),
       m_Xi_c(t_Xi_c)
 {
 
-    const Eigen::MatrixXd B = t_polynomial_representation->m_B;
-    Eigen::MatrixXd Phi = t_polynomial_representation->getPhi( 0 );
+    const Eigen::MatrixXd B = t_polynomial_representation.m_B;
+    Eigen::MatrixXd Phi = t_polynomial_representation.getPhi( 0 );
     Eigen::MatrixXd BPhi = B*Phi;
 
 
@@ -41,7 +41,7 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
     const auto Chebyshev_points = ::Chebyshev::ComputeChebyshevPoints(t_number_of_Chebyshev_point);
 
     for(unsigned int step=0; const auto point : Chebyshev_points){
-            Phi = t_polynomial_representation->getPhi( point );
+            Phi = t_polynomial_representation.getPhi( point );
 
             row = step * BPhi.rows();
 
@@ -75,15 +75,15 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
 
 }
 
-StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation,
+StrainParameterisationStack::StrainParameterisationStack(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                                                          const std::vector<double> &t_observation_points,
                                                          const StrainFunction &t_Xi_c)
     : m_number_of_points(t_observation_points.size()),
       m_Xi_c(t_Xi_c)
 {
 
-    const Eigen::MatrixXd B = t_polynomial_representation->m_B;
-    Eigen::MatrixXd Phi = t_polynomial_representation->getPhi( 0 );
+    const Eigen::MatrixXd B = t_polynomial_representation.m_B;
+    Eigen::MatrixXd Phi = t_polynomial_representation.getPhi( 0 );
     Eigen::MatrixXd BPhi = B*Phi;
 
 
@@ -108,7 +108,7 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
 
     unsigned int row;
     for(unsigned int step=0; const auto point : t_observation_points){
-            Phi = t_polynomial_representation->getPhi( point );
+            Phi = t_polynomial_representation.getPhi( point );
 
             row = step * BPhi.rows();
 

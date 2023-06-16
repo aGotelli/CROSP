@@ -4,6 +4,7 @@
 
 
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+#include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
 #include "CROSP/numerical_integrators/cosserat_rod_integrators.hpp"
@@ -20,11 +21,9 @@ namespace CROSP::numerical_integrators::runge_kutta {
 class RungeKuttaIntegrator : public CosseratRodIntegrators
 {
 public:
-    RungeKuttaIntegrator(const strain_parameterisation::StrainParameterisation t_strain_parameterisation,
-                         const strain_parameterisation::StrainParameterisation t_strain_parameterisation_Delta,
-                         const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
-                         const unsigned int t_number_of_Chebyshev_points);
+    RungeKuttaIntegrator(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                         const unsigned int t_number_of_Chebyshev_points,
+                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
     virtual std::string printIntegratorProperties()const final;
@@ -97,8 +96,9 @@ public:
 
 private:
 
-    strain_parameterisation::StrainParameterisation m_strain_parameterisation;
-    strain_parameterisation::StrainParameterisation m_strain_parameterisation_Delta;
+
+    ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
+
     polynomial_representation::PolynomialRepresentation m_polynomial_representation;
     std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 

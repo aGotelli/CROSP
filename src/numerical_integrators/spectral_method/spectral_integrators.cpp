@@ -3,15 +3,15 @@
 namespace CROSP::numerical_integrators::spectral_method {
 
 
-SpectralIntegrators::SpectralIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                                         std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+SpectralIntegrators::SpectralIntegrators(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                                         const unsigned int t_number_of_Chebyshev_points,
                                          std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
     : m_strain_parameterisation_stack(
-          std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_strain_parameterisation->m_polynomial_representation,
-                                                                                                t_strain_parameterisation->m_number_of_Chebyshev_points)),
+          std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
+                                                                                                t_number_of_Chebyshev_points)),
       m_Delta_strain_parameterisation_stack(
-          std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_strain_parameterisation->m_polynomial_representation,
-                                                                                                t_strain_parameterisation->m_number_of_Chebyshev_points,
+          std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
+                                                                                                t_number_of_Chebyshev_points,
                                                                                                 ::CROSP::strain_parameterisation_stack::zero_constrained_strain)),
 
       m_idm_integrators( std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation_stack,

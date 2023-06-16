@@ -12,8 +12,8 @@ namespace CROSP::numerical_integrators::spectral_method {
 struct SpectralIntegrators : public CosseratRodIntegrators {
 
 
-    SpectralIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                        std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    SpectralIntegrators(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                        const unsigned int t_number_of_Chebyshev_points,
                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 

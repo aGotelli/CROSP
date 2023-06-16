@@ -20,11 +20,11 @@ static StrainFunction zero_constrained_strain = [](const double&){return ::LieAl
 
 struct StrainParameterisationStack {
 
-    StrainParameterisationStack(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation,
+    StrainParameterisationStack(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                                 const unsigned int t_number_of_Chebyshev_point,
                                 const StrainFunction &t_Xi_c=default_constrained_strain);
 
-    StrainParameterisationStack(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation,
+    StrainParameterisationStack(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                                 const std::vector<double> &t_observation_points,
                                 const StrainFunction &t_Xi_c=default_constrained_strain);
 

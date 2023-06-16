@@ -15,28 +15,28 @@ target_link_libraries(benchmark_idm
 )
 target_compile_definitions(benchmark_idm PRIVATE DEVELOPER)
 
-add_executable(benchmark_tidm benchmark_tidm.cpp
-)
-target_link_libraries(benchmark_tidm
-    PRIVATE
-        ${PROJECT_NAME}
-        utilities
-        benchmark::benchmark
-)
-target_compile_definitions(benchmark_tidm PRIVATE DEVELOPER)
+#add_executable(benchmark_tidm benchmark_tidm.cpp
+#)
+#target_link_libraries(benchmark_tidm
+#    PRIVATE
+#        ${PROJECT_NAME}
+#        utilities
+#        benchmark::benchmark
+#)
+#target_compile_definitions(benchmark_tidm PRIVATE DEVELOPER)
 
 
-add_executable(benchmark_magnus benchmark_magnus.cpp
-)
-target_link_libraries(benchmark_magnus
-    PRIVATE
-        ${PROJECT_NAME}
-        utilities
-        benchmark::benchmark
-        optimized OMNI
-        debug OMNI-debug
-)
-target_compile_definitions(benchmark_magnus PRIVATE DEVELOPER)
+#add_executable(benchmark_magnus benchmark_magnus.cpp
+#)
+#target_link_libraries(benchmark_magnus
+#    PRIVATE
+#        ${PROJECT_NAME}
+#        utilities
+#        benchmark::benchmark
+#        optimized OMNI
+#        debug OMNI-debug
+#)
+#target_compile_definitions(benchmark_magnus PRIVATE DEVELOPER)
 
 #add_executable(benchmark_jacobian_tidm benchmark_jacobian_tidm.cpp
 #)

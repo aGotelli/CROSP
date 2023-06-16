@@ -20,13 +20,13 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
-constexpr unsigned int number_of_Chebyshev_points = 31;
+constexpr unsigned int number_of_Chebyshev_points = 21;
 
 
 void benchmarkIDM(::benchmark::State &t_state)
 {
 
-    const unsigned int ne =/* t_state.range(0)*/5;
+    const unsigned int ne =/* t_state.range(0)*/15;
 
     const unsigned int coordinated_dimension = na * ne;
 
@@ -39,13 +39,12 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
 
-    auto polynomial_representation =
-            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
+    CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-    auto strain_param =
-            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+//    auto strain_param =
+//            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-    ::CROSP::CosseratRod rod;
+    ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points);
 
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -55,13 +54,14 @@ void benchmarkIDM(::benchmark::State &t_state)
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
 
 
+
     while(t_state.KeepRunning()){
 
         rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
 
         rod.m_cosserat_rod_integrators->forwardKinematics();
 
-//        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
+        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
 
     }
 };
