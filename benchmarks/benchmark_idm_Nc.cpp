@@ -2,8 +2,6 @@
 
 #include "CROSP/CROSP/cosserat_rod.hpp"
 
-#include "CROSP/static_initialiser/static_initialiser.hpp"
-
 #include <benchmark/benchmark.h>
 
 
