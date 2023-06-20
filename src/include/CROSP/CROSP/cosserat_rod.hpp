@@ -37,6 +37,7 @@ namespace CROSP {
 /*!
  * \brief The CosseratRod class implements the functionalities needed to simulate a Cosserat rod
  */
+template<class CosseratIntegrator=::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>
 class CosseratRod
 {
 public:
@@ -45,6 +46,7 @@ public:
      * \brief Default constructors that initialised member with by their default initialisation
      */
     CosseratRod()=default;
+
 
     CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
                 unsigned int t_number_of_Chebyshev_points)
@@ -305,7 +307,7 @@ public:
      * \brief getCoordinatesDimension gives the dimension of the rod parameterisation, namely ne*na
      * \return the dimension of the rod parameterisation, namely ne*na
      */
-    inline unsigned int getCoordinatesDimension()const {return m_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension();}
+    inline unsigned int getCoordinatesDimension()const {return m_polynomial_representation.getCoordinatesDimension();}
 
     /*!
      * \brief getStaticEquilibrium returns the static equilibrium of the rod Kee*qe - Q
@@ -328,9 +330,9 @@ public:
                                               const Eigen::VectorXd &t_Delta_dot_qe)const;
 
 
-    virtual void updateInternalActuation(const double &t_current_time);
+    void updateInternalActuation([[maybe_unused]]const double &t_current_time) {};
 
-    virtual Eigen::VectorXd getQad()const;
+    Eigen::VectorXd getQad()const;
 
 
     /*!
@@ -366,7 +368,7 @@ public:
      * \param t_rod_lenght the new lenght of the rod.
      */
     [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
-    virtual void updateRodLength(const double &t_rod_lenght);
+    void updateRodLength(const double &t_rod_lenght);
 
 
     void updateRodProperties(const rod_properties::RodDimensions &t_rod_dimensions,
@@ -392,46 +394,72 @@ protected:
     };
 
 
-
-    //  Representation of the rod via strain
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation {
-        std::make_shared<strain_parameterisation::StrainParameterisation>()
-    };
-
-
-
-
-//#ifndef DEVELOPER
-//private:
-//#endif
-
     //  The set of rod properties
     rod_properties::RodPropertiesSPtr m_rod_properties {
-        std::make_shared<rod_properties::RodProperties>(m_polynomial_representation)
+        std::make_shared<rod_properties::RodProperties>()
     };
 
 
-
-    //  Variables related the perturbation of the strain parameterisation
-    std::shared_ptr<strain_parameterisation::StrainParameterisation> m_strain_parameterisation_Delta {
-        std::make_shared<strain_parameterisation::StrainParameterisation>(m_strain_parameterisation,
-                                                                          ::LieAlgebra::Vector6d::Zero())
-    };
-
-
-//    ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
-//      std::make_unique<::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator>(*m_strain_parameterisation,
-//                                                                                             *m_strain_parameterisation_Delta,
-//                                                                                          *m_strain_parameterisation->m_polynomial_representation,
-//                                                                                             m_rod_properties,
-//                                                                                          m_strain_parameterisation->m_number_of_Chebyshev_points)
-//    };
 
     ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
-      std::make_unique<::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator>(m_polynomial_representation,
-                                                                                             m_number_of_Chebyshev_points,
-                                                                                             m_rod_properties)
+      std::make_unique<CosseratIntegrator>(m_polynomial_representation,
+                                           m_number_of_Chebyshev_points,
+                                           m_rod_properties)
     };
+
+
+
+//    /*!
+//     * \brief defineKee defines the elasticity matrix Kee
+//     * \param t_ne the number of modes per admitted deformation
+//     * \param t_na the number of deformations degrees of freedom
+//     * \param t_B the map matrix to map the allowed strains in the space of the full strain
+//     * \return
+//     */
+//    Eigen::MatrixXd defineKee();
+
+
+    /// \brief m_Kee The generalised elasticity matrix
+    Eigen::MatrixXd m_Kee { [this]()->Eigen::MatrixXd
+        {
+
+            const unsigned int n = m_polynomial_representation.getCoordinatesDimension();
+
+            const Eigen::MatrixXd Ha = m_polynomial_representation.m_B.transpose() * m_rod_properties->m_H * m_polynomial_representation.m_B;
+
+
+            typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::MatrixXd, double,
+                                                                 Eigen::MatrixXd, double,
+                                                                 boost::numeric::odeint::vector_space_algebra> Ke_stepper;
+            Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
+
+            const double X0 = 0.0;
+            const double X1 = 1.0;
+            const double dX = 0.0005;
+
+            boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Eigen::MatrixXd &, Eigen::MatrixXd &t_dKeeds, const double t_X){
+                const auto Phi = m_polynomial_representation.getPhi( t_X );
+
+                t_dKeeds = Phi.transpose()*Ha*Phi;
+            }, Kee, X0, X1, dX);
+
+            Kee *= m_rod_properties->m_rod_dimensions.m_L;
+
+            return Kee;
+        }()
+    };
+
+    /// \brief m_Dee The matrix of the internal dumping
+    Eigen::MatrixXd m_Dee { m_rod_properties->m_material_properties.m_mu*m_Kee };
+
+
+
+
+
+
+
+
+
 
 
 

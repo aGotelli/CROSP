@@ -10,9 +10,22 @@
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
+#include "CROSP/rod_properties/rod_properties.hpp"
 
 
 namespace CROSP::numerical_integrators {
+
+
+
+template<class NumericalIntegrator>
+concept CosseratIntegrator = requires(NumericalIntegrator integrator){
+
+//        NumericalIntegrator() = NumericalIntegrator(rod_properties::RodProperties(),
+//                            );
+
+        integrator.printIntegratorProperties();
+};
 
 
 struct CosseratRodIntegrators {

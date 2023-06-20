@@ -44,7 +44,7 @@ void benchmarkIDM(::benchmark::State &t_state)
 //    auto strain_param =
 //            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-    ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points);
+    ::CROSP::CosseratRod<::CROSP::numerical_integrators::runge_kutta::RungeKuttaIntegrator> rod(polynomial_representation, number_of_Chebyshev_points);
 
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 

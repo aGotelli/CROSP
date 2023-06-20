@@ -221,17 +221,11 @@ class RodProperties {
 
 public:
 
-    RodProperties(polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                  RodDimensions t_rod_dimensions=rod_properties::RodDimensions(),
-                  MaterialProperties t_material_properties=rod_properties::MaterialProperties());
+    RodProperties()=default;
 
+    RodProperties(RodDimensions t_rod_dimensions,
+                  MaterialProperties t_material_properties);
 
-    /*!
-     * \brief updateRodLength this funtion is used to update the length of the rod
-     * \param t_rod_lenght the new lenght of the rod.
-     */
-    [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
-    void updateRodLength(const double &t_rod_lenght);
 
 
 
@@ -284,9 +278,6 @@ public:
     Eigen::Matrix3d getHLinear()const;
 
 
-    void updateRodProperties(const double &t_EI,
-                             const polynomial_representation::PolynomialRepresentation &t_polynomial_representation);
-
 
 
     /// \brief m_H The Hookean matrix default initialised using the members m_material_properties and m_rod_dimensions
@@ -296,12 +287,6 @@ public:
      Eigen::Matrix<double, 6, 6>  m_M{ computeCrossSectionalInertiaMatrix() };
 
 
-    /// \brief m_Kee The generalised elasticity matrix
-    Eigen::MatrixXd m_Kee;
-
-    /// \brief m_Dee The matrix of the internal dumping
-    Eigen::MatrixXd m_Dee { m_material_properties.m_mu*m_Kee };
-
 
 private:
 
@@ -310,14 +295,6 @@ private:
     ::LieAlgebra::Matrix6d computeCrossSectionalInertiaMatrix()const;
 
 
-    /*!
-     * \brief defineKee defines the elasticity matrix Kee
-     * \param t_ne the number of modes per admitted deformation
-     * \param t_na the number of deformations degrees of freedom
-     * \param t_B the map matrix to map the allowed strains in the space of the full strain
-     * \return
-     */
-    Eigen::MatrixXd defineKee(const polynomial_representation::PolynomialRepresentation &t_polynomial_representation)const;
 
 
     double gamma = 9.81;

@@ -169,6 +169,24 @@ target_compile_options(${PROJECT_NAME}
 #    debug ATORS-debug
 #)
 
+add_executable(test_Kee CROSP/test_Kee.cpp)
+target_link_libraries(test_Kee
+    ${PROJECT_NAME}
+    optimized ATORS
+    debug ATORS-debug
+)
+target_compile_definitions(test_Kee PRIVATE DEVELOPER)
+
+
+add_executable(test_integral_Phi CROSP/test_integral_Phi.cpp)
+target_link_libraries(test_integral_Phi
+    ${PROJECT_NAME}
+    optimized ATORS
+    debug ATORS-debug
+)
+target_compile_definitions(test_integral_Phi PRIVATE DEVELOPER)
+
+
 
 install(
     TARGETS
