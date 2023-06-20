@@ -10,7 +10,7 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
 
     IntegratorRotationMatrix(const unsigned int t_number_of_Chebyshev_points,
                              std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack)
-        : ::OMNI::ODEA<3, 3>((t_number_of_Chebyshev_points-1)*3),
+        : ::OMNI::ODEA<3, 3>((t_number_of_Chebyshev_points)),
           m_strain_parameterisation_stack(t_strain_parameterisation_stack),
           m_interpolator(::Chebyshev::ChebyshevInterpolator(t_number_of_Chebyshev_points, this->m_quadrature_points))
     {}
@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
     std::vector<double> obervation_points = Chebyshev_points;
 
     obervation_points.insert( obervation_points.end(), quadrature_points.begin(), quadrature_points.end() );
-    obervation_points.insert( obervation_points.end(), double_quadrature_points.begin(), double_quadrature_points.end() );
+//    obervation_points.insert( obervation_points.end(), double_quadrature_points.begin(), double_quadrature_points.end() );
 
     std::sort(obervation_points.begin(), obervation_points.end());
 
@@ -550,7 +550,7 @@ int main(int argc, char *argv[])
 
     q << 0, 0, 0, 0,
           0, 0, 0, 0,
-          1, 1, 1, 1;
+          0.75, -2.5, 0.25, 0.3333;
 
 
     const Eigen::Matrix3d R_X0 = Eigen::Matrix3d::Identity();
@@ -689,23 +689,23 @@ int main(int argc, char *argv[])
 
 
 
-//    m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+    m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
 
-//    integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-//    integrate_rotation_matrix->integrate(R_X0);
+    integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+    integrate_rotation_matrix->integrate(R_X0);
 
 
-//    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
-//        std::cout << "c" << i << ", point X=" << Chebyshev_points[i] << "\n";
-//        std::cout << "R : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n\n";
+    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
+        std::cout << "c" << i << ", point X=" << Chebyshev_points[i] << "\n";
+        std::cout << "R : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n\n";
 
-//    }
+    }
 
-    ::benchmark::Initialize(&argc, argv);
+//    ::benchmark::Initialize(&argc, argv);
 
-    ::benchmark::RunSpecifiedBenchmarks();
+//    ::benchmark::RunSpecifiedBenchmarks();
 
     return -64;
 

@@ -151,44 +151,44 @@ void StrainParameterisationStack::updateStrainParameterisation(const Eigen::Vect
     m_dot_Xi_stack = m_B_Phi_stack * t_dot_q;
     m_ddot_Xi_stack = m_B_Phi_stack * t_ddot_q;
 
-//    Eigen::Vector3d K;
-//    Eigen::Vector3d dot_K;
-//    Eigen::Vector3d ddot_K;
+    Eigen::Vector3d K;
+    Eigen::Vector3d dot_K;
+    Eigen::Vector3d ddot_K;
 
-//    Eigen::Vector3d Gamma;
-//    Eigen::Vector3d dot_Gamma;
-//    Eigen::Vector3d ddot_Gamma;
+    Eigen::Vector3d Gamma;
+    Eigen::Vector3d dot_Gamma;
+    Eigen::Vector3d ddot_Gamma;
 
-//    for(unsigned int step=0; step<m_number_of_points; step++){
+    for(unsigned int step=0; step<m_number_of_points; step++){
 
-//        K      =      m_Xi_stack.block<3, 1>(step*6, 0);
-//        dot_K  =  m_dot_Xi_stack.block<3, 1>(step*6, 0);
-//        ddot_K = m_ddot_Xi_stack.block<3, 1>(step*6, 0);
+        K      =      m_Xi_stack.block<3, 1>(step*6, 0);
+        dot_K  =  m_dot_Xi_stack.block<3, 1>(step*6, 0);
+        ddot_K = m_ddot_Xi_stack.block<3, 1>(step*6, 0);
 
-//        Gamma      =      m_Xi_stack.block<3, 1>(step*6 + 3, 0);
-//        dot_Gamma  =  m_dot_Xi_stack.block<3, 1>(step*6 + 3, 0);
-//        ddot_Gamma = m_ddot_Xi_stack.block<3, 1>(step*6 + 3, 0);
-
-
-////        m_K_stack->at(step)      = K;
-////        m_dot_K_stack->at(step)  = dot_K;
-////        m_ddot_K_stack->at(step) = ddot_K;
-
-////        m_Gamma_stack->at(step)      = Gamma;
-////        m_dot_Gamma_stack->at(step)  = dot_Gamma;
-////        m_ddot_Gamma_stack->at(step) = ddot_Gamma;
+        Gamma      =      m_Xi_stack.block<3, 1>(step*6 + 3, 0);
+        dot_Gamma  =  m_dot_Xi_stack.block<3, 1>(step*6 + 3, 0);
+        ddot_Gamma = m_ddot_Xi_stack.block<3, 1>(step*6 + 3, 0);
 
 
+        m_K_stack->at(step)      = K;
+        m_dot_K_stack->at(step)  = dot_K;
+        m_ddot_K_stack->at(step) = ddot_K;
 
-//        m_hat_K_stack->at(step)      = ::LieAlgebra::skew( K );
-//        m_hat_dot_K_stack->at(step)  = ::LieAlgebra::skew( dot_K );
-//        m_hat_ddot_K_stack->at(step) = ::LieAlgebra::skew( ddot_K );
+        m_Gamma_stack->at(step)      = Gamma;
+        m_dot_Gamma_stack->at(step)  = dot_Gamma;
+        m_ddot_Gamma_stack->at(step) = ddot_Gamma;
 
-//        m_hat_Gamma_stack->at(step)      = ::LieAlgebra::skew( Gamma );
-//        m_hat_dot_Gamma_stack->at(step)  = ::LieAlgebra::skew( dot_Gamma );
-//        m_hat_ddot_Gamma_stack->at(step) = ::LieAlgebra::skew( ddot_Gamma );
 
-//    }
+
+        m_hat_K_stack->at(step)      = ::LieAlgebra::skew( K );
+        m_hat_dot_K_stack->at(step)  = ::LieAlgebra::skew( dot_K );
+        m_hat_ddot_K_stack->at(step) = ::LieAlgebra::skew( ddot_K );
+
+        m_hat_Gamma_stack->at(step)      = ::LieAlgebra::skew( Gamma );
+        m_hat_dot_Gamma_stack->at(step)  = ::LieAlgebra::skew( dot_Gamma );
+        m_hat_ddot_Gamma_stack->at(step) = ::LieAlgebra::skew( ddot_Gamma );
+
+    }
 }
 
 
