@@ -10,7 +10,7 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
 
     IntegratorRotationMatrix(const unsigned int t_number_of_Chebyshev_points,
                              std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack)
-        : ::OMNI::ODEA<3, 3>(t_number_of_Chebyshev_points),
+        : ::OMNI::ODEA<3, 3>((t_number_of_Chebyshev_points-1)*3),
           m_strain_parameterisation_stack(t_strain_parameterisation_stack),
           m_interpolator(::Chebyshev::ChebyshevInterpolator(t_number_of_Chebyshev_points, this->m_quadrature_points))
     {}
@@ -73,9 +73,6 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
 };
 
 
-
-
-
 struct PositionIntegrator : public OSNI::ODEb {
 
     PositionIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
@@ -120,9 +117,6 @@ struct PositionIntegrator : public OSNI::ODEb {
 
 
 };
-
-
-
 
 
 struct IntegratorOmega : public ::OMNI::ODEAb<3>{
@@ -567,7 +561,36 @@ int main(int argc, char *argv[])
     const Eigen::Vector3d dot_V_X0 = Eigen::Vector3d::Zero();
 
 
-    ::benchmark::RegisterBenchmark("Intgrations", [&](::benchmark::State &t_state){
+
+
+    ::benchmark::RegisterBenchmark("Update", [&](::benchmark::State &t_state){
+
+        t_state.counters = {
+            {"ne", ne},
+            {"na", na},
+            {"Nc", number_of_Chebyshev_points}
+        };
+
+
+
+
+
+
+
+
+
+
+        while(t_state.KeepRunning()){
+
+
+            m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+        }
+    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+
+    ::benchmark::RegisterBenchmark("Integration R", [&](::benchmark::State &t_state){
 
         t_state.counters = {
             {"ne", ne},
@@ -587,43 +610,102 @@ int main(int argc, char *argv[])
         while(t_state.KeepRunning()){
 
 
-            m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+            integrate_rotation_matrix->integrate(R_X0);
+
+        }
+    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
 
 
-//            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-//            integrate_rotation_matrix->integrate(R_X0);
+    ::benchmark::RegisterBenchmark("Integrations FK", [&](::benchmark::State &t_state){
 
-//            integrate_position->integrate(r_X0);
+        t_state.counters = {
+            {"ne", ne},
+            {"na", na},
+            {"Nc", number_of_Chebyshev_points}
+        };
 
-//            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-//            Omega_integrator->integrate(Omega);
 
-//            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-//            V_integrator->integrate(V_X0);
 
-//            dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-//            dot_Omega_integrator->integrate(dot_Omega);
 
-//            dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-//            dot_V_integrator->integrate(dot_V_X0);
+
+
+        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+        integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+        integrate_rotation_matrix->integrate(R_X0);
+
+        while(t_state.KeepRunning()){
+
+
+            integrate_position->integrate(r_X0);
+
+            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+            Omega_integrator->integrate(Omega);
+
+            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+            V_integrator->integrate(V_X0);
+
+            dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+            dot_Omega_integrator->integrate(dot_Omega);
+
+            dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+            dot_V_integrator->integrate(dot_V_X0);
         }
     })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
 
 
 
-    m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+    ::benchmark::RegisterBenchmark("Fake BD", [&](::benchmark::State &t_state){
+
+        t_state.counters = {
+            {"ne", ne},
+            {"na", na},
+            {"Nc", number_of_Chebyshev_points}
+        };
 
 
 
-    integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-    integrate_rotation_matrix->integrate(R_X0);
+        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+        integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+        integrate_rotation_matrix->integrate(R_X0);
 
 
-    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
-        std::cout << "c" << i << ", point X=" << Chebyshev_points[i] << "\n";
-        std::cout << "R : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n\n";
+        while(t_state.KeepRunning()){
 
-    }
+
+
+            integrate_position->integrate(r_X0);
+
+            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+            Omega_integrator->integrate(Omega);
+
+            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+            V_integrator->integrate(V_X0);
+
+        }
+    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+
+//    m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+
+
+//    integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+//    integrate_rotation_matrix->integrate(R_X0);
+
+
+//    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
+//        std::cout << "c" << i << ", point X=" << Chebyshev_points[i] << "\n";
+//        std::cout << "R : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n\n";
+
+//    }
+
+    ::benchmark::Initialize(&argc, argv);
+
+    ::benchmark::RunSpecifiedBenchmarks();
 
     return -64;
 
