@@ -19,22 +19,24 @@
 
 namespace CROSP {
 
-template<class CosseratIntegrator>
-CosseratRod<CosseratIntegrator>::CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
-                         rod_properties::RodDimensions t_rod_dimensions,
-                         rod_properties::MaterialProperties t_material_properties,
-                         strain_parameterisation_stack::StrainFunction t_constrained_strain)
-    : m_polynomial_representation(t_polynomial_represenation),
-      m_constrained_strain(t_constrained_strain),
-      m_rod_properties(
-          std::make_shared<rod_properties::RodProperties>(t_rod_dimensions,
-                                                          t_material_properties)
-          )
-{}
+//template<class NumericalIntegrator>
+//CosseratRod<NumericalIntegrator>::CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
+//                                             unsigned int t_number_of_Chebyshev_points,
+//                                             rod_properties::RodDimensions t_rod_dimensions,
+//                                             rod_properties::MaterialProperties t_material_properties,
+//                                             strain_parameterisation_stack::StrainFunction t_constrained_strain)
+//    : m_polynomial_representation(t_polynomial_represenation),
+//      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+//      m_constrained_strain(t_constrained_strain),
+//      m_rod_properties(
+//          std::make_shared<rod_properties::RodProperties>(t_rod_dimensions,
+//                                                          t_material_properties)
+//          )
+//{}
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::updateParameterisation(const Eigen::VectorXd &t_qe,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::updateParameterisation(const Eigen::VectorXd &t_qe,
                                          const Eigen::VectorXd &t_dot_qe,
                                          const Eigen::VectorXd &t_ddot_qe)
 {
@@ -42,15 +44,15 @@ void CosseratRod<CosseratIntegrator>::updateParameterisation(const Eigen::Vector
 }
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::forwardKinematics()
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::forwardKinematics()
 {
     m_cosserat_rod_integrators->forwardKinematics();
 }
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                                     const Eigen::Vector3d &t_initial_position,
                                     const Eigen::Vector3d &t_initial_angular_velocity,
                                     const Eigen::Vector3d &t_initial_linear_velocity,
@@ -66,8 +68,8 @@ void CosseratRod<CosseratIntegrator>::forwardKinematics(const Eigen::Vector4d &t
 }
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::forwardKinematics(const Eigen::Quaterniond &t_initial_quaternion,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::forwardKinematics(const Eigen::Quaterniond &t_initial_quaternion,
                                     const Eigen::Vector3d &t_initial_position,
                                     const Eigen::Vector3d &t_initial_angular_velocity,
                                     const Eigen::Vector3d &t_initial_linear_velocity,
@@ -89,8 +91,8 @@ void CosseratRod<CosseratIntegrator>::forwardKinematics(const Eigen::Quaterniond
 
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
                                               const Eigen::VectorXd &t_Delta_dot_qe,
                                               const Eigen::VectorXd &t_Delta_ddot_qe)
 {
@@ -117,15 +119,15 @@ void CosseratRod<CosseratIntegrator>::updateDeltaParameterisation(const Eigen::V
     m_cosserat_rod_integrators->updateDeltaParameterisation(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
 }
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::forwardTangentKinematics()
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::forwardTangentKinematics()
 {
     m_cosserat_rod_integrators->forwardTangentKinematics();
 }
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
                                            const Eigen::Vector3d &t_initial_Delta_position,
                                            const Eigen::Vector3d &t_initial_Delta_angular_velocity,
                                            const Eigen::Vector3d &t_initial_Delta_linear_velocity,
@@ -144,31 +146,31 @@ void CosseratRod<CosseratIntegrator>::forwardTangentKinematics(const Eigen::Vect
 
 
 
-template<class CosseratIntegrator>
-::LieAlgebra::Kinematics CosseratRod<CosseratIntegrator>::getKinematicsAtTip()const
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+::LieAlgebra::Kinematics CosseratRod<NumericalIntegrator>::getKinematicsAtTip()const
 {
     return m_cosserat_rod_integrators->getKinematicsAtTip();
 }
 
 
-template<class CosseratIntegrator>
-::LieAlgebra::TangentKinematics CosseratRod<CosseratIntegrator>::getTangentKinematicsAtTip()const
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+::LieAlgebra::TangentKinematics CosseratRod<NumericalIntegrator>::getTangentKinematicsAtTip()const
 {
     return m_cosserat_rod_integrators->getTangentKinematicsAtTip();
 }
 
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
 {
     m_cosserat_rod_integrators->backwardDynamics(t_Lambda_X1);
 }
 
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
 {
     m_cosserat_rod_integrators->backwardTangentDynamics(t_Delta_Lambda_X1);
 
@@ -177,8 +179,8 @@ void CosseratRod<CosseratIntegrator>::backwardTangentDynamics(const ::LieAlgebra
 
 
 
-template<class CosseratIntegrator>
-::LieAlgebra::Vector6d CosseratRod<CosseratIntegrator>::IDM(const Eigen::VectorXd &t_qe,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::IDM(const Eigen::VectorXd &t_qe,
                                         const Eigen::VectorXd &t_dot_qe,
                                         const Eigen::VectorXd &t_ddot_qe,
                                         const Eigen::Vector4d &t_initial_quaternion,
@@ -202,8 +204,8 @@ template<class CosseratIntegrator>
 }
 
 
-template<class CosseratIntegrator>
-::LieAlgebra::Vector6d CosseratRod<CosseratIntegrator>::IDM(const Eigen::VectorXd &t_qe,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::IDM(const Eigen::VectorXd &t_qe,
                                         const Eigen::VectorXd &t_dot_qe,
                                         const Eigen::VectorXd &t_ddot_qe,
                                         const Eigen::Quaterniond &t_initial_quaternion,
@@ -227,8 +229,8 @@ template<class CosseratIntegrator>
                t_Lambda_X1);
 }
 
-template<class CosseratIntegrator>
-::LieAlgebra::Vector6d CosseratRod<CosseratIntegrator>::TIDM(const Eigen::VectorXd &t_Delta_qe,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::TIDM(const Eigen::VectorXd &t_Delta_qe,
                                          const Eigen::VectorXd &t_Delta_dot_qe,
                                          const Eigen::VectorXd &t_Delta_ddot_qe,
                                          const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
@@ -242,24 +244,24 @@ template<class CosseratIntegrator>
     return getDeltaLambdaAtBase();
 }
 
-template<class CosseratIntegrator>
-::LieAlgebra::Vector6d CosseratRod<CosseratIntegrator>::getLambdaAtBase()const
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::getLambdaAtBase()const
 {
     return m_cosserat_rod_integrators->getLambdaAtBase();
 }
 
 
 
-template<class CosseratIntegrator>
-::LieAlgebra::Vector6d CosseratRod<CosseratIntegrator>::getDeltaLambdaAtBase()const
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::getDeltaLambdaAtBase()const
 {
     return m_cosserat_rod_integrators->getDeltaLambdaAtBase();
 }
 
 
 
-template<class CosseratIntegrator>
-Eigen::VectorXd CosseratRod<CosseratIntegrator>::getStaticInternalBalance(const Eigen::VectorXd &t_qe) const
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+Eigen::VectorXd CosseratRod<NumericalIntegrator>::getStaticInternalBalance(const Eigen::VectorXd &t_qe) const
 {
 
     const Eigen::VectorXd Qe = m_Kee * t_qe;
@@ -271,8 +273,8 @@ Eigen::VectorXd CosseratRod<CosseratIntegrator>::getStaticInternalBalance(const 
 }
 
 
-template<class CosseratIntegrator>
-Eigen::VectorXd CosseratRod<CosseratIntegrator>::getInternalBalance(const Eigen::VectorXd &t_qe,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+Eigen::VectorXd CosseratRod<NumericalIntegrator>::getInternalBalance(const Eigen::VectorXd &t_qe,
                                                 const Eigen::VectorXd &t_dot_qe) const
 {
 
@@ -290,8 +292,8 @@ Eigen::VectorXd CosseratRod<CosseratIntegrator>::getInternalBalance(const Eigen:
 
 
 
-template<class CosseratIntegrator>
-Eigen::VectorXd CosseratRod<CosseratIntegrator>::getTangentStaticInternalBalance(const Eigen::VectorXd &t_Delta_qe)const
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+Eigen::VectorXd CosseratRod<NumericalIntegrator>::getTangentStaticInternalBalance(const Eigen::VectorXd &t_Delta_qe)const
 {
 
     Eigen::VectorXd Delta_Qe = m_Kee * t_Delta_qe;
@@ -304,8 +306,8 @@ Eigen::VectorXd CosseratRod<CosseratIntegrator>::getTangentStaticInternalBalance
 
 
 
-template<class CosseratIntegrator>
-Eigen::VectorXd CosseratRod<CosseratIntegrator>::getTangentInternalBalance(const Eigen::VectorXd &t_Delta_qe,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+Eigen::VectorXd CosseratRod<NumericalIntegrator>::getTangentInternalBalance(const Eigen::VectorXd &t_Delta_qe,
                                                        const Eigen::VectorXd &t_Delta_dot_qe)const
 {
 
@@ -318,15 +320,15 @@ Eigen::VectorXd CosseratRod<CosseratIntegrator>::getTangentInternalBalance(const
 }
 
 
-template<class CosseratIntegrator>
-Eigen::VectorXd CosseratRod<CosseratIntegrator>::getQad()const
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+Eigen::VectorXd CosseratRod<NumericalIntegrator>::getQad()const
 {
     return Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension());
 }
 
 
-template<class CosseratIntegrator>
-Eigen::MatrixXd CosseratRod<CosseratIntegrator>::getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+Eigen::MatrixXd CosseratRod<NumericalIntegrator>::getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)
 {
 
     updateParameterisation(t_qe, 0*t_qe, 0*t_qe);
@@ -339,8 +341,8 @@ Eigen::MatrixXd CosseratRod<CosseratIntegrator>::getRodShapeFromElasticCoordinat
 
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::printProperties()
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::printProperties()
 {
     std::stringstream rod_properties;
 
@@ -409,8 +411,8 @@ void CosseratRod<CosseratIntegrator>::printProperties()
     std::cout.flush();
 }
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::updateRodLength(const double &t_rod_lenght)
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::updateRodLength(const double &t_rod_lenght)
 {
     const double scale = t_rod_lenght/m_rod_properties->m_rod_dimensions.m_L;
     m_rod_properties->m_rod_dimensions.m_L = t_rod_lenght;
@@ -422,8 +424,8 @@ void CosseratRod<CosseratIntegrator>::updateRodLength(const double &t_rod_lenght
 }
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::updateRodProperties(const rod_properties::RodDimensions &t_rod_dimensions,
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::updateRodProperties(const rod_properties::RodDimensions &t_rod_dimensions,
                                            const rod_properties::MaterialProperties &t_material_properties)
 {
 //    m_rod_properties->updateRodProperties(t_rod_dimensions,
@@ -432,8 +434,8 @@ void CosseratRod<CosseratIntegrator>::updateRodProperties(const rod_properties::
 }
 
 
-template<class CosseratIntegrator>
-void CosseratRod<CosseratIntegrator>::updateRodProperties(const double &t_EI)
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+void CosseratRod<NumericalIntegrator>::updateRodProperties(const double &t_EI)
 {
     m_rod_properties->m_H(2, 2) = t_EI;
 
@@ -444,8 +446,8 @@ void CosseratRod<CosseratIntegrator>::updateRodProperties(const double &t_EI)
 
 
 
-//template<class CosseratIntegrator>
-//Eigen::MatrixXd CosseratRod<CosseratIntegrator>::defineKee()
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//Eigen::MatrixXd CosseratRod<NumericalIntegrator>::defineKee()
 //{
 
 //    const unsigned int n = m_polynomial_representation.getCoordinatesDimension();

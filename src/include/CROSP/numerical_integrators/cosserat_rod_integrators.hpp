@@ -21,10 +21,78 @@ namespace CROSP::numerical_integrators {
 template<class NumericalIntegrator>
 concept CosseratIntegrator = requires(NumericalIntegrator integrator){
 
-//        NumericalIntegrator() = NumericalIntegrator(rod_properties::RodProperties(),
-//                            );
+        NumericalIntegrator(polynomial_representation::PolynomialRepresentation(),
+                            int(),
+                            std::shared_ptr<rod_properties::RodProperties>());
 
         integrator.printIntegratorProperties();
+
+
+        integrator.updateParameterisation(Eigen::VectorXd(),
+                                          Eigen::VectorXd(),
+                                          Eigen::VectorXd());
+
+
+        integrator.forwardKinematics();
+
+
+        integrator.forwardKinematics(Eigen::Vector4d(),
+                                       Eigen::Vector3d(),
+                                       Eigen::Vector3d(),
+                                       Eigen::Vector3d(),
+                                       Eigen::Vector3d(),
+                                       Eigen::Vector3d());
+
+
+       integrator.updateDeltaParameterisation(Eigen::VectorXd(),
+                                                Eigen::VectorXd(),
+                                                Eigen::VectorXd());
+
+        integrator.forwardTangentKinematics();
+
+
+        integrator.forwardTangentKinematics(Eigen::Vector3d(),
+                                              Eigen::Vector3d(),
+                                              Eigen::Vector3d(),
+                                              Eigen::Vector3d(),
+                                              Eigen::Vector3d(),
+                                              Eigen::Vector3d());
+
+
+        ::LieAlgebra::Kinematics() = integrator.getKinematicsAtTip();
+
+        ::LieAlgebra::TangentKinematics() = integrator.getTangentKinematicsAtTip();
+
+
+
+        integrator.backwardDynamics(::LieAlgebra::Vector6d());
+
+
+
+        integrator.backwardTangentDynamics(::LieAlgebra::Vector6d());
+
+
+
+
+        ::LieAlgebra::Vector6d() = integrator.getLambdaAtBase();
+
+
+
+        LieAlgebra::Vector6d() = integrator.getDeltaLambdaAtBase();
+
+
+        ::LieAlgebra::Vector6d() = integrator.getQaAtBase();
+
+
+
+        LieAlgebra::Vector6d() = integrator.getDeltaQaAtBase();
+
+
+        integrator.updateIntegrationDomain(double());
+
+
+        Eigen::MatrixXd() = integrator.getRodPositions();
+
 };
 
 

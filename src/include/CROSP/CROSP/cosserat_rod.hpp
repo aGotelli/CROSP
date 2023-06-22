@@ -37,7 +37,7 @@ namespace CROSP {
 /*!
  * \brief The CosseratRod class implements the functionalities needed to simulate a Cosserat rod
  */
-template<class CosseratIntegrator=::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator=::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>
 class CosseratRod
 {
 public:
@@ -48,18 +48,27 @@ public:
     CosseratRod()=default;
 
 
+//    CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
+//                unsigned int t_number_of_Chebyshev_points)
+//        : m_polynomial_representation(t_polynomial_represenation),
+//          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+//    {}
+
+
+
     CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
-                unsigned int t_number_of_Chebyshev_points)
+                unsigned int t_number_of_Chebyshev_points,
+                rod_properties::RodDimensions t_rod_dimensions=rod_properties::RodDimensions(),
+                rod_properties::MaterialProperties t_material_properties=rod_properties::MaterialProperties(),
+                strain_parameterisation_stack::StrainFunction t_constrained_strain=strain_parameterisation_stack::default_constrained_strain)
         : m_polynomial_representation(t_polynomial_represenation),
-          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+          m_constrained_strain(t_constrained_strain),
+          m_rod_properties(
+              std::make_shared<rod_properties::RodProperties>(t_rod_dimensions,
+                                                              t_material_properties)
+              )
     {}
-
-
-
-    CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
-                rod_properties::RodDimensions t_rod_dimensions,
-                rod_properties::MaterialProperties t_material_properties,
-                strain_parameterisation_stack::StrainFunction t_constrained_strain=strain_parameterisation_stack::default_constrained_strain);
 
     /*!
      * \brief updateParameterisation updates the parameterisation of the strain describing the rod shape
@@ -402,7 +411,7 @@ protected:
 
 
     ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
-      std::make_unique<CosseratIntegrator>(m_polynomial_representation,
+      std::make_unique<NumericalIntegrator>(m_polynomial_representation,
                                            m_number_of_Chebyshev_points,
                                            m_rod_properties)
     };
