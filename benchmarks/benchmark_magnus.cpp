@@ -10,7 +10,7 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
 
     IntegratorRotationMatrix(const unsigned int t_number_of_Chebyshev_points,
                              std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack)
-        : ::OMNI::ODEA<3, 3>((t_number_of_Chebyshev_points)),
+        : ::OMNI::ODEA<3, 3>((t_number_of_Chebyshev_points-1)*3),
           m_strain_parameterisation_stack(t_strain_parameterisation_stack),
           m_interpolator(::Chebyshev::ChebyshevInterpolator(t_number_of_Chebyshev_points, this->m_quadrature_points))
     {}
@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
     std::vector<double> obervation_points = Chebyshev_points;
 
     obervation_points.insert( obervation_points.end(), quadrature_points.begin(), quadrature_points.end() );
-//    obervation_points.insert( obervation_points.end(), double_quadrature_points.begin(), double_quadrature_points.end() );
+    obervation_points.insert( obervation_points.end(), double_quadrature_points.begin(), double_quadrature_points.end() );
 
     std::sort(obervation_points.begin(), obervation_points.end());
 
@@ -563,6 +563,59 @@ int main(int argc, char *argv[])
 
 
 
+    ::benchmark::RegisterBenchmark("Serial", [&](::benchmark::State &t_state){
+
+
+    }
+
+//    ::benchmark::RegisterBenchmark("Serial", [&](::benchmark::State &t_state){
+
+//        unsigned int coord_dim = ne*na;
+
+//        Eigen::MatrixXd BPhi = Eigen::MatrixXd::Random(number_of_Chebyshev_points*na, coord_dim);
+
+//        Eigen::VectorXd q = Eigen::VectorXd::Random(coord_dim);
+//        Eigen::VectorXd dot_q = Eigen::VectorXd::Random(coord_dim);
+//        Eigen::VectorXd ddot_q = Eigen::VectorXd::Random(coord_dim);
+
+//        Eigen::VectorXd xi = BPhi * q;
+//        Eigen::VectorXd dot_xi = BPhi * dot_q;
+//        Eigen::VectorXd ddot_xi = BPhi * ddot_q;
+
+//        while(t_state.KeepRunning()){
+
+//            xi = BPhi * q;
+//            dot_xi = BPhi * dot_q;
+//            ddot_xi = BPhi * ddot_q;
+
+//        }
+//    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+
+//    ::benchmark::RegisterBenchmark("Parallel", [&](::benchmark::State &t_state){
+
+//        unsigned int coord_dim = ne*na;
+
+//        Eigen::MatrixXd BPhi = Eigen::MatrixXd::Random(number_of_Chebyshev_points*na, coord_dim);
+
+//        Eigen::MatrixXd q = Eigen::VectorXd::Random(coord_dim, 3);
+
+
+//        Eigen::VectorXd xi_dot_x_ddot_xi = BPhi * q;
+
+
+//        while(t_state.KeepRunning()){
+
+//            xi_dot_x_ddot_xi = BPhi * q;
+
+//        }
+//    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+
+
+
     ::benchmark::RegisterBenchmark("Update", [&](::benchmark::State &t_state){
 
         t_state.counters = {
@@ -570,15 +623,6 @@ int main(int argc, char *argv[])
             {"na", na},
             {"Nc", number_of_Chebyshev_points}
         };
-
-
-
-
-
-
-
-
-
 
         while(t_state.KeepRunning()){
 
@@ -589,123 +633,136 @@ int main(int argc, char *argv[])
     })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
 
 
+    Eigen::Vector3d K;
+    K << 1, 2, 3;
 
-    ::benchmark::RegisterBenchmark("Integration R", [&](::benchmark::State &t_state){
-
-        t_state.counters = {
-            {"ne", ne},
-            {"na", na},
-            {"Nc", number_of_Chebyshev_points}
-        };
+    Eigen::Matrix3d V = Eigen::Matrix3d::Identity();
 
 
+    auto res = K.selfadjointView<Eigen::Upper>() * V;
 
+    std::cout << "res : \n" << res << std::endl;
 
 
 
-        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
+//    ::benchmark::RegisterBenchmark("Integration R", [&](::benchmark::State &t_state){
 
-        while(t_state.KeepRunning()){
-
-
-            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-            integrate_rotation_matrix->integrate(R_X0);
-
-        }
-    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
-
-
-    ::benchmark::RegisterBenchmark("Integrations FK", [&](::benchmark::State &t_state){
-
-        t_state.counters = {
-            {"ne", ne},
-            {"na", na},
-            {"Nc", number_of_Chebyshev_points}
-        };
+//        t_state.counters = {
+//            {"ne", ne},
+//            {"na", na},
+//            {"Nc", number_of_Chebyshev_points}
+//        };
 
 
 
 
 
 
-        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
-
-        integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-        integrate_rotation_matrix->integrate(R_X0);
-
-        while(t_state.KeepRunning()){
-
-
-            integrate_position->integrate(r_X0);
-
-            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            Omega_integrator->integrate(Omega);
-
-            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            V_integrator->integrate(V_X0);
-
-            dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            dot_Omega_integrator->integrate(dot_Omega);
-
-            dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            dot_V_integrator->integrate(dot_V_X0);
-        }
-    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+//        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
 
-    ::benchmark::RegisterBenchmark("Fake BD", [&](::benchmark::State &t_state){
-
-        t_state.counters = {
-            {"ne", ne},
-            {"na", na},
-            {"Nc", number_of_Chebyshev_points}
-        };
+//        while(t_state.KeepRunning()){
 
 
+//            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+//            integrate_rotation_matrix->integrate(R_X0);
 
-        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
-
-        integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-        integrate_rotation_matrix->integrate(R_X0);
-
-
-        while(t_state.KeepRunning()){
+//        }
+//    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
 
 
+//    ::benchmark::RegisterBenchmark("Integrations FK", [&](::benchmark::State &t_state){
 
-            integrate_position->integrate(r_X0);
-
-            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            Omega_integrator->integrate(Omega);
-
-            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-            V_integrator->integrate(V_X0);
-
-        }
-    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+//        t_state.counters = {
+//            {"ne", ne},
+//            {"na", na},
+//            {"Nc", number_of_Chebyshev_points}
+//        };
 
 
 
-    m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 
 
-    integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-    integrate_rotation_matrix->integrate(R_X0);
+//        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+//        integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+//        integrate_rotation_matrix->integrate(R_X0);
+
+//        while(t_state.KeepRunning()){
 
 
-    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
-        std::cout << "c" << i << ", point X=" << Chebyshev_points[i] << "\n";
-        std::cout << "R : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n\n";
+//            integrate_position->integrate(r_X0);
 
-    }
+//            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            Omega_integrator->integrate(Omega);
 
-//    ::benchmark::Initialize(&argc, argv);
+//            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            V_integrator->integrate(V_X0);
 
-//    ::benchmark::RunSpecifiedBenchmarks();
+//            dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            dot_Omega_integrator->integrate(dot_Omega);
+
+//            dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            dot_V_integrator->integrate(dot_V_X0);
+//        }
+//    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+
+//    ::benchmark::RegisterBenchmark("Fake BD", [&](::benchmark::State &t_state){
+
+//        t_state.counters = {
+//            {"ne", ne},
+//            {"na", na},
+//            {"Nc", number_of_Chebyshev_points}
+//        };
+
+
+
+//        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+//        integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+//        integrate_rotation_matrix->integrate(R_X0);
+
+
+//        while(t_state.KeepRunning()){
+
+
+
+//            integrate_position->integrate(r_X0);
+
+//            Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            Omega_integrator->integrate(Omega);
+
+//            V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//            V_integrator->integrate(V_X0);
+
+//        }
+//    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+
+//    m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+
+
+//    integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+//    integrate_rotation_matrix->integrate(R_X0);
+
+
+//    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
+//        std::cout << "c" << i << ", point X=" << Chebyshev_points[i] << "\n";
+//        std::cout << "R : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n\n";
+
+//    }
+
+    ::benchmark::Initialize(&argc, argv);
+
+    ::benchmark::RunSpecifiedBenchmarks();
 
     return -64;
 
