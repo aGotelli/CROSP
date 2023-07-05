@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
     const std::string path = "../../../MATLAB/test_different_modes/";
 
     std::array<bool, 6> admitted_deformations = {
-            true,
-            true,
+            false,
+            false,
             true,
             false,
             false,
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     writeToFile("deformations_stack", deformations_stack, path);
 
     std::vector<unsigned int> number_of_modes_stack {
-        5, 2, 3
+        5
     };
 
     Eigen::VectorXd ne_stack = Eigen::VectorXd::Zero(6);
@@ -68,15 +68,17 @@ int main(int argc, char *argv[])
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
 
 
-    for(unsigned int i=0; i<ne; i++){
-        q(i)      = 1.0*(ne - i);
-        dot_q(i)  = 0.5*(ne - i);
-        ddot_q(i) = 0.2*(ne - i);
-    }
+//    for(unsigned int i=0; i<ne; i++){
+//        q(i)      = 1.0*(ne - i);
+//        dot_q(i)  = 0.5*(ne - i);
+//        ddot_q(i) = 0.2*(ne - i);
+//    }
 
-    q.setRandom();
-    dot_q.setRandom();
-    ddot_q.setRandom();
+//    q.setRandom();
+//    dot_q.setRandom();
+//    ddot_q.setRandom();
+
+    q(0) = 1;
 
 
     std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
