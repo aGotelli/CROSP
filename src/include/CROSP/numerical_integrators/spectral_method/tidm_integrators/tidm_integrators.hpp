@@ -231,8 +231,8 @@ struct DeltaAngularAccelerations : public OSNI::ODEAb {
     std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_K_stack {
         m_strain_parameterisation_stack->m_hat_K_stack
     };
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        m_strain_parameterisation_stack->m_dot_K_stack
+    std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_dot_K_stack {
+        m_strain_parameterisation_stack->m_hat_dot_K_stack
     };
     std::shared_ptr<const std::vector<Eigen::Matrix3d>> m_hat_Delta_K_stack {
         m_Delta_strain_parameterisation_stack->m_hat_K_stack

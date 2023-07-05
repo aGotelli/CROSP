@@ -93,7 +93,9 @@ struct SpectralIntegrators{
     Eigen::MatrixXd getRodPositions()const;
 
 
-    FullODEStatesObservations getFullODEStatesObservations();
+    FullODEStatesObservations getIDMStatesObservations();
+
+    FullODEStatesObservations getTIDMStatesObservations();
 
 
     std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;

@@ -26,7 +26,7 @@ Config.Nt    = length(Config.time);
 
 
 % longueur de la poutre
-Config.L = 1.5;
+Config.L = 1.33;
 % Pas de discrétisation du corps
 Config.dX = Config.L/101;
 % Construction du corps et de ses paramètres
@@ -163,8 +163,8 @@ Qa_cpp = load("../test_different_modes/Qa_stack.csv");
 
 error_Q = Q_cpp - QX;
 error_Q_norm = norm(error_Q);
-display(Q_cpp)
-display(QX)
+% display(Q_cpp)
+% display(QX)
 display(error_Q_norm)
 
 

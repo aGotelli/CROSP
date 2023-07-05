@@ -124,7 +124,9 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
         Eigen::MatrixXd() = integrator.getRodPositions();
 
 
-        FullODEStatesObservations() = integrator.getFullODEStatesObservations();
+        FullODEStatesObservations() = integrator.getIDMStatesObservations();
+
+        FullODEStatesObservations() = integrator.getTIDMStatesObservations();
 
 };
 

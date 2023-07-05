@@ -171,7 +171,7 @@ Eigen::VectorXd DeltaAngularAccelerations::computerParametersVectorAtPoint(const
 {
     return m_Delta_ddot_K_stack->at(t_point)
             - m_hat_Delta_K_stack->at(t_point) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
-            - m_dot_K_stack->at(t_point) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
+            - m_hat_dot_K_stack->at(t_point) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
             - m_hat_Delta_dot_K_stack->at(t_point) * m_angular_velocity_integrator->getStateAtPoint(t_point);
 }
 

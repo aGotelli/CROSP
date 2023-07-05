@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
     const std::string path = "../../../MATLAB/test_different_modes/";
 
     std::array<bool, 6> admitted_deformations = {
-            false,
-            false,
+            true,
+            true,
             true,
             false,
             false,
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     writeToFile("deformations_stack", deformations_stack, path);
 
     std::vector<unsigned int> number_of_modes_stack {
-        5
+        2, 3, 5
     };
 
     Eigen::VectorXd ne_stack = Eigen::VectorXd::Zero(6);
@@ -47,10 +47,9 @@ int main(int argc, char *argv[])
 
     CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, number_of_modes_stack);
 
-//    auto strain_param =
-//            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
-
-    ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points);
+    ::CROSP::rod_properties::RodDimensions rod_dimension;
+    rod_dimension.m_L = 1.33;
+    ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points, rod_dimension);
 
 
 
@@ -74,11 +73,13 @@ int main(int argc, char *argv[])
 //        ddot_q(i) = 0.2*(ne - i);
 //    }
 
-//    q.setRandom();
-//    dot_q.setRandom();
-//    ddot_q.setRandom();
+    q.setRandom();
+    dot_q.setRandom();
+    ddot_q.setRandom();
 
-    q(0) = 1;
+
+//    dot_q(0) = 1;
+
 
 
     std::cout << "q : \n" << q << "\n\n" "dot q : \n" << dot_q << "\n\n" "ddot q : \n" << ddot_q << "\n\n";
@@ -99,111 +100,61 @@ int main(int argc, char *argv[])
     auto zeros_6x1 = ::LieAlgebra::Vector6d::Zero();
     rod.m_cosserat_rod_integrators->backwardDynamics(zeros_6x1);
 
-    const auto ODE_states_stacks = rod.m_cosserat_rod_integrators->getFullODEStatesObservations();
+    const auto IDM_ODE_states_stacks = rod.m_cosserat_rod_integrators->getIDMStatesObservations();
 
 
 
 
-    writeToFile("Q_stack", ODE_states_stacks.orientation_stack, path);
-    writeToFile("r_stack", ODE_states_stacks.r_stack, path);
-    writeToFile("Omega_stack", ODE_states_stacks.Omega_stack, path);
-    writeToFile("V_stack", ODE_states_stacks.V_stack, path);
-    writeToFile("dot_Omega_stack", ODE_states_stacks.dot_Omega_stack, path);
-    writeToFile("dot_V_stack", ODE_states_stacks.dot_V_stack, path);
-    writeToFile("N_stack", ODE_states_stacks.N_stack, path);
-    writeToFile("C_stack", ODE_states_stacks.C_stack, path);
-    writeToFile("Qa_stack", ODE_states_stacks.Qa_stack, path);
-    writeToFile("Qad_stack", ODE_states_stacks.Qad_stack, path);
+    writeToFile("Q_stack", IDM_ODE_states_stacks.orientation_stack, path);
+    writeToFile("r_stack", IDM_ODE_states_stacks.r_stack, path);
+    writeToFile("Omega_stack", IDM_ODE_states_stacks.Omega_stack, path);
+    writeToFile("V_stack", IDM_ODE_states_stacks.V_stack, path);
+    writeToFile("dot_Omega_stack", IDM_ODE_states_stacks.dot_Omega_stack, path);
+    writeToFile("dot_V_stack", IDM_ODE_states_stacks.dot_V_stack, path);
+    writeToFile("N_stack", IDM_ODE_states_stacks.N_stack, path);
+    writeToFile("C_stack", IDM_ODE_states_stacks.C_stack, path);
+    writeToFile("Qa_stack", IDM_ODE_states_stacks.Qa_stack, path);
+    writeToFile("Qad_stack", IDM_ODE_states_stacks.Qad_stack, path);
 
 
 
-//    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
-//    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
-//    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);
+    Eigen::VectorXd Delta_ddot_q = Eigen::VectorXd::Zero(ne);
 
 
-//    const unsigned int a = 400;
-//    const unsigned int b = 160000;
+    const unsigned int a = 400;
+    const unsigned int b = 160000;
 
-//    for(unsigned int i=0; i<ne; i++){
+    for(unsigned int i=0; i<ne; i++){
 
-//        Delta_q.setZero();
-//        Delta_q[i] = 1;
+        Delta_q.setZero();
+        Delta_q[i] = 1;
 
-//        Delta_dot_q  = a * Delta_q;
-//        Delta_ddot_q = b * Delta_q;
-
-
-//         m_cosserat_rod_integrators->updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
-
-//         m_cosserat_rod_integrators->forwardTangentKinematics();
-
-//         m_cosserat_rod_integrators->backwardTangentDynamics(zeros_6x1);
+        Delta_dot_q  = a * Delta_q;
+        Delta_ddot_q = b * Delta_q;
 
 
+        rod.m_cosserat_rod_integrators->updateDeltaParameterisation(Delta_q, Delta_dot_q, Delta_ddot_q);
 
-//        const auto Delta_rotation_stack =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_rotation->getStackAsMatrix();
-//        const auto Delta_position_stack =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_position->getStackAsMatrix();
-//        const auto Delta_Omega_stack =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix();
-//        const auto Delta_V_stack     =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix();
-//        const auto Delta_dot_Omega_stack =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix();
-//        const auto Delta_dot_V_stack     =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix();
+        rod.m_cosserat_rod_integrators->forwardTangentKinematics();
 
-//        const auto Delta_N_stack =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_internal_forces->getStackAsMatrix();
-//        const auto Delta_C_stack =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_internal_couples->getStackAsMatrix();
-//        const auto Delta_Qa_stack =  m_cosserat_rod_integrators->m_tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix();
+        rod.m_cosserat_rod_integrators->backwardTangentDynamics(zeros_6x1);
+
+        const auto TIDM_ODE_states_stacks = rod.m_cosserat_rod_integrators->getTIDMStatesObservations();
 
 
-//        writeToFile("Delta_rotation_stack" "_Delta" + std::to_string(i), Delta_rotation_stack, path);
-//        writeToFile("Delta_position_stack" "_Delta" + std::to_string(i), Delta_position_stack, path);
-//        writeToFile("Delta_Omega_stack" "_Delta" + std::to_string(i), Delta_Omega_stack, path);
-//        writeToFile("Delta_V_stack" "_Delta" + std::to_string(i), Delta_V_stack, path);
-//        writeToFile("Delta_dot_Omega_stack" "_Delta" + std::to_string(i), Delta_dot_Omega_stack, path);
-//        writeToFile("Delta_dot_V_stack" "_Delta" + std::to_string(i), Delta_dot_V_stack, path);
-//        writeToFile("Delta_N_stack" "_Delta" + std::to_string(i), Delta_N_stack, path);
-//        writeToFile("Delta_C_stack" "_Delta" + std::to_string(i), Delta_C_stack, path);
-//        writeToFile("Delta_Qa_stack" "_Delta" + std::to_string(i), Delta_Qa_stack, path);
+        writeToFile("Delta_rotation_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.orientation_stack, path);
+        writeToFile("Delta_position_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.r_stack, path);
+        writeToFile("Delta_Omega_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.Omega_stack, path);
+        writeToFile("Delta_V_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.V_stack, path);
+        writeToFile("Delta_dot_Omega_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.dot_Omega_stack, path);
+        writeToFile("Delta_dot_V_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.dot_V_stack, path);
+        writeToFile("Delta_N_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.N_stack, path);
+        writeToFile("Delta_C_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.C_stack, path);
+        writeToFile("Delta_Qa_stack" "_Delta" + std::to_string(i), TIDM_ODE_states_stacks.Qa_stack, path);
 
-//    }
-
-//    ::ATORS::tendon_driven_actuation::ActuatedTendons actuated_tendons;
-
-//    const double d_tendon = -0.011;
-//    ::ATORS::tendon_driven_actuation::Tendon tendon1(Eigen::Vector3d(0, d_tendon, 0));
-
-
-//    unsigned int weight = 2000;
-//    const double gravity_Toronto = 9.80436;
-
-//    ::ATORS::simple_actuator::SimpleActuator motor_tendon_1([&](const double &t)->Eigen::VectorXd{
-//        ::LieAlgebra::Vector1d tension;
-//        tension << weight*gravity_Toronto/1000;
-
-//        return tension;
-//    });
-
-
-
-
-//    actuated_tendons = {
-//        { motor_tendon_1, tendon1 }
-//    };
-
-
-//    //  Now the internal actuation
-//    ::ATORS::tendon_driven_actuation::TendonDrivenActuation tendond_driven_actuation(strain_parameterisation->m_K_stack,
-//                                                                                    strain_parameterisation->m_Gamma_stack,
-//                                                                                    strain_parameterisation->m_map_to_strain_stack,
-//                                                                                    actuated_tendons,
-//                                                                                    rod_dimensions.m_L);
-
-//    tendond_driven_actuation.updateActuation(0.0);
-//    const auto Q_ad_stack = tendond_driven_actuation.getStackAsMatrix();
-//    Eigen::VectorXd Q_ad = tendond_driven_actuation.getActuation();
-
-//    std::cout << "Q_ad:\n" << Q_ad << "\n\n";
-
-//    writeToFile("Q_ad_stack" + std::to_string(weight) + "g", Q_ad_stack, path);
+    }
 
 
     std::cout << "Ok saved all the data\n\n\n";

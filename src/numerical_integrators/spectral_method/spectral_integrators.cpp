@@ -275,7 +275,7 @@ Eigen::MatrixXd SpectralIntegrators::getRodPositions()const
 }
 
 
-FullODEStatesObservations SpectralIntegrators::getFullODEStatesObservations()
+FullODEStatesObservations SpectralIntegrators::getIDMStatesObservations()
 {
     FullODEStatesObservations ODE_states_observations;
 
@@ -294,6 +294,30 @@ FullODEStatesObservations SpectralIntegrators::getFullODEStatesObservations()
 
     ODE_states_observations.Qa_stack = m_idm_integrators->m_generalised_forces->getStackAsMatrix();
     ODE_states_observations.Qad_stack = m_internal_actuation_integrator->getStackAsMatrix();
+
+    return ODE_states_observations;
+
+}
+
+
+FullODEStatesObservations SpectralIntegrators::getTIDMStatesObservations()
+{
+    FullODEStatesObservations ODE_states_observations;
+
+
+    ODE_states_observations.orientation_stack = m_tidm_integrators->m_Delta_rotation->getStackAsMatrix();
+    ODE_states_observations.r_stack = m_tidm_integrators->m_Delta_position->getStackAsMatrix();
+
+    ODE_states_observations.Omega_stack = m_tidm_integrators->m_Delta_angular_velocity->getStackAsMatrix();
+    ODE_states_observations.V_stack = m_tidm_integrators->m_Delta_linear_velocity->getStackAsMatrix();
+
+    ODE_states_observations.dot_Omega_stack = m_tidm_integrators->m_Delta_angular_acceleration->getStackAsMatrix();
+    ODE_states_observations.dot_V_stack = m_tidm_integrators->m_Delta_linear_acceleration->getStackAsMatrix();
+
+    ODE_states_observations.C_stack = m_tidm_integrators->m_Delta_internal_couples->getStackAsMatrix();
+    ODE_states_observations.N_stack = m_tidm_integrators->m_Delta_internal_forces->getStackAsMatrix();
+
+    ODE_states_observations.Qa_stack = m_tidm_integrators->m_Delta_generalised_forces->getStackAsMatrix();
 
     return ODE_states_observations;
 
