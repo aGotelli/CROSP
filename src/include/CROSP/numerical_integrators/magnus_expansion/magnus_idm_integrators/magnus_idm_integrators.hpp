@@ -11,8 +11,8 @@
 
 
 
-#ifndef IDM_INTEGRATORS_HPP
-#define IDM_INTEGRATORS_HPP
+#ifndef MAGNUS_IDM_INTEGRATORS_HPP
+#define MAGNUS_IDM_INTEGRATORS_HPP
 
 #include <memory>
 
@@ -506,4 +506,4 @@ std::shared_ptr<::CROSP::numerical_integrators::magnus_expansion::magnus_idm_int
 
 
 
-#endif // IDM_INTEGRATORS_HPP
+#endif // MAGNUS_IDM_INTEGRATORS_HPP

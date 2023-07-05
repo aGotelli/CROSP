@@ -93,8 +93,7 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp
-#                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
-#                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
+
 
 
                             include/${PROJECT_NAME}/strain_parameterisation_stack/strain_parameterisation_stack.hpp
@@ -108,10 +107,14 @@ add_library(${PROJECT_NAME} SHARED
 #                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_odes.hpp
                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp
                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.hpp
                             numerical_integrators/spectral_method/spectral_integrators.cpp
 #                            numerical_integrators/spectral_method/idm_integrators/idm_odes.cpp
                             numerical_integrators/spectral_method/idm_integrators/idm_integrators.cpp
                             numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.cpp
+                            numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.cpp
+
+
 
 
                             include/${PROJECT_NAME}/numerical_integrators/runge_kutta/runge_kutta_integrator.hpp
@@ -125,20 +128,14 @@ add_library(${PROJECT_NAME} SHARED
 
 
 
-#                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
-#                            static_initialiser/static_initialiser.cpp
-#                            include/CROSP/CROSP/internal_actuation.hpp
-#                            ${PROJECT_NAME}/internal_actuation.cpp
+
                             include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
                             polynomial_representation/polynomial_representation.cpp
                             include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
                             rod_properties/rod_properties.cpp
                             include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
                             strain_parameterisation/strain_parameterisation.cpp
-#                            include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
-#                            idm_integrators/idm_integrators.cpp
-#                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
-#                            tidm_integrators/tidm_integrators.cpp
+
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC

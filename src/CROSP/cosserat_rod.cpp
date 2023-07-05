@@ -266,7 +266,7 @@ Eigen::VectorXd CosseratRod<NumericalIntegrator>::getStaticInternalBalance(const
 
     const Eigen::VectorXd Qe = m_Kee * t_qe;
     const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
-    const Eigen::VectorXd Q_ad = getQad();
+    const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
     const Eigen::VectorXd internal_balance = Qe - Qa - Q_ad;
     return internal_balance;
@@ -281,7 +281,7 @@ Eigen::VectorXd CosseratRod<NumericalIntegrator>::getInternalBalance(const Eigen
     const Eigen::VectorXd Qe = m_Dee * t_qe;
     const Eigen::VectorXd Ce = m_Kee * t_dot_qe;
     const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
-    const Eigen::VectorXd Q_ad = getQad();
+    const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
     const Eigen::VectorXd internal_balance = Qe + Ce - Qa - Q_ad;
     return internal_balance;
@@ -315,16 +315,18 @@ Eigen::VectorXd CosseratRod<NumericalIntegrator>::getTangentInternalBalance(cons
     Eigen::VectorXd Delta_Ce = m_Dee * t_Delta_dot_qe;
     Eigen::VectorXd Delta_Qa = m_cosserat_rod_integrators->getDeltaQaAtBase();
 
+
     Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Ce - Delta_Qa;
     return Delta_internal_balance;
 }
 
 
 template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
-Eigen::VectorXd CosseratRod<NumericalIntegrator>::getQad()const
+void CosseratRod<NumericalIntegrator>::updateInternalActuation(const double &t_current_time)
 {
-    return Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension());
+    m_cosserat_rod_integrators->updateInternalActuation(t_current_time);
 }
+
 
 
 template<numerical_integrators::CosseratIntegrator NumericalIntegrator>

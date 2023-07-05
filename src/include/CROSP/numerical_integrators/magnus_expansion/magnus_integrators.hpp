@@ -19,7 +19,7 @@
 namespace CROSP::numerical_integrators::magnus_expansion {
 
 
-struct MagnusIntegrators : public CosseratRodIntegrators {
+struct MagnusIntegrators {
 
 
     MagnusIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
@@ -28,73 +28,73 @@ struct MagnusIntegrators : public CosseratRodIntegrators {
 
 
 
-    virtual std::string printIntegratorProperties()const final;
+    std::string printIntegratorProperties()const;
 
 
-    virtual void updateParameterisation(const Eigen::VectorXd &t_qe,
+    void updateParameterisation(const Eigen::VectorXd &t_qe,
                                         const Eigen::VectorXd &t_dot_qe,
-                                        const Eigen::VectorXd &t_ddot_qe) final;
+                                        const Eigen::VectorXd &t_ddot_qe);
 
 
-    virtual void forwardKinematics() final;
+    void forwardKinematics();
 
 
-    virtual void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+    void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                                    const Eigen::Vector3d &t_initial_position,
                                    const Eigen::Vector3d &t_initial_angular_velocity,
                                    const Eigen::Vector3d &t_initial_linear_velocity,
                                    const Eigen::Vector3d &t_initial_angular_acceleration,
-                                   const Eigen::Vector3d &t_initial_linear_acceleration) final;
+                                   const Eigen::Vector3d &t_initial_linear_acceleration);
 
 
-    virtual void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+    void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
                                              const Eigen::VectorXd &t_Delta_dot_qe,
-                                             const Eigen::VectorXd &t_Delta_ddot_qe) final;
+                                             const Eigen::VectorXd &t_Delta_ddot_qe);
 
-    virtual void forwardTangentKinematics() final;
+    void forwardTangentKinematics();
 
 
-    virtual void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+    void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
                                           const Eigen::Vector3d &t_initial_Delta_position,
                                           const Eigen::Vector3d &t_initial_Delta_angular_velocity,
                                           const Eigen::Vector3d &t_initial_Delta_linear_velocity,
                                           const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
-                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration) final;
+                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration);
 
 
-    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const final;
+    ::LieAlgebra::Kinematics getKinematicsAtTip()const;
 
-    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const final;
-
-
-
-    virtual void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1) final;
+    ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const;
 
 
 
-    virtual void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1) final;
+    void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1);
+
+
+
+    void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1);
 
 
 
 
-    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const final;
+    ::LieAlgebra::Vector6d getLambdaAtBase()const;
 
 
 
-    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const final;
+    LieAlgebra::Vector6d getDeltaLambdaAtBase()const;
 
 
-    virtual ::LieAlgebra::Vector6d getQaAtBase()const final;
+    ::LieAlgebra::Vector6d getQaAtBase()const;
 
 
 
-    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const final;
+    LieAlgebra::Vector6d getDeltaQaAtBase()const;
 
 
-    virtual void updateIntegrationDomain(const double &t_rod_lenght) final;
+    void updateIntegrationDomain(const double &t_rod_lenght);
 
 
-    virtual Eigen::MatrixXd getRodPositions()const final;
+    Eigen::MatrixXd getRodPositions()const;
 
 
     std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;

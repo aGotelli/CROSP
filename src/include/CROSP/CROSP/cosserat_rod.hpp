@@ -339,9 +339,8 @@ public:
                                               const Eigen::VectorXd &t_Delta_dot_qe)const;
 
 
-    void updateInternalActuation([[maybe_unused]]const double &t_current_time) {};
+    void updateInternalActuation(const double &t_current_time);
 
-    Eigen::VectorXd getQad()const;
 
 
     /*!
@@ -410,7 +409,7 @@ protected:
 
 
 
-    ::CROSP::numerical_integrators::CosseratIntegratorUPtr m_cosserat_rod_integrators {
+    std::unique_ptr<NumericalIntegrator> m_cosserat_rod_integrators {
       std::make_unique<NumericalIntegrator>(m_polynomial_representation,
                                            m_number_of_Chebyshev_points,
                                            m_rod_properties)

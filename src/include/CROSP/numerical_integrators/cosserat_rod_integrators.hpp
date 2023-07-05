@@ -14,7 +14,32 @@
 #include "CROSP/rod_properties/rod_properties.hpp"
 
 
+
+
 namespace CROSP::numerical_integrators {
+
+
+struct FullODEStatesObservations {
+
+
+    Eigen::MatrixXd orientation_stack;
+    Eigen::MatrixXd r_stack;
+
+    Eigen::MatrixXd Omega_stack;
+    Eigen::MatrixXd V_stack;
+
+    Eigen::MatrixXd dot_Omega_stack;
+    Eigen::MatrixXd dot_V_stack;
+
+    Eigen::MatrixXd C_stack;
+    Eigen::MatrixXd N_stack;
+
+    Eigen::MatrixXd Qa_stack;
+    Eigen::MatrixXd Qad_stack;
+
+};
+
+
 
 
 
@@ -68,6 +93,11 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
         integrator.backwardDynamics(::LieAlgebra::Vector6d());
 
 
+        integrator.updateInternalActuation(double());
+
+        Eigen::VectorXd() = integrator.getQad();
+
+
 
         integrator.backwardTangentDynamics(::LieAlgebra::Vector6d());
 
@@ -93,90 +123,11 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
 
         Eigen::MatrixXd() = integrator.getRodPositions();
 
-};
 
-
-struct CosseratRodIntegrators {
-
-
-    virtual ~CosseratRodIntegrators()=default;
-
-
-    virtual std::string printIntegratorProperties()const=0;
-
-
-    virtual void updateParameterisation(const Eigen::VectorXd &t_qe,
-                                        const Eigen::VectorXd &t_dot_qe,
-                                        const Eigen::VectorXd &t_ddot_qe)=0;
-
-
-    virtual void forwardKinematics()=0;
-
-
-    virtual void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
-                                   const Eigen::Vector3d &t_initial_position,
-                                   const Eigen::Vector3d &t_initial_angular_velocity,
-                                   const Eigen::Vector3d &t_initial_linear_velocity,
-                                   const Eigen::Vector3d &t_initial_angular_acceleration,
-                                   const Eigen::Vector3d &t_initial_linear_acceleration)=0;
-
-
-   virtual void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
-                                            const Eigen::VectorXd &t_Delta_dot_qe,
-                                            const Eigen::VectorXd &t_Delta_ddot_qe)=0;
-
-    virtual void forwardTangentKinematics()=0;
-
-
-    virtual void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
-                                          const Eigen::Vector3d &t_initial_Delta_position,
-                                          const Eigen::Vector3d &t_initial_Delta_angular_velocity,
-                                          const Eigen::Vector3d &t_initial_Delta_linear_velocity,
-                                          const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
-                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration)=0;
-
-
-    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const=0;
-
-    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const=0;
-
-
-
-    virtual void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)=0;
-
-
-
-    virtual void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)=0;
-
-
-
-
-    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const=0;
-
-
-
-    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const=0;
-
-
-    virtual ::LieAlgebra::Vector6d getQaAtBase()const=0;
-
-
-
-    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const=0;
-
-
-    virtual void updateIntegrationDomain(const double &t_rod_lenght)=0;
-
-
-    virtual Eigen::MatrixXd getRodPositions()const=0;
-
-
+        FullODEStatesObservations() = integrator.getFullODEStatesObservations();
 
 };
 
-typedef std::unique_ptr<CosseratRodIntegrators> CosseratIntegratorUPtr;
-
-typedef std::shared_ptr<CosseratRodIntegrators> CosseratIntegratorSPtr;
 
 
 

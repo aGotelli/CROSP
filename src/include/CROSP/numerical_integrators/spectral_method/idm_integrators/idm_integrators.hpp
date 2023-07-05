@@ -26,6 +26,7 @@
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 #include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
+#include "ATORS/ATORS.hpp"
 
 
 /// \brief CROSP::idm_integrators is the namespace containing the integrators for the IDM
@@ -361,6 +362,10 @@ struct GeneralisedForcesIntegrator : public OSNI::ODEb {
 
 
 
+
+
+
+
 /*!
  * \brief The IDMIntegrators struct contains all the intgrators in order to integrate the kinematics and dynamics of the rod
  *
@@ -448,11 +453,13 @@ struct IDMIntegrators {
 
     //  Integrator for the generalised coordinates
     std::shared_ptr<OSNI::ODESolverInterface> m_generalised_forces {
-        std::make_unique<GeneralisedForcesIntegrator>(m_strain_parameterisation_stack,
+        std::make_shared<GeneralisedForcesIntegrator>(m_strain_parameterisation_stack,
                                                       m_internal_couples,
                                                       m_internal_forces,
                                                       m_rod_properties->m_rod_dimensions.m_L)
     };
+
+
 
 
     /*!

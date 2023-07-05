@@ -18,7 +18,7 @@ namespace CROSP::numerical_integrators::runge_kutta {
 /*!
  * \brief The RungeKuttaIntegrator class provides a numeric integrator for the Cosserat IDM and TIDM using the standard Runge-Kutta integrator
  */
-class RungeKuttaIntegrator : public CosseratRodIntegrators
+class RungeKuttaIntegrator
 {
 public:
     RungeKuttaIntegrator(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
@@ -26,69 +26,69 @@ public:
                          std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
-    virtual std::string printIntegratorProperties()const final;
+    std::string printIntegratorProperties()const;
 
 
-    virtual void updateParameterisation(const Eigen::VectorXd &t_qe,
+    void updateParameterisation(const Eigen::VectorXd &t_qe,
                                         const Eigen::VectorXd &t_dot_qe,
-                                        const Eigen::VectorXd &t_ddot_qe) final;
+                                        const Eigen::VectorXd &t_ddot_qe);
 
 
-    virtual void forwardKinematics() final;
+    void forwardKinematics();
 
 
-    virtual void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+    void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                                    const Eigen::Vector3d &t_initial_position,
                                    const Eigen::Vector3d &t_initial_angular_velocity,
                                    const Eigen::Vector3d &t_initial_linear_velocity,
                                    const Eigen::Vector3d &t_initial_angular_acceleration,
-                                   const Eigen::Vector3d &t_initial_linear_acceleration) final;
+                                   const Eigen::Vector3d &t_initial_linear_acceleration);
 
 
-    virtual void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+    void updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
                                              const Eigen::VectorXd &t_Delta_dot_qe,
-                                             const Eigen::VectorXd &t_Delta_ddot_qe) final;
+                                             const Eigen::VectorXd &t_Delta_ddot_qe);
 
 
-    virtual void forwardTangentKinematics() final;
+    void forwardTangentKinematics();
 
 
-    virtual void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+    void forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
                                           const Eigen::Vector3d &t_initial_Delta_position,
                                           const Eigen::Vector3d &t_initial_Delta_angular_velocity,
                                           const Eigen::Vector3d &t_initial_Delta_linear_velocity,
                                           const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
-                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration) final;
+                                          const Eigen::Vector3d &t_initial_Delta_linear_acceleration);
 
 
-    virtual ::LieAlgebra::Kinematics getKinematicsAtTip()const final;
+    ::LieAlgebra::Kinematics getKinematicsAtTip()const;
 
 
-    virtual ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const final;
+    ::LieAlgebra::TangentKinematics getTangentKinematicsAtTip()const;
 
 
-    virtual void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1) final;
+    void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1);
 
 
-    virtual void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1) final;
+    void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1);
 
 
-    virtual ::LieAlgebra::Vector6d getLambdaAtBase()const final;
+    ::LieAlgebra::Vector6d getLambdaAtBase()const;
 
 
-    virtual LieAlgebra::Vector6d getDeltaLambdaAtBase()const final;
+    LieAlgebra::Vector6d getDeltaLambdaAtBase()const;
 
 
-    virtual ::LieAlgebra::Vector6d getQaAtBase()const final;
+    ::LieAlgebra::Vector6d getQaAtBase()const;
 
 
-    virtual LieAlgebra::Vector6d getDeltaQaAtBase()const final;
+    LieAlgebra::Vector6d getDeltaQaAtBase()const;
 
 
-    virtual void updateIntegrationDomain(const double &t_rod_lenght) final;
+    void updateIntegrationDomain(const double &t_rod_lenght);
 
 
-    virtual Eigen::MatrixXd getRodPositions()const;
+    Eigen::MatrixXd getRodPositions()const;
 
 
 

@@ -135,7 +135,6 @@ CI = [Const.q;Const.q_dot];
 
 
 
-
 a = 400;
 b = 160000;
 
@@ -164,6 +163,8 @@ Qa_cpp = load("../test_different_modes/Qa_stack.csv");
 
 error_Q = Q_cpp - QX;
 error_Q_norm = norm(error_Q);
+display(Q_cpp)
+display(QX)
 display(error_Q_norm)
 
 

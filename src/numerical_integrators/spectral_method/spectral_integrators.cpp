@@ -193,6 +193,24 @@ void SpectralIntegrators::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambd
 
 
 
+
+void SpectralIntegrators::updateInternalActuation(const double &t_time)
+{
+    m_internal_actuation_integrator->updateActuation(t_time);
+
+
+}
+
+
+Eigen::VectorXd SpectralIntegrators::getQad()const
+{
+    const Eigen::VectorXd Q_ad = m_internal_actuation_integrator->getActuation();
+
+    return Q_ad;
+}
+
+
+
 void SpectralIntegrators::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
 {
 
@@ -256,6 +274,30 @@ Eigen::MatrixXd SpectralIntegrators::getRodPositions()const
     return m_idm_integrators->m_position->getStackAsMatrix();
 }
 
+
+FullODEStatesObservations SpectralIntegrators::getFullODEStatesObservations()
+{
+    FullODEStatesObservations ODE_states_observations;
+
+
+    ODE_states_observations.orientation_stack = m_idm_integrators->m_quaternion->getStackAsMatrix();
+    ODE_states_observations.r_stack = m_idm_integrators->m_position->getStackAsMatrix();
+
+    ODE_states_observations.Omega_stack = m_idm_integrators->m_angular_velocity->getStackAsMatrix();
+    ODE_states_observations.V_stack = m_idm_integrators->m_linear_velocity->getStackAsMatrix();
+
+    ODE_states_observations.dot_Omega_stack = m_idm_integrators->m_angular_acceleration->getStackAsMatrix();
+    ODE_states_observations.dot_V_stack = m_idm_integrators->m_linear_acceleration->getStackAsMatrix();
+
+    ODE_states_observations.C_stack = m_idm_integrators->m_internal_couples->getStackAsMatrix();
+    ODE_states_observations.N_stack = m_idm_integrators->m_internal_forces->getStackAsMatrix();
+
+    ODE_states_observations.Qa_stack = m_idm_integrators->m_generalised_forces->getStackAsMatrix();
+    ODE_states_observations.Qad_stack = m_internal_actuation_integrator->getStackAsMatrix();
+
+    return ODE_states_observations;
+
+}
 
 
 
