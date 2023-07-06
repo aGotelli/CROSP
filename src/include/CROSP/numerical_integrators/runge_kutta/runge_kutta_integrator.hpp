@@ -11,8 +11,199 @@
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
+#include <boost/numeric/odeint.hpp>
 
 namespace CROSP::numerical_integrators::runge_kutta {
+
+
+/*!
+ * \brief The RungeKuttaIntegrator class provides a numeric integrator for the Cosserat IDM and TIDM using the standard Runge-Kutta integrator
+ */
+class ExplicitIntegrationODEs
+{
+public:
+    ExplicitIntegrationODEs()=default;
+
+    ExplicitIntegrationODEs(std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                            unsigned int t_generalised_coordinates_dimension);
+
+    //  Define a compiled time known dimension for the state of the pose (quaternion + position)
+    typedef Eigen::Matrix<double, 7, 1> PoseState;
+
+    typedef Eigen::Matrix<double, 19, 1> ForwardKinematicState;
+
+    typedef Eigen::Matrix<double, 37, 1> TangentKinematicState;
+
+
+    std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
+
+    unsigned int m_generalised_coordinates_dimension;
+
+    double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
+
+
+
+
+    PoseState forwardStaticODEs(const PoseState &t_state,
+                                const ::LieAlgebra::Vector6d &t_Xi) const;
+
+
+
+    ForwardKinematicState forwardODEs(const ForwardKinematicState &t_state,
+                                      const ::LieAlgebra::Vector6d &t_Xi,
+                                      const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                      const ::LieAlgebra::Vector6d &t_ddot_Xi) const;
+
+
+
+    ::LieAlgebra::Vector6d getLambdaPrime(const Eigen::Quaterniond &t_Q,
+                                          const ::LieAlgebra::Vector6d &t_Lambda,
+                                          const ::LieAlgebra::Vector6d &t_eta,
+                                          const ::LieAlgebra::Vector6d &t_dot_eta,
+                                          const ::LieAlgebra::Matrix6d &t_ad_Xi,
+                                          const double &t_X)const;
+
+
+
+    Eigen::VectorXd backwardODEs(const Eigen::VectorXd &t_state,
+                                 const ::LieAlgebra::Vector6d &t_Xi,
+                                 const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                 const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                 const Eigen::MatrixXd &t_BPhi,
+                                 const double &t_X)const;
+
+
+
+
+
+
+
+
+    TangentKinematicState tangentKinematicsODEs(const TangentKinematicState &t_state,
+                                                const ::LieAlgebra::Vector6d &t_Xi,
+                                                const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                                const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                                const ::LieAlgebra::Vector6d &t_Delta_Xi,
+                                                const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
+                                                const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi) const;
+
+
+    Eigen::VectorXd tangentDynamicsODEs(const Eigen::VectorXd &t_state,
+                                        const ::LieAlgebra::Vector6d &t_Xi,
+                                        const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                        const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                        const ::LieAlgebra::Vector6d &t_Delta_Xi,
+                                        const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
+                                        const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
+                                        const Eigen::MatrixXd &t_BPhi,
+                                        const double &t_X)const;
+
+
+    Eigen::VectorXd m_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
+    Eigen::VectorXd m_dot_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
+    Eigen::VectorXd m_ddot_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
+
+
+    Eigen::VectorXd m_Delta_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
+    Eigen::VectorXd m_Delta_dot_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
+    Eigen::VectorXd m_Delta_ddot_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
+
+
+
+
+
+
+    Eigen::VectorXd m_forward_integration_state_X0 { Eigen::VectorXd::Zero(19) };
+    Eigen::VectorXd m_forward_integration_state_X1 { Eigen::VectorXd::Zero(19) };
+
+
+
+    Eigen::VectorXd m_backward_integration_state_X0 { Eigen::VectorXd::Zero(25+m_generalised_coordinates_dimension) };
+    Eigen::VectorXd m_backward_integration_state_X1 { Eigen::VectorXd::Zero(25+m_generalised_coordinates_dimension) };
+
+
+    Eigen::VectorXd m_forward_tangent_kinematics_state_X0 { Eigen::VectorXd::Zero(37) };
+    Eigen::VectorXd m_forward_tangent_kinematics_state_X1 { Eigen::VectorXd::Zero(37) };
+
+
+    Eigen::VectorXd m_tangent_dynamics_state_X0 { Eigen::VectorXd::Zero(49+m_generalised_coordinates_dimension) };
+
+
+};
+
+
+
+
+template<class Method=boost::numeric::odeint::runge_kutta_dopri5< Eigen::VectorXd, double,
+                                                                  Eigen::VectorXd, double,
+                                                                  boost::numeric::odeint::vector_space_algebra>>
+class ExplicitIntegrator : public ExplicitIntegrationODEs {
+
+    ExplicitIntegrator(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                       const unsigned int t_number_of_Chebyshev_points,
+                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+        : ExplicitIntegrationODEs(t_rod_properties,
+                                  t_polynomial_representation.getCoordinatesDimension()),
+          m_polynomial_representation(t_polynomial_representation),
+          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
+    {}
+
+ polynomial_representation::PolynomialRepresentation m_polynomial_representation;
+ ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
+    unsigned int m_number_of_Chebyshev_points;
+
+ double m_dX { 0.005 };
+    void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+                           const Eigen::Vector3d &t_initial_position,
+                           const Eigen::Vector3d &t_initial_angular_velocity,
+                           const Eigen::Vector3d &t_initial_linear_velocity,
+                           const Eigen::Vector3d &t_initial_angular_acceleration,
+                           const Eigen::Vector3d &t_initial_linear_acceleration)
+    {
+
+        ExplicitIntegrationODEs::ForwardKinematicState forward_integration_state;
+        forward_integration_state << t_initial_quaternion,
+             t_initial_position,
+             t_initial_angular_velocity,
+             t_initial_linear_velocity,
+             t_initial_angular_acceleration,
+             t_initial_linear_acceleration;
+
+        //  Save a track of the state
+        m_forward_integration_state_X0 = forward_integration_state;
+
+
+
+
+
+        boost::numeric::odeint::integrate_adaptive(Method(),
+                                                   [this](const Eigen::VectorXd &t_y,
+                                                          Eigen::VectorXd &t_dyds,
+                                                          const double t_X){
+            /*  Preprocessing    */
+            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
+
+            //  Get the strains for the rod
+            const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
+            const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
+            const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
+
+            t_dyds = this->forwardODEs(t_y, Xi, dot_Xi, ddot_Xi);
+
+                                                    },
+                                                    forward_integration_state,
+                                                    0.0,
+                                                    1.0,
+                                                    m_dX);
+
+
+        //  Save a track of the state
+        m_forward_integration_state_X1 = forward_integration_state;
+    }
+
+};
+
+
 
 
 /*!

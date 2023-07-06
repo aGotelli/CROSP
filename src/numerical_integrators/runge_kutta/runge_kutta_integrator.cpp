@@ -4,13 +4,6 @@
 
 
 namespace CROSP::numerical_integrators::runge_kutta {
-
-
-typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::VectorXd, double,
-                                                    Eigen::VectorXd, double,
-                                                    boost::numeric::odeint::vector_space_algebra> eigen_stepper;
-
-
 Eigen::Matrix4d getA(const Eigen::Vector3d t_k){
     Eigen::Matrix4d A;
     A   <<     0  , -t_k(0),  -t_k(1),  -t_k(2),
@@ -20,6 +13,361 @@ Eigen::Matrix4d getA(const Eigen::Vector3d t_k){
 
     return A;
 }
+
+
+ExplicitIntegrationODEs::ExplicitIntegrationODEs(std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                        unsigned int t_generalised_coordinates_dimension)
+    : m_rod_properties(t_rod_properties),
+      m_generalised_coordinates_dimension(t_generalised_coordinates_dimension)
+{}
+
+
+
+
+
+ExplicitIntegrationODEs::PoseState ExplicitIntegrationODEs::forwardStaticODEs(const PoseState &t_state,
+                                                      const ::LieAlgebra::Vector6d &t_Xi) const
+{
+    //  Decompose the strain
+    const Eigen::Vector3d k = t_Xi.block<3,1>(0,0);
+    const Eigen::Vector3d gamma = t_Xi.block<3,1>(3,0);
+
+
+    /*  The state has the form
+     *  | Q |   w, x, y, z                  0-3
+     *  | r |   x, y, z                     4-6
+     */
+
+
+    //  Unpack state vector
+    const Eigen::Quaterniond Q(t_state[0], t_state[1],t_state[2], t_state[3]);
+    [[maybe_unused]] const Eigen::Vector3d r = t_state.block<3,1>(4,0);
+
+
+    const Eigen::Matrix3d R = Q.toRotationMatrix();
+
+
+    //  Actual ODE
+    const Eigen::Vector4d Q_prime = 0.5*getA(k)*Eigen::Vector4d(Q.w(),Q.x(),Q.y(),Q.z());
+    const Eigen::Vector3d r_prime = R*gamma;
+
+
+    //  Packing state vector derivative
+    ExplicitIntegrationODEs::PoseState dyds;
+    dyds << Q_prime,
+            r_prime;
+
+    dyds *= m_rod_length;
+
+    return dyds;
+
+}
+
+ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardODEs(const ExplicitIntegrationODEs::ForwardKinematicState &t_state,
+                                                                              const ::LieAlgebra::Vector6d &t_Xi,
+                                                                              const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                                                              const ::LieAlgebra::Vector6d &t_ddot_Xi) const
+{
+    /*  The state has the form
+     *  | Q |   w, x, y, z                  0-3
+     *  | r |   x, y, z                     4-6
+     *  | η |   Ω1 , Ω2 , Ω3 , V1 , V2 , V3 7-12
+     *  | η̇ |   Ω1 , Ω2 , Ω3 , V1 , V2 , V3 13-18
+     */
+
+
+    //  Unpack state vector
+    const ExplicitIntegrationODEs::PoseState g = t_state.block<7,1>(0,0);
+    const ::LieAlgebra::Vector6d eta = t_state.block<6,1>(7,0);
+    const ::LieAlgebra::Vector6d eta_dot = t_state.block<6,1>(13,0);
+
+
+    const auto ad_Xi = ::LieAlgebra::ad(t_Xi);
+    const auto ad_dot_Xi = ::LieAlgebra::ad(t_dot_Xi);
+
+    //  Actual ODE
+    const ExplicitIntegrationODEs::PoseState g_prime = forwardStaticODEs(g, t_Xi);
+    const ::LieAlgebra::Vector6d eta_prime = - ad_Xi*eta + t_dot_Xi;
+    const ::LieAlgebra::Vector6d eta_dot_prime = - ad_Xi*eta_dot - ad_dot_Xi*eta + t_ddot_Xi;
+
+
+
+    ExplicitIntegrationODEs::ForwardKinematicState dydx;
+
+    //  Packing state vector derivative
+    dydx << g_prime,
+            eta_prime,
+            eta_dot_prime;
+
+    dydx *= m_rod_length;
+
+    return dydx;
+}
+
+
+
+
+
+
+::LieAlgebra::Vector6d ExplicitIntegrationODEs::getLambdaPrime(const Eigen::Quaterniond &t_Q,
+                                                            const ::LieAlgebra::Vector6d &t_Lambda,
+                                                            const ::LieAlgebra::Vector6d &t_eta,
+                                                            const ::LieAlgebra::Vector6d &t_dot_eta,
+                                                            const ::LieAlgebra::Matrix6d &t_ad_Xi,
+                                                            const double &t_X)const
+{
+    if(t_X == 0 or t_X == 1.0)
+        return ::LieAlgebra::Vector6d::Zero();
+
+
+    //  Some needed variables
+    const Eigen::Matrix3d R = t_Q.toRotationMatrix();
+    ::LieAlgebra::Vector6d F_bar = ::LieAlgebra::Vector6d::Zero();
+    F_bar.block<3, 1>(3, 0) = R.transpose() * m_rod_properties->distributedGravitationalForce();
+
+
+    const auto M = m_rod_properties->m_M;
+
+    const Eigen::VectorXd Lambda_prime = t_ad_Xi.transpose()*t_Lambda
+                                            + M*t_dot_eta
+                                            - ::LieAlgebra::ad(t_eta).transpose()*M*t_eta
+                                            - F_bar;
+
+    return Lambda_prime;
+}
+
+
+
+Eigen::VectorXd ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y,
+                                                   const ::LieAlgebra::Vector6d &t_Xi,
+                                                   const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                                   const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                                   const Eigen::MatrixXd &t_BPhi,
+                                                   const double &t_X)const
+{
+    /*  The state has the form
+     *  | Q |   w, x, y, z                  0-3
+     *  | r |   x, y, z                     4-6
+     *  | η |   Ω1, Ω2, Ω3, V1, V2, V3      7-12
+     *  | η̇ |   Ω1, Ω2, Ω3, V1, V2, V3     13-18
+     *  | Λ |   C1, C2, C3, N1, N2, N3     19-24
+     *  | Qa|                              25-(25+ne*na)
+     */
+
+    //  Unpack state vector
+    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state = t_y.block<19,1>(0,0);
+
+    const ::LieAlgebra::Vector6d eta = t_y.block<6,1>(7,0);
+    const ::LieAlgebra::Vector6d dot_eta = t_y.block<6,1>(13,0);
+    const ::LieAlgebra::Vector6d Lambda = t_y.block<6,1>(19,0);
+
+
+
+
+    const auto ad_Xi = ::LieAlgebra::ad(t_Xi);
+
+
+
+    //  Actual ODE
+    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state_prime = forwardODEs(kinematic_state, t_Xi, t_dot_Xi, t_ddot_Xi);
+
+
+    const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_y[0], t_y[1],t_y[2], t_y[3]),
+                                                                           Lambda, eta, dot_eta, ad_Xi, t_X);
+    const Eigen::VectorXd Qa_prime = - t_BPhi.transpose()*Lambda;
+
+    //  Packing state vector derivative
+    Eigen::VectorXd dyds(25 + m_generalised_coordinates_dimension);
+    dyds <<  kinematic_state_prime,
+             Lambda_prime,
+             Qa_prime;
+
+    dyds *= m_rod_length;
+
+    return dyds;
+}
+
+
+
+ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentKinematicsODEs(const ExplicitIntegrationODEs::TangentKinematicState &t_state,
+                                                                                        const ::LieAlgebra::Vector6d &t_Xi,
+                                                                                        const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                                                                        const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                                                                        const ::LieAlgebra::Vector6d &t_Delta_Xi,
+                                                                                        const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
+                                                                                        const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi) const
+{
+    /*  The state has the form
+     *  | Q |   w, x, y, z                      0-3
+     *  | r |   x, y, z                         4-6
+     *  | η |   Ω1, Ω2, Ω3, V1, V2, V3         7-12
+     *  | η̇ |   Ω1, Ω2, Ω3, V1, V2, V3         13-18
+     *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    19-24
+     *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   25-30
+     *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-37
+     */
+
+    //  Unpack state vector
+    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state = t_state.block<19,1>(0,0);
+    const ::LieAlgebra::Vector6d eta = t_state.block<6,1>(7,0);
+    const ::LieAlgebra::Vector6d dot_eta = t_state.block<6,1>(13,0);
+
+    const ::LieAlgebra::Vector6d Delta_zeta    = t_state.block<6,1>(19,0);
+    const ::LieAlgebra::Vector6d Delta_eta     = t_state.block<6,1>(25,0);
+    const ::LieAlgebra::Vector6d Delta_dot_eta = t_state.block<6,1>(31,0);
+
+
+
+    const auto ad_Xi = ::LieAlgebra::ad(t_Xi);
+
+    const auto ad_Delta_dot_Xi = ::LieAlgebra::ad(t_Delta_dot_Xi);
+
+    const auto ad_eta = ::LieAlgebra::ad(eta);
+    const auto ad_dot_eta = ::LieAlgebra::ad(dot_eta);
+
+
+    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state_prime = forwardODEs(kinematic_state, t_Xi, t_dot_Xi, t_ddot_Xi);
+    const ::LieAlgebra::Vector6d Delta_zeta_prime =
+            - ad_Xi*Delta_zeta + t_Delta_Xi;
+    const ::LieAlgebra::Vector6d Delta_eta_prime =
+            - ad_Xi*Delta_eta + ad_eta*t_Delta_Xi + t_Delta_dot_Xi;
+    const ::LieAlgebra::Vector6d Delta_dot_eta_prime =
+            - ad_Xi*Delta_dot_eta - ad_Delta_dot_Xi*Delta_eta + ad_eta*t_Delta_dot_Xi + ad_dot_eta*t_Delta_Xi + t_Delta_ddot_Xi;
+
+
+    //  Packing state vector derivative
+    ExplicitIntegrationODEs::TangentKinematicState dydx;
+    dydx <<  kinematic_state_prime,
+             Delta_zeta_prime,
+             Delta_eta_prime,
+             Delta_dot_eta_prime;
+
+    dydx *= m_rod_length;
+
+    return dydx;
+}
+
+
+Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_state,
+                                                          const ::LieAlgebra::Vector6d &t_Xi,
+                                                          const ::LieAlgebra::Vector6d &t_dot_Xi,
+                                                          const ::LieAlgebra::Vector6d &t_ddot_Xi,
+                                                          const ::LieAlgebra::Vector6d &t_Delta_Xi,
+                                                          const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
+                                                          const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
+                                                          const Eigen::MatrixXd &t_BPhi,
+                                                          const double &t_X)const
+{
+
+    /*  The state has the form
+     *  | Q  |   w, x, y, z                       0-3
+     *  | r  |   x, y, z                          4-6
+     *  | η  |   Ω1, Ω2, Ω3, V1, V2, V3          7-12
+     *  | η̇  |   Ω1, Ω2, Ω3, V1, V2, V3         13-18
+     *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    19-24
+     *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   25-30
+     *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
+     *  | Λ  |   C1, C2, C3, N1, N2, N3          37-42
+     *  | ∆Λ |   C1, C2, C3, N1, N2, N3          43-48
+     *  | ∆Qa|                                   49-49+ne
+     */
+
+
+    //  Unpack state vector
+    const ExplicitIntegrationODEs::TangentKinematicState tangent_kinematic_state = t_state.block<37,1>(0,0);
+    const ::LieAlgebra::Vector6d eta = t_state.block<6,1>(7,0);
+    const ::LieAlgebra::Vector6d dot_eta = t_state.block<6,1>(13,0);
+
+    const ::LieAlgebra::Vector6d Delta_zeta    = t_state.block<6,1>(19,0);
+    const ::LieAlgebra::Vector6d Delta_eta     = t_state.block<6,1>(25,0);
+    const ::LieAlgebra::Vector6d Delta_dot_eta = t_state.block<6,1>(31,0);
+
+
+    const ::LieAlgebra::Vector6d Lambda = t_state.block<6, 1>(37,0);
+    const ::LieAlgebra::Vector6d Delta_Lambda = t_state.block<6, 1>(43,0);
+
+
+
+    const auto ad_Xi = ::LieAlgebra::ad(t_Xi);
+    const auto ad_Delta_Xi = ::LieAlgebra::ad(t_Delta_Xi);
+
+
+    const auto ad_eta = ::LieAlgebra::ad(eta);
+    const auto ad_Delta_eta = ::LieAlgebra::ad(Delta_eta);
+
+    const auto M = m_rod_properties->m_M;
+
+
+
+
+
+
+
+
+    const Eigen::Matrix3d R = Eigen::Quaterniond(t_state[0], t_state[1],t_state[2], t_state[3]).toRotationMatrix();
+
+    Eigen::Vector3d Delta_rotation = Delta_zeta.block<3,1>(0, 0);
+
+    Eigen::Vector3d Delta_N_bar = ::LieAlgebra::skew( Delta_rotation ).transpose()
+                                    *R.transpose()
+                                    *m_rod_properties->distributedGravitationalForce();
+
+    ::LieAlgebra::Vector6d Delta_F_bar = ::LieAlgebra::Vector6d::Zero();
+    Delta_F_bar.block<3,1>(3, 0) = Delta_N_bar;
+
+
+
+
+
+    const ExplicitIntegrationODEs::TangentKinematicState tangent_kinematic_state_prime = tangentKinematicsODEs(tangent_kinematic_state,
+                                                                                      t_Xi, t_dot_Xi, t_ddot_Xi,
+                                                                                      t_Delta_Xi, t_Delta_dot_Xi, t_Delta_ddot_Xi);
+    const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_state[0], t_state[1],t_state[2], t_state[3]),
+                                                                           Lambda, eta, dot_eta, ad_Xi, t_X);
+    const ::LieAlgebra::Vector6d Delta_Lambda_prime =
+            M*Delta_dot_eta - ad_eta.transpose()*M*Delta_eta - ad_Delta_eta.transpose()*M*eta + ad_Xi.transpose()*Delta_Lambda + ad_Delta_Xi.transpose()*Lambda - Delta_F_bar;
+
+    const Eigen::VectorXd Delta_Qa_prime = -t_BPhi.transpose()*Delta_Lambda;
+
+
+    //  Packing state vector derivative
+    Eigen::VectorXd dydx(49 + m_generalised_coordinates_dimension);
+    dydx <<  tangent_kinematic_state_prime,
+             Lambda_prime,
+             Delta_Lambda_prime,
+             Delta_Qa_prime;
+
+    dydx *= m_rod_length;
+
+    return dydx;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> eigen_stepper;
+
+
 
 
 
