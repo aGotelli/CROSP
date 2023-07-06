@@ -117,6 +117,10 @@ display(Kee_cpp)
 display(Kee)
 display(error_Kee_norm)
 
+
+
+
+
 error_Dee = Dee_cpp - Dee;
 error_Dee_norm = norm(error_Dee);
 display(error_Dee_norm)

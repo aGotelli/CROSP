@@ -18,6 +18,7 @@ H = diag([Const.GI,Const.EI,Const.EI,Const.EA,Const.GA,Const.GA]);
 D = Const.mu*H;
 
 
+
 Ha  = B'*H*B;
 Da  = B'*D*B;
 
