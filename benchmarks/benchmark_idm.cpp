@@ -57,11 +57,18 @@ void benchmarkIDM(::benchmark::State &t_state)
 
     while(t_state.KeepRunning()){
 
-        rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
+//        rod.updateParameterisation(q, dot_q, ddot_q);
 
-        rod.m_cosserat_rod_integrators->forwardKinematics();
+//        rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
 
-        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
+//        rod.m_cosserat_rod_integrators->forwardKinematics();
+
+//        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
+        rod.updateParameterisation(q, dot_q, ddot_q);
+
+        rod.forwardKinematics();
+
+        rod.backwardDynamics(Lambda_X1);
 
     }
 };
