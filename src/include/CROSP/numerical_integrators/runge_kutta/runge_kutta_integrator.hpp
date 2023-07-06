@@ -70,6 +70,12 @@ public:
     void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1);
 
 
+    void updateInternalActuation(const double &t_time);
+
+
+    Eigen::VectorXd getQad() const;
+
+
     void backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1);
 
 
@@ -91,7 +97,9 @@ public:
     Eigen::MatrixXd getRodPositions()const;
 
 
+    FullODEStatesObservations getIDMStatesObservations();
 
+    FullODEStatesObservations getTIDMStatesObservations();
 
 
 private:

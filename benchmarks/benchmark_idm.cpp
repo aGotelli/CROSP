@@ -39,10 +39,9 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
 
-    CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
 
-//    auto strain_param =
-//            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
+
 
     ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points);
 

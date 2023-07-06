@@ -325,7 +325,15 @@ void RungeKuttaIntegrator::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lamb
 }
 
 
+void RungeKuttaIntegrator::updateInternalActuation(const double &t_time)
+{
 
+}
+
+Eigen::VectorXd RungeKuttaIntegrator::getQad() const
+{
+
+}
 
 
 void RungeKuttaIntegrator::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
@@ -463,6 +471,17 @@ Eigen::MatrixXd RungeKuttaIntegrator::getRodPositions() const
 
 
     return rod_shapes_stack;
+}
+
+
+FullODEStatesObservations RungeKuttaIntegrator::getIDMStatesObservations()
+{
+
+}
+
+FullODEStatesObservations RungeKuttaIntegrator::getTIDMStatesObservations()
+{
+
 }
 
 
