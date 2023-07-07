@@ -327,11 +327,13 @@ Eigen::MatrixXd SpectralIntegrators::integratePhiTPhi()const
 {
     m_integrator_polynomial_base->solveSystem();
 
-    Eigen::VectorXd PhiTPhi = m_integrator_polynomial_base->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
+    Eigen::VectorXd PhiTPhi_state = m_integrator_polynomial_base->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
 
-    unsigned int size = sqrt(PhiTPhi.size());
+    unsigned int size = sqrt(PhiTPhi_state.size());
 
-    return Eigen::Map<Eigen::MatrixXd>(PhiTPhi.data(), size, size);
+    Eigen::MatrixXd PhiTPhi = Eigen::Map<Eigen::MatrixXd>(PhiTPhi_state.data(), size, size);
+
+    return PhiTPhi;
 }
 
 

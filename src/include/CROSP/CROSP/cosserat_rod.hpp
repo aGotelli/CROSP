@@ -607,55 +607,6 @@ protected:
 
 
 
-//    /*!
-//     * \brief defineKee defines the elasticity matrix Kee
-//     * \param t_ne the number of modes per admitted deformation
-//     * \param t_na the number of deformations degrees of freedom
-//     * \param t_B the map matrix to map the allowed strains in the space of the full strain
-//     * \return
-//     */
-//    Eigen::MatrixXd defineKee();
-
-
-//    /// \brief m_Kee The generalised elasticity matrix
-//    Eigen::MatrixXd m_Kee { [this]()->Eigen::MatrixXd
-//        {
-
-//            const unsigned int n = m_polynomial_representation.getCoordinatesDimension();
-
-//            Eigen::MatrixXd Ha = m_polynomial_representation.m_B.transpose() * m_rod_properties->m_H * m_polynomial_representation.m_B;
-
-
-//            typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::MatrixXd, double,
-//                                                                 Eigen::MatrixXd, double,
-//                                                                 boost::numeric::odeint::vector_space_algebra> Ke_stepper;
-//            Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
-
-//            const double X0 = 0.0;
-//            const double X1 = 1.0;
-//            const double dX = 0.0005;
-
-//            boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Eigen::MatrixXd &, Eigen::MatrixXd &t_dKeeds, const double t_X){
-//                const auto Phi = m_polynomial_representation.getPhi( t_X );
-
-//                t_dKeeds = Phi.transpose()*Phi;
-//            }, Kee, X0, X1, dX);
-
-//            unsigned int Kee_index = 0;
-//            for(unsigned int i=0; i<m_polynomial_representation.m_na; i++){
-//                double scale = m_rod_properties->m_rod_dimensions.m_L*Ha(i, i);
-
-//                unsigned int ne_i = m_polynomial_representation.m_number_of_modes_stack[i];
-
-//                Kee.block(Kee_index, Kee_index, ne_i, ne_i) *= scale;
-
-//                Kee_index += ne_i;
-//            }
-
-//            return Kee;
-//        }()
-//    };
-
     /// \brief m_Kee The generalised elasticity matrix
     Eigen::MatrixXd m_Kee { [this]()->Eigen::MatrixXd
         {

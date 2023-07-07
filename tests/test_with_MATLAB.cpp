@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     writeToFile("deformations_stack", deformations_stack, path);
 
     std::vector<unsigned int> number_of_modes_stack {
-        /*2, */3/*, 5*/
+        /*2, 3, */3
     };
 
     Eigen::VectorXd ne_stack = Eigen::VectorXd::Zero(6);

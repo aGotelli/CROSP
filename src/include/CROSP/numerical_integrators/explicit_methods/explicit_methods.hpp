@@ -707,22 +707,25 @@ public:
     Eigen::MatrixXd integratePhiTPhi()const
     {
 
-        Eigen::VectorXd PhiTPhi = Eigen::VectorXd(m_generalised_coordinates_dimension*m_generalised_coordinates_dimension);
+        Eigen::VectorXd PhiTPhi_state = Eigen::VectorXd::Zero(m_generalised_coordinates_dimension*m_generalised_coordinates_dimension);
 
 
 
         boost::numeric::odeint::integrate_adaptive(stepper,
                                                    [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
                                                     {this->PhiTPhiODE(t_y, t_dyds, t_s);},
-                                                    PhiTPhi,
+                                                    PhiTPhi_state,
                                                     0.0,
                                                     1.0,
                                                     m_dX);
 
 
-        return Eigen::Map<Eigen::MatrixXd>(PhiTPhi.data(),
-                                           m_generalised_coordinates_dimension,
-                                           m_generalised_coordinates_dimension);
+        Eigen::MatrixXd PhiTPhi = Eigen::Map<Eigen::MatrixXd>(PhiTPhi_state.data(),
+                                                              m_generalised_coordinates_dimension,
+                                                              m_generalised_coordinates_dimension);
+
+
+        return PhiTPhi;
     }
 
 
