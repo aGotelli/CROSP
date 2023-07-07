@@ -93,6 +93,7 @@ target_link_libraries(test_tmp_stepper
     PRIVATE
         utilities
         ${PROJECT_NAME}
+        benchmark::benchmark
 )
 target_compile_definitions(test_tmp_stepper
     PRIVATE
