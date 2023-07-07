@@ -26,7 +26,7 @@ Config.Nt    = length(Config.time);
 
 
 % longueur de la poutre
-Config.L = 1.33;
+Config.L = 1.0;
 % Pas de discrétisation du corps
 Config.dX = Config.L/101;
 % Construction du corps et de ses paramètres
@@ -138,9 +138,10 @@ CI = [Const.q;Const.q_dot];
 
 
 
-
 a = 400;
 b = 160000;
+a = 0;
+%b = 0;
 
 time = 0;
 qn_0 = q_0;
@@ -283,6 +284,9 @@ for i=1:Const.dim_base
     Delta_dot_V_cpp = load("../test_different_modes/Delta_dot_V_stack_Delta" + (i-1) + ".csv");
 
     error_Delta_dot_V = Delta_dot_V_cpp - Delta_eta_dot_X(4:6, :, i);
+    Delta_dot_V = Delta_eta_dot_X(4:6, :, i);
+    display(Delta_dot_V_cpp)
+    display(Delta_dot_V)
     error_Delta_dot_V_norms_stack = [error_Delta_dot_V_norms_stack norm(error_Delta_dot_V)];
 
 

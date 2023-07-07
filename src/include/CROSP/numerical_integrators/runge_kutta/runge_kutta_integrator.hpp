@@ -28,8 +28,8 @@ class ExplicitIntegrationODEs
 public:
     ExplicitIntegrationODEs()=default;
 
-    ExplicitIntegrationODEs(std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
-                            unsigned int t_generalised_coordinates_dimension);
+    ExplicitIntegrationODEs(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
     //  Define a compiled time known dimension for the state of the pose (quaternion + position)
     typedef Eigen::Matrix<double, 7, 1> PoseState;
@@ -39,21 +39,22 @@ public:
     typedef Eigen::Matrix<double, 37, 1> TangentKinematicState;
 
 
-    std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
-
-    unsigned int m_generalised_coordinates_dimension;
-
-    double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
 
 
 
+    void forwardStaticODEs(const Eigen::VectorXd &t_y,
+                           Eigen::VectorXd &t_dyds,
+                           const double t_X) const;
 
-    PoseState forwardStaticODEs(const PoseState &t_state,
+    PoseState forwardStaticStep(const PoseState &t_state,
                                 const ::LieAlgebra::Vector6d &t_Xi) const;
 
 
+    void forwardODEs(const Eigen::VectorXd &t_y,
+                           Eigen::VectorXd &t_dyds,
+                           const double t_X) const;
 
-    ForwardKinematicState forwardODEs(const ForwardKinematicState &t_state,
+    ForwardKinematicState forwardStep(const ForwardKinematicState &t_state,
                                       const ::LieAlgebra::Vector6d &t_Xi,
                                       const ::LieAlgebra::Vector6d &t_dot_Xi,
                                       const ::LieAlgebra::Vector6d &t_ddot_Xi) const;
@@ -69,8 +70,11 @@ public:
                                           const double &t_X)const;
 
 
+    void backwardODEs(const Eigen::VectorXd &t_y,
+                                              Eigen::VectorXd &t_dyds,
+                                              const double t_X)const;
 
-    Eigen::VectorXd backwardODEs(const Eigen::VectorXd &t_state,
+    Eigen::VectorXd backwardStep(const Eigen::VectorXd &t_state,
                                  const ::LieAlgebra::Vector6d &t_Xi,
                                  const ::LieAlgebra::Vector6d &t_dot_Xi,
                                  const ::LieAlgebra::Vector6d &t_ddot_Xi,
@@ -81,10 +85,12 @@ public:
 
 
 
+    void tangentKinematicsODEs(const Eigen::VectorXd &t_y,
+                                              Eigen::VectorXd &t_dyds,
+                                              const double t_X)const;
 
 
-
-    TangentKinematicState tangentKinematicsODEs(const TangentKinematicState &t_state,
+    TangentKinematicState tangentKinematicsStep(const TangentKinematicState &t_state,
                                                 const ::LieAlgebra::Vector6d &t_Xi,
                                                 const ::LieAlgebra::Vector6d &t_dot_Xi,
                                                 const ::LieAlgebra::Vector6d &t_ddot_Xi,
@@ -93,7 +99,13 @@ public:
                                                 const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi) const;
 
 
-    Eigen::VectorXd tangentDynamicsODEs(const Eigen::VectorXd &t_state,
+    void tangentDynamicsODEs(const Eigen::VectorXd &t_y,
+                                              Eigen::VectorXd &t_dyds,
+                                              const double t_X)const;
+
+
+
+    Eigen::VectorXd tangentDynamicsStep(const Eigen::VectorXd &t_state,
                                         const ::LieAlgebra::Vector6d &t_Xi,
                                         const ::LieAlgebra::Vector6d &t_dot_Xi,
                                         const ::LieAlgebra::Vector6d &t_ddot_Xi,
@@ -102,6 +114,19 @@ public:
                                         const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
                                         const Eigen::MatrixXd &t_BPhi,
                                         const double &t_X)const;
+
+    std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
+
+
+
+    double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
+
+
+    polynomial_representation::PolynomialRepresentation m_polynomial_representation;
+    ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
+
+    unsigned int m_generalised_coordinates_dimension { m_polynomial_representation.getCoordinatesDimension() };
+
 
 
     Eigen::VectorXd m_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
@@ -133,6 +158,7 @@ public:
 
 
     Eigen::VectorXd m_tangent_dynamics_state_X0 { Eigen::VectorXd::Zero(49+m_generalised_coordinates_dimension) };
+    Eigen::VectorXd m_tangent_dynamics_state_X1 { Eigen::VectorXd::Zero(49+m_generalised_coordinates_dimension) };
 
 
 };
@@ -182,17 +208,15 @@ public:
     ExplicitIntegrator(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                        const unsigned int t_number_of_Chebyshev_points,
                        std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
-        : ExplicitIntegrationODEs(t_rod_properties,
-                                  t_polynomial_representation.getCoordinatesDimension()),
-          m_polynomial_representation(t_polynomial_representation),
+        : ExplicitIntegrationODEs(t_polynomial_representation,
+                                  t_rod_properties),
           m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
     {}
 
-    polynomial_representation::PolynomialRepresentation m_polynomial_representation;
-    ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
+
     unsigned int m_number_of_Chebyshev_points;
 
-    double m_dX { 0.005 };
+    double m_dX { 0.001 };
 
 
     std::string printIntegratorProperties()const
@@ -275,26 +299,13 @@ public:
         m_forward_integration_state_X0 = forward_integration_state;
 
 
-
-
-
-        boost::numeric::odeint::integrate_adaptive(Method(), [this](const Eigen::VectorXd &t_y,
-                                                                    Eigen::VectorXd &t_dyds,
-                                                                    const double t_X){
-            /*  Preprocessing    */
-            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
-
-            //  Get the strains for the rod
-            const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
-            const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
-            const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
-
-            t_dyds = this->forwardODEs(t_y, Xi, dot_Xi, ddot_Xi);
-
-        }, forward_integration_state,
-            0.0,
-            1.0,
-            m_dX);
+        boost::numeric::odeint::integrate_adaptive(stepper,
+                                                   [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                        {this->forwardODEs(t_y, t_dyds, t_s);},
+                                                   forward_integration_state,
+                                                   0.0,
+                                                   1.0,
+                                                   m_dX);
 
 
         //  Save a track of the state
@@ -348,37 +359,22 @@ public:
         //  Save a track of the state
         m_forward_tangent_kinematics_state_X0 = tangent_kinematics_state;
 
-
+        std::cout << "tangent_kinematics_state X=0 : \n" <<  tangent_kinematics_state << "\n\n";
 
     //  Forward Integration
-        boost::numeric::odeint::integrate_adaptive(Method(),
-                                                   [this](const Eigen::VectorXd &t_y,
-                                                          Eigen::VectorXd &t_dyds,
-                                                          const double t_X){
-            /*  Preprocessing    */
-            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
-
-            //  Get the strains for the rod
-            const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
-            const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
-            const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
-
-
-            //  Get the strains for the rod
-            const ::LieAlgebra::Vector6d Delta_Xi      = BPhi*m_Delta_qe;
-            const ::LieAlgebra::Vector6d Delta_dot_Xi  = BPhi*m_Delta_dot_qe;
-            const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
-
-
-            t_dyds = this->tangentKinematicsODEs(t_y, Xi, dot_Xi, ddot_Xi, Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi);
-
-        }, tangent_kinematics_state,
+        boost::numeric::odeint::integrate_adaptive(stepper,
+                                                   [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                        {this->tangentKinematicsODEs(t_y, t_dyds, t_s);},
+                                                   tangent_kinematics_state,
             0.0,
             1.0,
             m_dX);
 
         //  Save a track of the state
         m_forward_tangent_kinematics_state_X1 = tangent_kinematics_state;
+
+        std::cout << "tangent_kinematics_state X=1 : \n" <<  tangent_kinematics_state << "\n\n";
+        std::cout.flush();
     }
 
 
@@ -453,9 +449,9 @@ public:
 
 
         m_backward_integration_state_X1 <<
-                      m_forward_integration_state_X1,
-                      t_Lambda_X1,
-                      Q1;
+                m_forward_integration_state_X1,
+                t_Lambda_X1,
+                Q1;
 
 
         m_backward_integration_state_X0 = m_backward_integration_state_X1;
@@ -463,78 +459,22 @@ public:
 
 
         //  Backward Integration
-        boost::numeric::odeint::integrate_adaptive(Method(),
-                                                   [this](const Eigen::VectorXd& t_y,
-                                                          Eigen::VectorXd& t_dyds,
-                                                          const double t_X){
-            /*  Preprocessing    */
-            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
-
-            //  Get the strains for the rod
-            const Eigen::VectorXd Xi      = BPhi*m_qe + m_constant_strain;
-            const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
-            const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
-
-            t_dyds = this->backwardODEs(t_y, Xi, dot_Xi, ddot_Xi, BPhi, t_X);
-
-        }, m_backward_integration_state_X0,
-            1.0,
-            0.0,
-            -m_dX);
+        boost::numeric::odeint::integrate_adaptive(stepper,
+                                                   [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                    {this->backwardODEs(t_y, t_dyds, t_s);},
+                                                    m_backward_integration_state_X0,
+                                                    1.0,
+                                                    0.0,
+                                                    -m_dX);
 
 
     }
 
 
 
-    FullODEStatesObservations getIDMStatesObservations()
-    {
-        /*  The backward state has the form
-         *  | Q |   w, x, y, z                  0-3
-         *  | r |   x, y, z                     4-6
-         *  | η |   Ω1, Ω2, Ω3, V1, V2, V3      7-12
-         *  | η̇ |   Ω1, Ω2, Ω3, V1, V2, V3     13-18
-         *  | Λ |   C1, C2, C3, N1, N2, N3     19-24
-         *  | Qa|                              25-(25+ne*na)
-         *
-         *
-         */
-
-        Eigen::VectorXd Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
 
 
-
-        m_backward_integration_state_X0 = m_backward_integration_state_X1;
-
-
-
-
-        //  Backward Integration
-        boost::numeric::odeint::integrate_times(Method(),
-                                                   [this](const Eigen::VectorXd& t_y,
-                                                          Eigen::VectorXd& t_dyds,
-                                                          const double t_X){
-            /*  Preprocessing    */
-            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
-
-            //  Get the strains for the rod
-            const Eigen::VectorXd Xi      = BPhi*m_qe + m_constant_strain;
-            const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
-            const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
-
-            t_dyds = this->backwardODEs(t_y, Xi, dot_Xi, ddot_Xi, BPhi, t_X);
-
-        }, m_backward_integration_state_X0,
-            m_Chebyshev_points.begin(),
-            m_Chebyshev_points.end(),
-            -m_dX,
-        [this, col=0](const Eigen::VectorXd& t_y, const double)mutable{
-//            m_IDM_states_stack.block(0, col++, m_backward_state_size, 1) = t_y;
-            m_IDM_states_observation.writeState(t_y, col++);
-        });
-
-        return m_IDM_states_observation;
-    }
+    Method stepper { Method() };
 
 
     void updateInternalActuation(const double &t_time)
@@ -556,51 +496,34 @@ public:
          *  | r  |   x, y, z                          4-6
          *  | η  |   Ω1, Ω2, Ω3, V1, V2, V3          7-12
          *  | η̇  |   Ω1, Ω2, Ω3, V1, V2, V3         13-18
-         *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    19-24
-         *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   25-30
-         *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
-         *  | Λ  |   C1, C2, C3, N1, N2, N3          37-42
-         *  | ∆Λ |   C1, C2, C3, N1, N2, N3          44+ne-49+ne
-         *  | ∆Qa|                                   50+ne-50+2ne
+         *  | Λ  |   C1, C2, C3, N1, N2, N3          19-24
+         *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    25-30
+         *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
+         *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   37-42
+         *  | ∆Λ |   C1, C2, C3, N1, N2, N3          43-48
+         *  | ∆Qa|                                   49-49+ne
          */
 
         Eigen::VectorXd Delta_Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
 
         Eigen::VectorXd Lambda_X1 = m_backward_integration_state_X1.block<6, 1>(19,0);
 
-        m_tangent_dynamics_state_X0 <<
-                      m_forward_tangent_kinematics_state_X1,
+        m_tangent_dynamics_state_X1 <<
+                      m_forward_tangent_kinematics_state_X1.block<19,1>(0,0),
                       Lambda_X1,
+                      m_forward_tangent_kinematics_state_X1.block<18,1>(19,0),
                       t_Delta_Lambda_X1,
                       Delta_Q1;
 
 
+        m_tangent_dynamics_state_X0 = m_tangent_dynamics_state_X1;
+
+
 
     //  Backward Integration
-        boost::numeric::odeint::integrate_adaptive(Method(),
-                                                   [this](const Eigen::VectorXd& t_y,
-                                                          Eigen::VectorXd& t_dyds,
-                                                          const double t_X){
-            /*  Preprocessing    */
-            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
-
-            //  Get the strains for the rod
-            const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
-            const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
-            const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
-
-
-            //  Get the strains for the rod
-            const ::LieAlgebra::Vector6d Delta_Xi      = BPhi*m_Delta_qe;
-            const ::LieAlgebra::Vector6d Delta_dot_Xi  = BPhi*m_Delta_dot_qe;
-            const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
-
-            t_dyds = this->tangentDynamicsODEs(t_y,
-                                               Xi, dot_Xi, ddot_Xi,
-                                               Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi,
-                                               BPhi, t_X);
-
-                                                          },
+        boost::numeric::odeint::integrate_adaptive(stepper,
+                                                   [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                    {this->tangentDynamicsODEs(t_y, t_dyds, t_s);},
                                                           m_tangent_dynamics_state_X0,
                                                           1.0,
                                                           0.0,
@@ -659,20 +582,9 @@ public:
         Eigen::MatrixXd rod_shapes_stack { Eigen::MatrixXd::Zero(3, m_number_of_Chebyshev_points) };
 
     //  Forward Integration with observer
-        boost::numeric::odeint::integrate_times(Method(),
-                                                [this](const Eigen::VectorXd& t_y, Eigen::VectorXd& t_dydX, const double t_s){
-
-            /*  Preprocessing    */
-            Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_s);
-
-            //  Get the strains for the rod
-            const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain;
-
-
-            t_dydX = this->forwardStaticODEs(t_y, Xi);
-
-
-        },
+        boost::numeric::odeint::integrate_times(stepper,
+                                                [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                 {this->forwardStaticODEs(t_y, t_dyds, t_s);},
         y,
         m_Chebyshev_points_reversed.begin(),
         m_Chebyshev_points_reversed.end(),
@@ -687,9 +599,84 @@ public:
 
 
 
+
+    FullODEStatesObservations getIDMStatesObservations()
+    {
+        /*  The backward state has the form
+         *  | Q |   w, x, y, z                  0-3
+         *  | r |   x, y, z                     4-6
+         *  | η |   Ω1, Ω2, Ω3, V1, V2, V3      7-12
+         *  | η̇ |   Ω1, Ω2, Ω3, V1, V2, V3     13-18
+         *  | Λ |   C1, C2, C3, N1, N2, N3     19-24
+         *  | Qa|                              25-(25+ne*na)
+         *
+         *
+         */
+
+        Eigen::VectorXd Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
+
+
+
+        m_backward_integration_state_X0 = m_backward_integration_state_X1;
+
+
+
+
+        //  Backward Integration
+        boost::numeric::odeint::integrate_times(stepper,
+                                                [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                 {this->backwardODEs(t_y, t_dyds, t_s);},
+            m_backward_integration_state_X0,
+            m_Chebyshev_points.begin(),
+            m_Chebyshev_points.end(),
+            -m_dX,
+        [this, col=m_number_of_Chebyshev_points](const Eigen::VectorXd& t_y, const double)mutable{
+            m_IDM_states_observation.writeState(t_y, --col);
+        });
+
+        return m_IDM_states_observation;
+    }
+
+
+
+
+
     FullODEStatesObservations getTIDMStatesObservations()
     {
+        /*  The state has the form
+         *  | Q  |   w, x, y, z                       0-3
+         *  | r  |   x, y, z                          4-6
+         *  | η  |   Ω1, Ω2, Ω3, V1, V2, V3          7-12
+         *  | η̇  |   Ω1, Ω2, Ω3, V1, V2, V3         13-18
+         *  | Λ  |   C1, C2, C3, N1, N2, N3          19-24
+         *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    25-30
+         *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
+         *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   37-42
+         *  | ∆Λ |   C1, C2, C3, N1, N2, N3          43-48
+         *  | ∆Qa|                                   49-49+ne
+         */
 
+        Eigen::VectorXd Delta_Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
+
+        Eigen::VectorXd Lambda_X1 = m_backward_integration_state_X1.block<6, 1>(19,0);
+
+        m_tangent_dynamics_state_X0 = m_tangent_dynamics_state_X1;
+
+
+
+        //  Backward Integration
+        boost::numeric::odeint::integrate_times(stepper,
+                                                [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                 {this->tangentDynamicsODEs(t_y, t_dyds, t_s);},
+            m_tangent_dynamics_state_X0,
+            m_Chebyshev_points.begin(),
+            m_Chebyshev_points.end(),
+            -m_dX,
+        [this, col=m_number_of_Chebyshev_points](const Eigen::VectorXd& t_y, const double)mutable{
+            m_TIDM_states_observation.writeState(t_y.block(25, 0, 24+m_generalised_coordinates_dimension, 1), --col);
+        });
+
+        return m_TIDM_states_observation;
     }
 
 
@@ -715,6 +702,10 @@ public:
     //    Eigen::MatrixXd m_IDM_states_stack { Eigen::MatrixXd::Zero(m_backward_state_size, m_number_of_Chebyshev_points) };
     FullODEStatesObservations m_IDM_states_observation { FullODEStatesObservations(m_number_of_Chebyshev_points,
                                                                                    m_generalised_coordinates_dimension) };
+
+    FullODEStatesObservations m_TIDM_states_observation { FullODEStatesObservations(m_number_of_Chebyshev_points,
+                                                                                    m_generalised_coordinates_dimension,
+                                                                                    {3, 1}) };
 
 
 };

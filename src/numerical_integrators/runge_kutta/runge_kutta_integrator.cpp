@@ -15,17 +15,28 @@ Eigen::Matrix4d getA(const Eigen::Vector3d t_k){
 }
 
 
-ExplicitIntegrationODEs::ExplicitIntegrationODEs(std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
-                        unsigned int t_generalised_coordinates_dimension)
+ExplicitIntegrationODEs::ExplicitIntegrationODEs(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
+                                                     std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
     : m_rod_properties(t_rod_properties),
-      m_generalised_coordinates_dimension(t_generalised_coordinates_dimension)
+      m_polynomial_representation(t_polynomial_representation)
 {}
 
 
 
+void ExplicitIntegrationODEs::forwardStaticODEs(const Eigen::VectorXd &t_y,
+                                                Eigen::VectorXd &t_dyds,
+                                                const double t_X) const
+{
+    /*  Preprocessing    */
+    Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
+    //  Get the strains for the rod
+    const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain;
 
-ExplicitIntegrationODEs::PoseState ExplicitIntegrationODEs::forwardStaticODEs(const PoseState &t_state,
+    t_dyds = forwardStaticStep(t_y, Xi);
+}
+
+ExplicitIntegrationODEs::PoseState ExplicitIntegrationODEs::forwardStaticStep(const PoseState &t_state,
                                                       const ::LieAlgebra::Vector6d &t_Xi) const
 {
     //  Decompose the strain
@@ -63,7 +74,26 @@ ExplicitIntegrationODEs::PoseState ExplicitIntegrationODEs::forwardStaticODEs(co
 
 }
 
-ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardODEs(const ExplicitIntegrationODEs::ForwardKinematicState &t_state,
+
+
+void ExplicitIntegrationODEs::forwardODEs(const Eigen::VectorXd &t_y,
+                                          Eigen::VectorXd &t_dyds,
+                                          const double t_X) const
+{
+    /*  Preprocessing    */
+    Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
+
+    //  Get the strains for the rod
+    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
+    const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
+    const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
+
+    t_dyds = forwardStep(t_y, Xi, dot_Xi, ddot_Xi);
+}
+
+
+
+ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardStep(const ExplicitIntegrationODEs::ForwardKinematicState &t_state,
                                                                               const ::LieAlgebra::Vector6d &t_Xi,
                                                                               const ::LieAlgebra::Vector6d &t_dot_Xi,
                                                                               const ::LieAlgebra::Vector6d &t_ddot_Xi) const
@@ -86,7 +116,7 @@ ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardO
     const auto ad_dot_Xi = ::LieAlgebra::ad(t_dot_Xi);
 
     //  Actual ODE
-    const ExplicitIntegrationODEs::PoseState g_prime = forwardStaticODEs(g, t_Xi);
+    const ExplicitIntegrationODEs::PoseState g_prime = forwardStaticStep(g, t_Xi);
     const ::LieAlgebra::Vector6d eta_prime = - ad_Xi*eta + t_dot_Xi;
     const ::LieAlgebra::Vector6d eta_dot_prime = - ad_Xi*eta_dot - ad_dot_Xi*eta + t_ddot_Xi;
 
@@ -138,7 +168,26 @@ ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardO
 
 
 
-Eigen::VectorXd ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y,
+
+void ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y,
+                                          Eigen::VectorXd &t_dyds,
+                                          const double t_X) const
+{
+    /*  Preprocessing    */
+    Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
+
+    //  Get the strains for the rod
+    const Eigen::VectorXd Xi      = BPhi*m_qe + m_constant_strain;
+    const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
+    const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
+
+    t_dyds = backwardStep(t_y, Xi, dot_Xi, ddot_Xi, BPhi, t_X);
+}
+
+
+
+
+Eigen::VectorXd ExplicitIntegrationODEs::backwardStep(const Eigen::VectorXd &t_y,
                                                    const ::LieAlgebra::Vector6d &t_Xi,
                                                    const ::LieAlgebra::Vector6d &t_dot_Xi,
                                                    const ::LieAlgebra::Vector6d &t_ddot_Xi,
@@ -169,7 +218,7 @@ Eigen::VectorXd ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y
 
 
     //  Actual ODE
-    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state_prime = forwardODEs(kinematic_state, t_Xi, t_dot_Xi, t_ddot_Xi);
+    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state_prime = forwardStep(kinematic_state, t_Xi, t_dot_Xi, t_ddot_Xi);
 
 
     const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_y[0], t_y[1],t_y[2], t_y[3]),
@@ -187,9 +236,31 @@ Eigen::VectorXd ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y
     return dyds;
 }
 
+void ExplicitIntegrationODEs::tangentKinematicsODEs(const Eigen::VectorXd &t_y,
+                                          Eigen::VectorXd &t_dyds,
+                                          const double t_X)const
+{
+    /*  Preprocessing    */
+    Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
+
+    //  Get the strains for the rod
+    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
+    const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
+    const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
 
-ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentKinematicsODEs(const ExplicitIntegrationODEs::TangentKinematicState &t_state,
+    //  Get the strains for the rod
+    const ::LieAlgebra::Vector6d Delta_Xi      = BPhi*m_Delta_qe;
+    const ::LieAlgebra::Vector6d Delta_dot_Xi  = BPhi*m_Delta_dot_qe;
+    const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
+
+
+    t_dyds = tangentKinematicsStep(t_y, Xi, dot_Xi, ddot_Xi, Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi);
+}
+
+
+
+ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentKinematicsStep(const ExplicitIntegrationODEs::TangentKinematicState &t_state,
                                                                                         const ::LieAlgebra::Vector6d &t_Xi,
                                                                                         const ::LieAlgebra::Vector6d &t_dot_Xi,
                                                                                         const ::LieAlgebra::Vector6d &t_ddot_Xi,
@@ -226,7 +297,7 @@ ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentK
     const auto ad_dot_eta = ::LieAlgebra::ad(dot_eta);
 
 
-    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state_prime = forwardODEs(kinematic_state, t_Xi, t_dot_Xi, t_ddot_Xi);
+    const ExplicitIntegrationODEs::ForwardKinematicState kinematic_state_prime = forwardStep(kinematic_state, t_Xi, t_dot_Xi, t_ddot_Xi);
     const ::LieAlgebra::Vector6d Delta_zeta_prime =
             - ad_Xi*Delta_zeta + t_Delta_Xi;
     const ::LieAlgebra::Vector6d Delta_eta_prime =
@@ -248,7 +319,47 @@ ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentK
 }
 
 
-Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_state,
+
+void ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_y,
+                                          Eigen::VectorXd &t_dyds,
+                                          const double t_X)const
+{
+    /*  The state has the form
+     *  | Q  |   w, x, y, z                       0-3
+     *  | r  |   x, y, z                          4-6
+     *  | η  |   Ω1, Ω2, Ω3, V1, V2, V3          7-12
+     *  | η̇  |   Ω1, Ω2, Ω3, V1, V2, V3         13-18
+     *  | Λ  |   C1, C2, C3, N1, N2, N3          19-24
+     *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    25-30
+     *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
+     *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   37-42
+     *  | ∆Λ |   C1, C2, C3, N1, N2, N3          43-48
+     *  | ∆Qa|                                   59-59+ne
+     */
+
+    /*  Preprocessing    */
+    Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
+
+    //  Get the strains for the rod
+    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
+    const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
+    const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
+
+
+    //  Get the strains for the rod
+    const ::LieAlgebra::Vector6d Delta_Xi      = BPhi*m_Delta_qe;
+    const ::LieAlgebra::Vector6d Delta_dot_Xi  = BPhi*m_Delta_dot_qe;
+    const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
+
+    t_dyds = tangentDynamicsStep(t_y,
+                                       Xi, dot_Xi, ddot_Xi,
+                                       Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi,
+                                       BPhi, t_X);
+}
+
+
+
+Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsStep(const Eigen::VectorXd &t_state,
                                                           const ::LieAlgebra::Vector6d &t_Xi,
                                                           const ::LieAlgebra::Vector6d &t_dot_Xi,
                                                           const ::LieAlgebra::Vector6d &t_ddot_Xi,
@@ -264,26 +375,30 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::Vector
      *  | r  |   x, y, z                          4-6
      *  | η  |   Ω1, Ω2, Ω3, V1, V2, V3          7-12
      *  | η̇  |   Ω1, Ω2, Ω3, V1, V2, V3         13-18
-     *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    19-24
-     *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   25-30
-     *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
-     *  | Λ  |   C1, C2, C3, N1, N2, N3          37-42
+     *  | Λ  |   C1, C2, C3, N1, N2, N3          19-24
+     *  | ∆ζ |  ∆K1, ∆K2, ∆K3, ∆Γ1, ∆Γ2, ∆Γ3    25-30
+     *  | ∆η |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   31-36
+     *  | ∆η̇ |  ∆Ω1, ∆Ω2, ∆Ω3, ∆V1, ∆V2, ∆V3   37-42
      *  | ∆Λ |   C1, C2, C3, N1, N2, N3          43-48
      *  | ∆Qa|                                   49-49+ne
      */
 
 
     //  Unpack state vector
-    const ExplicitIntegrationODEs::TangentKinematicState tangent_kinematic_state = t_state.block<37,1>(0,0);
+    ExplicitIntegrationODEs::TangentKinematicState tangent_kinematic_state;
+    tangent_kinematic_state << t_state.block<19,1>(0, 0), t_state.block<18,1>(25, 0);
+
+
+    const ::LieAlgebra::Vector6d Lambda = t_state.block<6, 1>(19,0);
+
     const ::LieAlgebra::Vector6d eta = t_state.block<6,1>(7,0);
     const ::LieAlgebra::Vector6d dot_eta = t_state.block<6,1>(13,0);
 
-    const ::LieAlgebra::Vector6d Delta_zeta    = t_state.block<6,1>(19,0);
-    const ::LieAlgebra::Vector6d Delta_eta     = t_state.block<6,1>(25,0);
-    const ::LieAlgebra::Vector6d Delta_dot_eta = t_state.block<6,1>(31,0);
+    const ::LieAlgebra::Vector6d Delta_zeta    = t_state.block<6,1>(25,0);
+    const ::LieAlgebra::Vector6d Delta_eta     = t_state.block<6,1>(31,0);
+    const ::LieAlgebra::Vector6d Delta_dot_eta = t_state.block<6,1>(37,0);
 
 
-    const ::LieAlgebra::Vector6d Lambda = t_state.block<6, 1>(37,0);
     const ::LieAlgebra::Vector6d Delta_Lambda = t_state.block<6, 1>(43,0);
 
 
@@ -319,7 +434,7 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::Vector
 
 
 
-    const ExplicitIntegrationODEs::TangentKinematicState tangent_kinematic_state_prime = tangentKinematicsODEs(tangent_kinematic_state,
+    const ExplicitIntegrationODEs::TangentKinematicState tangent_kinematic_state_prime = tangentKinematicsStep(tangent_kinematic_state,
                                                                                       t_Xi, t_dot_Xi, t_ddot_Xi,
                                                                                       t_Delta_Xi, t_Delta_dot_Xi, t_Delta_ddot_Xi);
     const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_state[0], t_state[1],t_state[2], t_state[3]),
@@ -332,10 +447,12 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::Vector
 
     //  Packing state vector derivative
     Eigen::VectorXd dydx(49 + m_generalised_coordinates_dimension);
-    dydx <<  tangent_kinematic_state_prime,
+    dydx <<  tangent_kinematic_state_prime.block<19,1>(0,0),
              Lambda_prime,
+             tangent_kinematic_state_prime.block<18,1>(19,0),
              Delta_Lambda_prime,
              Delta_Qa_prime;
+
 
     dydx *= m_rod_length;
 
@@ -928,8 +1045,7 @@ RungeKuttaIntegrator::ForwardKinematicState RungeKuttaIntegrator::forwardODEs(co
                                                             const ::LieAlgebra::Matrix6d &t_ad_Xi,
                                                             const double &t_X)const
 {
-    if(t_X == 0 or t_X == 1.0)
-        return ::LieAlgebra::Vector6d::Zero();
+
 
 
     //  Some needed variables

@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
     const std::string path = "../../../MATLAB/test_different_modes/";
 
     std::array<bool, 6> admitted_deformations = {
-            true,
-            true,
+            false,
+            false,
             true,
             false,
             false,
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     writeToFile("deformations_stack", deformations_stack, path);
 
     std::vector<unsigned int> number_of_modes_stack {
-        2, 3, 5
+        /*2, */3/*, 5*/
     };
 
     Eigen::VectorXd ne_stack = Eigen::VectorXd::Zero(6);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, number_of_modes_stack);
 
     ::CROSP::rod_properties::RodDimensions rod_dimension;
-    rod_dimension.m_L = 1.33;
+    rod_dimension.m_L = 1.0;
     ::CROSP::CosseratRod<::CROSP::numerical_integrators::runge_kutta::ExplicitIntegrator<::CROSP::numerical_integrators::runge_kutta::runge_kutta_dopri5>> rod(polynomial_representation, number_of_Chebyshev_points, rod_dimension);
 
 
@@ -97,6 +97,8 @@ int main(int argc, char *argv[])
 
     rod.m_cosserat_rod_integrators->forwardKinematics();
 
+
+
     auto zeros_6x1 = ::LieAlgebra::Vector6d::Zero();
     rod.m_cosserat_rod_integrators->backwardDynamics(zeros_6x1);
 
@@ -125,9 +127,12 @@ int main(int argc, char *argv[])
 
     const unsigned int a = 400;
     const unsigned int b = 160000;
+//    const unsigned int a = 0;
+//    const unsigned int b = 160000;
 
     for(unsigned int i=0; i<ne; i++){
 
+        std::cout.flush();
         Delta_q.setZero();
         Delta_q[i] = 1;
 
