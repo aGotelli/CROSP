@@ -1,5 +1,5 @@
-#ifndef RUNGEKUTTAINTEGRATOR_HPP
-#define RUNGEKUTTAINTEGRATOR_HPP
+#ifndef EXPLICIT_METHOTDS_HPP
+#define EXPLICIT_METHOTDS_HPP
 
 
 
@@ -715,4 +715,4 @@ public:
 
 }   //  namespace CROSP::numerical_integrators::explicit_methods
 
-#endif // RUNGEKUTTAINTEGRATOR_HPP
+#endif // EXPLICIT_METHOTDS_HPP

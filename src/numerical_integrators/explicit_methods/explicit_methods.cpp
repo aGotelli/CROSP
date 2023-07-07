@@ -1,4 +1,4 @@
-#include "CROSP/numerical_integrators/runge_kutta/runge_kutta_integrator.hpp"
+#include "CROSP/numerical_integrators/explicit_methods/explicit_methods.hpp"
 
 #include <boost/numeric/odeint.hpp>
 

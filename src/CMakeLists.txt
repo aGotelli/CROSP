@@ -117,8 +117,8 @@ add_library(${PROJECT_NAME} SHARED
 
 
 
-                            include/${PROJECT_NAME}/numerical_integrators/runge_kutta/runge_kutta_integrator.hpp
-                            numerical_integrators/runge_kutta/runge_kutta_integrator.cpp
+                            include/${PROJECT_NAME}/numerical_integrators/explicit_methods/explicit_methods.hpp
+                            numerical_integrators/explicit_methods/explicit_methods.cpp
 
 
                             include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
