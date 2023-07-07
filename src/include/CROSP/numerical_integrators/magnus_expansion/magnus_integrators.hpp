@@ -15,6 +15,7 @@
 #include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
 
 
+#include "magnus_idm_integrators/magnus_idm_integrators.hpp"
 
 namespace CROSP::numerical_integrators::magnus_expansion {
 
@@ -22,8 +23,8 @@ namespace CROSP::numerical_integrators::magnus_expansion {
 struct MagnusIntegrators {
 
 
-    MagnusIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                      std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
+    MagnusIntegrators(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+                      std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
@@ -97,27 +98,18 @@ struct MagnusIntegrators {
     Eigen::MatrixXd getRodPositions()const;
 
 
-    std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
+    std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_Delta_strain_parameterisation_stack;
-
-
+    std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_Delta_strain_parameterisation_stack;
 
 
-    //  The set of integrators needed for the IDM
+    std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
 
 
-
-//    std::shared_ptr<magnus_idm_integrators::MagnusIDMIntegrators> m_inte;
-    //magnus_idm_integrators::IDMIntegrators m_idm;
-    //::CROSP::numerical_integrators::magnus_expansion::magnus_idm_integrators::IDMIntegrators m_idm;
-//    ::CROSP::numerical_integrators::magnus_expansion::idm_integrators::MagnusIDMIntSPtr m_idm_integrators;
-    //::CROSP::numerical_integrators::magnus_expansion::idm_integrators::MagnusIDMIntSPtr m_idm_integrators;
-
-    //std::shared_ptr<CROSP::numerical_integrators::magnus_expansion::idm_integrators::IDMIntegrators> m_idm_integrators;
-
-    //  The set of integrators needed for the TIDM
-//    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators;
+    std::shared_ptr<magnus_expansion::magnus_idm_integrators::MagnusIDMIntegrators> m_idm_integrators {
+        std::make_shared<magnus_expansion::magnus_idm_integrators::MagnusIDMIntegrators>(m_strain_parameterisation_stack,
+                                                                                          m_rod_properties)
+    };
 
 
 

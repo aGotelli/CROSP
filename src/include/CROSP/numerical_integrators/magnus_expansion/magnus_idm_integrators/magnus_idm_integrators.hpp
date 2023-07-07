@@ -495,14 +495,14 @@ struct MagnusIDMIntegrators {
 //    void updateIntegrationDomain(const double &t_upper_integration_limit=1.0f);
 };
 
-typedef std::shared_ptr<MagnusIDMIntegrators> MagnusIDMIntSPtr;
+//typedef std::shared_ptr<MagnusIDMIntegrators> MagnusIDMIntSPtr;
 
 
 
 }   //  namespace CROSP::numerical_integrators::magnus_expansion::magnus_idm_integrators
 
 
-std::shared_ptr<::CROSP::numerical_integrators::magnus_expansion::magnus_idm_integrators::MagnusIDMIntegrators> m_inte;
+//std::shared_ptr<::CROSP::numerical_integrators::magnus_expansion::magnus_idm_integrators::MagnusIDMIntegrators> m_inte;
 
 
 
