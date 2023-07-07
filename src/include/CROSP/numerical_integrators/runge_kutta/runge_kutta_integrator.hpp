@@ -13,6 +13,10 @@
 
 #include <boost/numeric/odeint.hpp>
 
+#include <regex>
+
+
+
 namespace CROSP::numerical_integrators::runge_kutta {
 
 
@@ -134,10 +138,39 @@ public:
 
 
 
-template<class Method=boost::numeric::odeint::runge_kutta_dopri5< Eigen::VectorXd, double,
-                                                                  Eigen::VectorXd, double,
-                                                                  boost::numeric::odeint::vector_space_algebra>>
+typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta_dopri5;
+
+typedef boost::numeric::odeint::runge_kutta4< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta4;
+
+
+typedef boost::numeric::odeint::bulirsch_stoer< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> bulirsch_stoer;
+
+typedef boost::numeric::odeint::runge_kutta_cash_karp54< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta_cash_karp54;
+
+typedef boost::numeric::odeint::euler< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> euler;
+
+
+typedef boost::numeric::odeint::modified_midpoint< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> modified_midpoint;
+
+
+
+
+template<class Method=runge_kutta_dopri5>
 class ExplicitIntegrator : public ExplicitIntegrationODEs {
+
+public:
 
     ExplicitIntegrator(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                        const unsigned int t_number_of_Chebyshev_points,
@@ -148,11 +181,68 @@ class ExplicitIntegrator : public ExplicitIntegrationODEs {
           m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
     {}
 
- polynomial_representation::PolynomialRepresentation m_polynomial_representation;
- ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
+    polynomial_representation::PolynomialRepresentation m_polynomial_representation;
+    ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
     unsigned int m_number_of_Chebyshev_points;
 
- double m_dX { 0.005 };
+    double m_dX { 0.005 };
+
+
+    std::string printIntegratorProperties()const
+    {
+
+        std::string method_type = typeid(Method()).name();
+
+
+
+//        std::regex lowercase_regex("[a-z_]+|(\\d(?![a-z-\\d]))");
+        std::regex lowercase_regex("[a-z_]+");
+        std::smatch match;
+
+        std::stringstream name;
+        while (std::regex_search(method_type, match, lowercase_regex)) {
+
+
+            if (match[0].str().find("igen") != std::string::npos)
+                break;
+            else
+                name << "::";
+//            char * p;
+//            std::strtol(match[0].str().c_str(), &p, 10);
+
+//            if (*p != 0)
+//                name << "::";
+
+
+
+
+            name << match[0];
+            method_type = match.suffix().str();
+        }
+
+
+        std::stringstream integrator_properties;
+        integrator_properties << "Stepper integrator\n"
+                              << typeid(Method()).name() << "\n"
+                                 "      Method : " << name.str() << "   Order : " << Method().order() << "\n"
+                                 "      Adaptive step with initial value of : " << m_dX << " m";
+
+        return integrator_properties.str();
+
+    }
+
+
+    void forwardKinematics()
+    {
+        forwardKinematics(Eigen::Vector4d(1, 0, 0, 0),
+                          Eigen::Vector3d::Zero(),
+                          Eigen::Vector3d::Zero(),
+                          Eigen::Vector3d::Zero(),
+                          Eigen::Vector3d::Zero(),
+                          Eigen::Vector3d::Zero());
+    }
+
+
     void forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
                            const Eigen::Vector3d &t_initial_position,
                            const Eigen::Vector3d &t_initial_angular_velocity,
@@ -163,11 +253,11 @@ class ExplicitIntegrator : public ExplicitIntegrationODEs {
 
         ExplicitIntegrationODEs::ForwardKinematicState forward_integration_state;
         forward_integration_state << t_initial_quaternion,
-             t_initial_position,
-             t_initial_angular_velocity,
-             t_initial_linear_velocity,
-             t_initial_angular_acceleration,
-             t_initial_linear_acceleration;
+                t_initial_position,
+                t_initial_angular_velocity,
+                t_initial_linear_velocity,
+                t_initial_angular_acceleration,
+                t_initial_linear_acceleration;
 
         //  Save a track of the state
         m_forward_integration_state_X0 = forward_integration_state;
@@ -176,10 +266,9 @@ class ExplicitIntegrator : public ExplicitIntegrationODEs {
 
 
 
-        boost::numeric::odeint::integrate_adaptive(Method(),
-                                                   [this](const Eigen::VectorXd &t_y,
-                                                          Eigen::VectorXd &t_dyds,
-                                                          const double t_X){
+        boost::numeric::odeint::integrate_adaptive(Method(), [this](const Eigen::VectorXd &t_y,
+                                                                    Eigen::VectorXd &t_dyds,
+                                                                    const double t_X){
             /*  Preprocessing    */
             Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
@@ -190,11 +279,10 @@ class ExplicitIntegrator : public ExplicitIntegrationODEs {
 
             t_dyds = this->forwardODEs(t_y, Xi, dot_Xi, ddot_Xi);
 
-                                                    },
-                                                    forward_integration_state,
-                                                    0.0,
-                                                    1.0,
-                                                    m_dX);
+        }, forward_integration_state,
+            0.0,
+            1.0,
+            m_dX);
 
 
         //  Save a track of the state

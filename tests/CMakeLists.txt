@@ -88,6 +88,17 @@ target_compile_definitions(test_with_MATLAB
         DEVELOPER
 )
 
+add_executable(test_tmp_stepper test_tmp_stepper.cpp)
+target_link_libraries(test_tmp_stepper
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+)
+target_compile_definitions(test_tmp_stepper
+    PRIVATE
+        DEVELOPER
+)
+
 #add_executable(test_with_MATLAB_runge_kutta test_with_MATLAB_runge_kutta.cpp)
 #target_link_libraries(test_with_MATLAB_runge_kutta
 #    PRIVATE
