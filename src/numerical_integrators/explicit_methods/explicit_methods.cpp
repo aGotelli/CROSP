@@ -1,9 +1,39 @@
 #include "CROSP/numerical_integrators/explicit_methods/explicit_methods.hpp"
 
-#include <boost/numeric/odeint.hpp>
 
+#include <regex>
 
 namespace CROSP::numerical_integrators::explicit_methods {
+
+
+
+
+std::string extractBoostSignatureFromtypeid(std::string t_method_type)
+{
+
+    std::regex lowercase_regex("[a-z_]+");
+    std::smatch match;
+
+    std::stringstream name;
+    while (std::regex_search(t_method_type, match, lowercase_regex)) {
+
+
+        if (match[0].str().find("igen") != std::string::npos)
+            break;
+        else
+            name << "::";
+
+
+        name << match[0];
+        t_method_type = match.suffix().str();
+    }
+
+    return name.str();
+
+}
+
+
+
 
 Eigen::Matrix4d getA(const Eigen::Vector3d t_k){
     Eigen::Matrix4d A;
@@ -147,9 +177,6 @@ ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardS
                                                             const ::LieAlgebra::Matrix6d &t_ad_Xi,
                                                             const double &t_X)const
 {
-    if(t_X == 0 or t_X == 1.0)
-        return ::LieAlgebra::Vector6d::Zero();
-
 
     //  Some needed variables
     const Eigen::Matrix3d R = t_Q.toRotationMatrix();
@@ -458,6 +485,29 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsStep(const Eigen::Vector
     dydx *= m_rod_length;
 
     return dydx;
+}
+
+
+
+void ExplicitIntegrationODEs::distributedActuationODE(const Eigen::VectorXd &,
+                                                     Eigen::VectorXd &t_dyds,
+                                                     const double t_X)const
+{
+    /*  Preprocessing    */
+    Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
+
+    //  Get the strains for the rod
+    const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain;
+
+
+    //  Decompose the strain
+    const Eigen::Vector3d K = Xi.block<3,1>(0,0);
+    const Eigen::Vector3d Gamma = Xi.block<3,1>(3,0);
+
+
+    t_dyds = m_distributed_actuation.getInternalActuatedStresses(K,
+                                                        Gamma,
+                                                        BPhi);
 }
 
 

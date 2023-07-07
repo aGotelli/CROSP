@@ -13,7 +13,8 @@
 
 #include <boost/numeric/odeint.hpp>
 
-#include <regex>
+
+#include "ATORS/ATORS.hpp"
 
 
 
@@ -49,7 +50,7 @@ typedef boost::numeric::odeint::modified_midpoint< Eigen::VectorXd, double,
 
 
 
-
+std::string extractBoostSignatureFromtypeid(std::string t_method_type);
 
 /*!
  * \brief The RungeKuttaIntegrator class provides a numeric integrator for the Cosserat IDM and TIDM using the standard Runge-Kutta integrator
@@ -104,7 +105,9 @@ public:
 
 
 
-
+    void distributedActuationODE(const Eigen::VectorXd &t_y,
+                                 Eigen::VectorXd &t_dyds,
+                                 const double t_X)const;
 
 private:
 
@@ -177,6 +180,7 @@ private:
 
 
 
+
 protected:
 
     double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
@@ -216,6 +220,9 @@ protected:
     Eigen::VectorXd m_tangent_dynamics_state_X1 { Eigen::VectorXd::Zero(49+m_generalised_coordinates_dimension) };
 
 
+    ::ATORS::tendon_driven_actuation::TendonDrivenActuation m_distributed_actuation;
+
+    Eigen::VectorXd m_Qad_X0 { Eigen::VectorXd::Zero(25+m_generalised_coordinates_dimension) };
 
 };
 
@@ -248,32 +255,12 @@ public:
     std::string printIntegratorProperties()const
     {
 
-        std::string method_type = typeid(Method()).name();
-
-
-
-//        std::regex lowercase_regex("[a-z_]+|(\\d(?![a-z-\\d]))");
-        std::regex lowercase_regex("[a-z_]+");
-        std::smatch match;
-
-        std::stringstream name;
-        while (std::regex_search(method_type, match, lowercase_regex)) {
-
-
-            if (match[0].str().find("igen") != std::string::npos)
-                break;
-            else
-                name << "::";
-
-
-            name << match[0];
-            method_type = match.suffix().str();
-        }
+        std::string method_type =  extractBoostSignatureFromtypeid( typeid(Method()).name() );
 
 
         std::stringstream integrator_properties;
         integrator_properties << "Stepper integrator\n"
-                                 "      Method : " << name.str() << "   Order : " << Method().order() << "\n"
+                                 "      Method : " << method_type << "   Order : " << Method().order() << "\n"
                                  "      Adaptive step with initial value of : " << m_dX << "\n"
                                  "Integration domain : [0, 1]\n"
                                  "Observerving using : " << m_number_of_Chebyshev_points << " Chebyshev points";
@@ -500,12 +487,25 @@ public:
 
     void updateInternalActuation(const double &t_time)
     {
+        m_distributed_actuation.updateActuation(t_time);
 
+        m_Qad_X0.setZero();
+
+
+
+        //  Backward Integration
+        boost::numeric::odeint::integrate_adaptive(stepper,
+                                                   [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                    {this->distributedActuationODE(t_y, t_dyds, t_s);},
+                                                    m_Qad_X0,
+                                                    1.0,
+                                                    0.0,
+                                                    -m_dX);
     }
 
     Eigen::VectorXd getQad() const
     {
-
+        return m_Qad_X0;
     }
 
 
