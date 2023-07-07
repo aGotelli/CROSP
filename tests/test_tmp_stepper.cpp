@@ -8,7 +8,7 @@
 
 
 
-using namespace ::CROSP::numerical_integrators::runge_kutta;
+using namespace ::CROSP::numerical_integrators::explicit_methods;
 
 int main(int argc, char *argv[])
 {
