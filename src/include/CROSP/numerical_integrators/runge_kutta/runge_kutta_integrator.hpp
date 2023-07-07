@@ -167,6 +167,11 @@ typedef boost::numeric::odeint::modified_midpoint< Eigen::VectorXd, double,
 
 
 
+
+
+
+
+
 template<class Method=runge_kutta_dopri5>
 class ExplicitIntegrator : public ExplicitIntegrationODEs {
 
@@ -223,9 +228,10 @@ public:
 
         std::stringstream integrator_properties;
         integrator_properties << "Stepper integrator\n"
-                              << typeid(Method()).name() << "\n"
                                  "      Method : " << name.str() << "   Order : " << Method().order() << "\n"
-                                 "      Adaptive step with initial value of : " << m_dX << " m";
+                                 "      Adaptive step with initial value of : " << m_dX << "\n"
+                                 "Integration domain : [0, 1]\n"
+                                 "Observerving using : " << m_number_of_Chebyshev_points << " Chebyshev points";
 
         return integrator_properties.str();
 
