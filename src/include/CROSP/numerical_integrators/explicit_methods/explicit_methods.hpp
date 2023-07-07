@@ -20,6 +20,37 @@
 namespace CROSP::numerical_integrators::explicit_methods {
 
 
+
+typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta_dopri5;
+
+typedef boost::numeric::odeint::runge_kutta4< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta4;
+
+
+typedef boost::numeric::odeint::bulirsch_stoer< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> bulirsch_stoer;
+
+typedef boost::numeric::odeint::runge_kutta_cash_karp54< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta_cash_karp54;
+
+typedef boost::numeric::odeint::euler< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> euler;
+
+
+typedef boost::numeric::odeint::modified_midpoint< Eigen::VectorXd, double,
+                                                    Eigen::VectorXd, double,
+                                                    boost::numeric::odeint::vector_space_algebra> modified_midpoint;
+
+
+
+
+
 /*!
  * \brief The RungeKuttaIntegrator class provides a numeric integrator for the Cosserat IDM and TIDM using the standard Runge-Kutta integrator
  */
@@ -46,19 +77,45 @@ public:
                            Eigen::VectorXd &t_dyds,
                            const double t_X) const;
 
-    PoseState forwardStaticStep(const PoseState &t_state,
-                                const ::LieAlgebra::Vector6d &t_Xi) const;
+
 
 
     void forwardODEs(const Eigen::VectorXd &t_y,
                            Eigen::VectorXd &t_dyds,
                            const double t_X) const;
 
+
+
+    void backwardODEs(const Eigen::VectorXd &t_y,
+                                              Eigen::VectorXd &t_dyds,
+                                              const double t_X)const;
+
+    [[deprecated("This function does not work.. there is a bug in Delta_dot_V")]]
+    void tangentKinematicsODEs(const Eigen::VectorXd &t_y,
+                                              Eigen::VectorXd &t_dyds,
+                                              const double t_X)const;
+
+
+    void tangentDynamicsODEs(const Eigen::VectorXd &t_y,
+                                              Eigen::VectorXd &t_dyds,
+                                              const double t_X)const;
+
+
+
+
+
+
+
+private:
+
+    PoseState forwardStaticStep(const PoseState &t_state,
+                                const ::LieAlgebra::Vector6d &t_Xi) const;
+
+
     ForwardKinematicState forwardStep(const ForwardKinematicState &t_state,
                                       const ::LieAlgebra::Vector6d &t_Xi,
                                       const ::LieAlgebra::Vector6d &t_dot_Xi,
                                       const ::LieAlgebra::Vector6d &t_ddot_Xi) const;
-
 
 
 
@@ -70,9 +127,8 @@ public:
                                           const double &t_X)const;
 
 
-    void backwardODEs(const Eigen::VectorXd &t_y,
-                                              Eigen::VectorXd &t_dyds,
-                                              const double t_X)const;
+
+
 
     Eigen::VectorXd backwardStep(const Eigen::VectorXd &t_state,
                                  const ::LieAlgebra::Vector6d &t_Xi,
@@ -85,10 +141,6 @@ public:
 
 
 
-    void tangentKinematicsODEs(const Eigen::VectorXd &t_y,
-                                              Eigen::VectorXd &t_dyds,
-                                              const double t_X)const;
-
 
     TangentKinematicState tangentKinematicsStep(const TangentKinematicState &t_state,
                                                 const ::LieAlgebra::Vector6d &t_Xi,
@@ -97,11 +149,6 @@ public:
                                                 const ::LieAlgebra::Vector6d &t_Delta_Xi,
                                                 const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
                                                 const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi) const;
-
-
-    void tangentDynamicsODEs(const Eigen::VectorXd &t_y,
-                                              Eigen::VectorXd &t_dyds,
-                                              const double t_X)const;
 
 
 
@@ -115,18 +162,26 @@ public:
                                         const Eigen::MatrixXd &t_BPhi,
                                         const double &t_X)const;
 
+
+
+
+
+
     std::shared_ptr<const rod_properties::RodProperties> m_rod_properties;
-
-
-
-    double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
 
 
     polynomial_representation::PolynomialRepresentation m_polynomial_representation;
     ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
 
-    unsigned int m_generalised_coordinates_dimension { m_polynomial_representation.getCoordinatesDimension() };
 
+
+
+
+protected:
+
+    double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
+
+    unsigned int m_generalised_coordinates_dimension { m_polynomial_representation.getCoordinatesDimension() };
 
 
     Eigen::VectorXd m_qe { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
@@ -161,36 +216,9 @@ public:
     Eigen::VectorXd m_tangent_dynamics_state_X1 { Eigen::VectorXd::Zero(49+m_generalised_coordinates_dimension) };
 
 
+
 };
 
-
-
-
-typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::VectorXd, double,
-                                                    Eigen::VectorXd, double,
-                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta_dopri5;
-
-typedef boost::numeric::odeint::runge_kutta4< Eigen::VectorXd, double,
-                                                    Eigen::VectorXd, double,
-                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta4;
-
-
-typedef boost::numeric::odeint::bulirsch_stoer< Eigen::VectorXd, double,
-                                                    Eigen::VectorXd, double,
-                                                    boost::numeric::odeint::vector_space_algebra> bulirsch_stoer;
-
-typedef boost::numeric::odeint::runge_kutta_cash_karp54< Eigen::VectorXd, double,
-                                                    Eigen::VectorXd, double,
-                                                    boost::numeric::odeint::vector_space_algebra> runge_kutta_cash_karp54;
-
-typedef boost::numeric::odeint::euler< Eigen::VectorXd, double,
-                                                    Eigen::VectorXd, double,
-                                                    boost::numeric::odeint::vector_space_algebra> euler;
-
-
-typedef boost::numeric::odeint::modified_midpoint< Eigen::VectorXd, double,
-                                                    Eigen::VectorXd, double,
-                                                    boost::numeric::odeint::vector_space_algebra> modified_midpoint;
 
 
 
@@ -214,9 +242,7 @@ public:
     {}
 
 
-    unsigned int m_number_of_Chebyshev_points;
 
-    double m_dX { 0.001 };
 
 
     std::string printIntegratorProperties()const
@@ -445,7 +471,7 @@ public:
          *
          */
 
-        Eigen::VectorXd Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
+        Eigen::VectorXd Q1 = Eigen::VectorXd::Zero(m_generalised_coordinates_dimension);
 
 
         m_backward_integration_state_X1 <<
@@ -470,11 +496,6 @@ public:
 
     }
 
-
-
-
-
-    Method stepper { Method() };
 
 
     void updateInternalActuation(const double &t_time)
@@ -504,7 +525,7 @@ public:
          *  | ∆Qa|                                   49-49+ne
          */
 
-        Eigen::VectorXd Delta_Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
+        Eigen::VectorXd Delta_Q1 = Eigen::VectorXd::Zero(m_generalised_coordinates_dimension);
 
         Eigen::VectorXd Lambda_X1 = m_backward_integration_state_X1.block<6, 1>(19,0);
 
@@ -613,7 +634,7 @@ public:
          *
          */
 
-        Eigen::VectorXd Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
+        Eigen::VectorXd Q1 = Eigen::VectorXd::Zero(m_generalised_coordinates_dimension);
 
 
 
@@ -656,7 +677,7 @@ public:
          *  | ∆Qa|                                   49-49+ne
          */
 
-        Eigen::VectorXd Delta_Q1 = Eigen::VectorXd::Zero(m_polynomial_representation.getCoordinatesDimension(), 1);
+        Eigen::VectorXd Delta_Q1 = Eigen::VectorXd::Zero(m_generalised_coordinates_dimension);
 
         Eigen::VectorXd Lambda_X1 = m_backward_integration_state_X1.block<6, 1>(19,0);
 
@@ -680,7 +701,12 @@ public:
     }
 
 
+    unsigned int m_number_of_Chebyshev_points;
 
+    double m_dX { 0.001 };
+
+
+    Method stepper { Method() };
 
 
 
