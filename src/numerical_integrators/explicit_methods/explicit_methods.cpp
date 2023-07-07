@@ -208,7 +208,7 @@ void ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y,
     const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
     const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
 
-    t_dyds = backwardStep(t_y, Xi, dot_Xi, ddot_Xi, BPhi, t_X);
+    t_dyds = backwardStep(t_y, Xi, dot_Xi, ddot_Xi, BPhi);
 }
 
 
@@ -218,8 +218,7 @@ Eigen::VectorXd ExplicitIntegrationODEs::backwardStep(const Eigen::VectorXd &t_y
                                                    const ::LieAlgebra::Vector6d &t_Xi,
                                                    const ::LieAlgebra::Vector6d &t_dot_Xi,
                                                    const ::LieAlgebra::Vector6d &t_ddot_Xi,
-                                                   const Eigen::MatrixXd &t_BPhi,
-                                                   const double &t_X)const
+                                                   const Eigen::MatrixXd &t_BPhi)const
 {
     /*  The state has the form
      *  | Q |   w, x, y, z                  0-3
@@ -381,7 +380,7 @@ void ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_y,
     t_dyds = tangentDynamicsStep(t_y,
                                        Xi, dot_Xi, ddot_Xi,
                                        Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi,
-                                       BPhi, t_X);
+                                       BPhi);
 }
 
 
@@ -393,8 +392,7 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsStep(const Eigen::Vector
                                                           const ::LieAlgebra::Vector6d &t_Delta_Xi,
                                                           const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
                                                           const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
-                                                          const Eigen::MatrixXd &t_BPhi,
-                                                          const double &t_X)const
+                                                          const Eigen::MatrixXd &t_BPhi)const
 {
 
     /*  The state has the form

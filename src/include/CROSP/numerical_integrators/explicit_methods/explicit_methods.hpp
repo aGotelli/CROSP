@@ -142,8 +142,7 @@ private:
                                  const ::LieAlgebra::Vector6d &t_Xi,
                                  const ::LieAlgebra::Vector6d &t_dot_Xi,
                                  const ::LieAlgebra::Vector6d &t_ddot_Xi,
-                                 const Eigen::MatrixXd &t_BPhi,
-                                 const double &t_X)const;
+                                 const Eigen::MatrixXd &t_BPhi)const;
 
 
 
@@ -167,8 +166,7 @@ private:
                                         const ::LieAlgebra::Vector6d &t_Delta_Xi,
                                         const ::LieAlgebra::Vector6d &t_Delta_dot_Xi,
                                         const ::LieAlgebra::Vector6d &t_Delta_ddot_Xi,
-                                        const Eigen::MatrixXd &t_BPhi,
-                                        const double &t_X)const;
+                                        const Eigen::MatrixXd &t_BPhi)const;
 
 
 
@@ -239,7 +237,6 @@ protected:
 
 
 
-
 template<class Method=runge_kutta_dopri5>
 class ExplicitIntegrator : public ExplicitIntegrationODEs {
 
@@ -260,12 +257,12 @@ public:
     std::string printIntegratorProperties()const
     {
 
-        std::string method_type =  extractBoostSignatureFromtypeid( typeid(Method()).name() );
+        std::string method_type =  extractBoostSignatureFromtypeid( typeid(stepper).name() );
 
 
         std::stringstream integrator_properties;
         integrator_properties << "Stepper integrator\n"
-                                 "      Method : " << method_type << "   Order : " << Method().order() << "\n"
+                                 "      Method : " << method_type << "   Order : " << stepper.order() << "\n"
                                  "      Adaptive step with initial value of : " << m_dX << "\n"
                                  "Integration domain : [0, 1]\n"
                                  "Observerving using : " << m_number_of_Chebyshev_points << " Chebyshev points";

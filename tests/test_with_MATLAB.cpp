@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     ::CROSP::rod_properties::RodDimensions rod_dimension;
     rod_dimension.m_L = 1.0;
-    ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points, rod_dimension);
+    ::CROSP::CosseratRod<::CROSP::numerical_integrators::explicit_methods::ExplicitIntegrator<>> rod(polynomial_representation, number_of_Chebyshev_points, rod_dimension);
 
 
 
