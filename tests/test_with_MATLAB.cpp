@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
 //        ddot_q(i) = 0.2*(ne - i);
 //    }
 
-    q.setRandom();
-    dot_q.setRandom();
-    ddot_q.setRandom();
+//    q.setRandom();
+//    dot_q.setRandom();
+//    ddot_q.setRandom();
 
 
 //    dot_q(0) = 1;

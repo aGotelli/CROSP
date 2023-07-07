@@ -332,6 +332,7 @@ ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentK
             - ad_Xi*Delta_dot_eta - ad_Delta_dot_Xi*Delta_eta + ad_eta*t_Delta_dot_Xi + ad_dot_eta*t_Delta_Xi + t_Delta_ddot_Xi;
 
 
+
     //  Packing state vector derivative
     ExplicitIntegrationODEs::TangentKinematicState dydx;
     dydx <<  kinematic_state_prime,
