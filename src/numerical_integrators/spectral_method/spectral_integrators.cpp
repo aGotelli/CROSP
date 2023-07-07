@@ -323,6 +323,17 @@ FullODEStatesObservations SpectralIntegrators::getTIDMStatesObservations()
 
 }
 
+Eigen::MatrixXd SpectralIntegrators::integratePhiTPhi()const
+{
+    m_integrator_polynomial_base->solveSystem();
+
+    Eigen::VectorXd PhiTPhi = m_integrator_polynomial_base->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
+
+    unsigned int size = sqrt(PhiTPhi.size());
+
+    return Eigen::Map<Eigen::MatrixXd>(PhiTPhi.data(), size, size);
+}
+
 
 
 }   //  CROSP::numerical_integrators::spectral_method

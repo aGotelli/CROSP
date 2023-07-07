@@ -174,8 +174,7 @@ ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardS
                                                             const ::LieAlgebra::Vector6d &t_Lambda,
                                                             const ::LieAlgebra::Vector6d &t_eta,
                                                             const ::LieAlgebra::Vector6d &t_dot_eta,
-                                                            const ::LieAlgebra::Matrix6d &t_ad_Xi,
-                                                            const double &t_X)const
+                                                            const ::LieAlgebra::Matrix6d &t_ad_Xi)const
 {
 
     //  Some needed variables
@@ -250,7 +249,7 @@ Eigen::VectorXd ExplicitIntegrationODEs::backwardStep(const Eigen::VectorXd &t_y
 
 
     const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_y[0], t_y[1],t_y[2], t_y[3]),
-                                                                           Lambda, eta, dot_eta, ad_Xi, t_X);
+                                                                           Lambda, eta, dot_eta, ad_Xi);
     const Eigen::VectorXd Qa_prime = - t_BPhi.transpose()*Lambda;
 
     //  Packing state vector derivative
@@ -466,7 +465,7 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsStep(const Eigen::Vector
                                                                                       t_Xi, t_dot_Xi, t_ddot_Xi,
                                                                                       t_Delta_Xi, t_Delta_dot_Xi, t_Delta_ddot_Xi);
     const Eigen::VectorXd Lambda_prime = getLambdaPrime(Eigen::Quaterniond(t_state[0], t_state[1],t_state[2], t_state[3]),
-                                                                           Lambda, eta, dot_eta, ad_Xi, t_X);
+                                                                           Lambda, eta, dot_eta, ad_Xi);
     const ::LieAlgebra::Vector6d Delta_Lambda_prime =
             M*Delta_dot_eta - ad_eta.transpose()*M*Delta_eta - ad_Delta_eta.transpose()*M*eta + ad_Xi.transpose()*Delta_Lambda + ad_Delta_Xi.transpose()*Lambda - Delta_F_bar;
 
@@ -508,6 +507,17 @@ void ExplicitIntegrationODEs::distributedActuationODE(const Eigen::VectorXd &,
     t_dyds = m_distributed_actuation.getInternalActuatedStresses(K,
                                                         Gamma,
                                                         BPhi);
+}
+
+void ExplicitIntegrationODEs::PhiTPhiODE(const Eigen::VectorXd &,
+                Eigen::VectorXd &t_dyds,
+                const double t_X)const
+{
+    const auto Phi = m_polynomial_representation.getPhi( t_X );
+
+    Eigen::MatrixXd PhiTPhi = Phi.transpose()*Phi;
+
+    t_dyds = Eigen::Map<Eigen::VectorXd>(PhiTPhi.data(), PhiTPhi.size());
 }
 
 

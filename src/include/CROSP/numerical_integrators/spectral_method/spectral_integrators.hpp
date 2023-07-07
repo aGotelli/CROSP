@@ -6,6 +6,7 @@
 #include "idm_integrators/idm_integrators.hpp"
 #include "tidm_integrators/tidm_integrators.hpp"
 #include "internal_actuation/internal_actuation_integrator.hpp"
+#include "integration_polynomial_base/integration_polynomial_base.hpp"
 
 namespace CROSP::numerical_integrators::spectral_method {
 
@@ -98,6 +99,9 @@ struct SpectralIntegrators{
     FullODEStatesObservations getTIDMStatesObservations();
 
 
+    Eigen::MatrixXd integratePhiTPhi()const;
+
+
     std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
     std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_Delta_strain_parameterisation_stack;
@@ -114,6 +118,11 @@ struct SpectralIntegrators{
 
     std::unique_ptr<internal_actuation_integrator::InternalActuationIntegrator> m_internal_actuation_integrator {
         std::make_unique<internal_actuation_integrator::NullInternalActuationIntegrator>(m_strain_parameterisation_stack)
+    };
+
+
+    std::unique_ptr<integration_polynomial_base::InternalActuationIntegrator> m_integrator_polynomial_base {
+        std::make_unique<integration_polynomial_base::InternalActuationIntegrator>(m_strain_parameterisation_stack)
     };
 
 

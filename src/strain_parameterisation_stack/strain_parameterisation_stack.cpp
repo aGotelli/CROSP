@@ -43,6 +43,8 @@ StrainParameterisationStack::StrainParameterisationStack(const polynomial_repres
     for(unsigned int step=0; const auto point : Chebyshev_points){
             Phi = t_polynomial_representation.getPhi( point );
 
+            m_Phi_stack.push_back(Phi);
+
             row = step * BPhi.rows();
 
             m_B_Phi_stack.block(row, 0, BPhi.rows(), BPhi.cols()) = B*Phi;
@@ -109,6 +111,8 @@ StrainParameterisationStack::StrainParameterisationStack(const polynomial_repres
     unsigned int row;
     for(unsigned int step=0; const auto point : t_observation_points){
             Phi = t_polynomial_representation.getPhi( point );
+
+            m_Phi_stack.push_back(Phi);
 
             row = step * BPhi.rows();
 

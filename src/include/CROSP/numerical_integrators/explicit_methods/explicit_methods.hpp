@@ -109,6 +109,12 @@ public:
                                  Eigen::VectorXd &t_dyds,
                                  const double t_X)const;
 
+
+    void PhiTPhiODE(const Eigen::VectorXd &t_y,
+                    Eigen::VectorXd &t_dyds,
+                    const double t_X)const;
+
+
 private:
 
     PoseState forwardStaticStep(const PoseState &t_state,
@@ -126,8 +132,7 @@ private:
                                           const ::LieAlgebra::Vector6d &t_Lambda,
                                           const ::LieAlgebra::Vector6d &t_eta,
                                           const ::LieAlgebra::Vector6d &t_dot_eta,
-                                          const ::LieAlgebra::Matrix6d &t_ad_Xi,
-                                          const double &t_X)const;
+                                          const ::LieAlgebra::Matrix6d &t_ad_Xi)const;
 
 
 
@@ -698,6 +703,29 @@ public:
         });
 
         return m_TIDM_states_observation;
+    }
+
+
+
+    Eigen::MatrixXd integratePhiTPhi()const
+    {
+
+        Eigen::VectorXd PhiTPhi = Eigen::VectorXd(m_generalised_coordinates_dimension*m_generalised_coordinates_dimension);
+
+
+
+        boost::numeric::odeint::integrate_adaptive(stepper,
+                                                   [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                    {this->PhiTPhiODE(t_y, t_dyds, t_s);},
+                                                    PhiTPhi,
+                                                    0.0,
+                                                    1.0,
+                                                    m_dX);
+
+
+        return Eigen::Map<Eigen::MatrixXd>(PhiTPhi.data(),
+                                           m_generalised_coordinates_dimension,
+                                           m_generalised_coordinates_dimension);
     }
 
 

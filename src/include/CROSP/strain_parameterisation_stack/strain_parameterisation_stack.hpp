@@ -39,6 +39,8 @@ struct StrainParameterisationStack {
     StrainFunction m_Xi_c;
 
 
+    std::vector<Eigen::MatrixXd> m_Phi_stack;
+
     Eigen::MatrixXd m_B_Phi_stack;
 
     Eigen::MatrixXd m_Xi_stack;

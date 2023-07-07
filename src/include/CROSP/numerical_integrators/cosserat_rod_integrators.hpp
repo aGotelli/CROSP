@@ -222,6 +222,8 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
 
         FullODEStatesObservations() = integrator.getTIDMStatesObservations();
 
+        Eigen::MatrixXd() = integrator.integratePhiTPhi();
+
 };
 
 
