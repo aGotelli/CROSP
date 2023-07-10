@@ -64,7 +64,7 @@ void ExplicitIntegrationODEs::forwardStaticODEs(const Eigen::VectorXd &t_y,
     //  Get the strains for the rod
     const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain;
 
-    t_dyds = forwardStaticStep(t_y, Xi);
+    t_dyds = m_rod_length * forwardStaticStep(t_y, Xi);
 }
 
 ExplicitIntegrationODEs::PoseState ExplicitIntegrationODEs::forwardStaticStep(const PoseState &t_state,
@@ -99,7 +99,6 @@ ExplicitIntegrationODEs::PoseState ExplicitIntegrationODEs::forwardStaticStep(co
     dyds << Q_prime,
             r_prime;
 
-    dyds *= m_rod_length;
 
     return dyds;
 
@@ -119,7 +118,7 @@ void ExplicitIntegrationODEs::forwardODEs(const Eigen::VectorXd &t_y,
     const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
     const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
-    t_dyds = forwardStep(t_y, Xi, dot_Xi, ddot_Xi);
+    t_dyds = m_rod_length * forwardStep(t_y, Xi, dot_Xi, ddot_Xi);
 }
 
 
@@ -156,11 +155,9 @@ ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardS
     ExplicitIntegrationODEs::ForwardKinematicState dydx;
 
     //  Packing state vector derivative
-    dydx << m_rod_length*g_prime,
-            m_rod_length*eta_prime,
-            m_rod_length*eta_dot_prime;
-
-
+    dydx << g_prime,
+            eta_prime,
+            eta_dot_prime;
 
     return dydx;
 }
@@ -208,7 +205,7 @@ void ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y,
     const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
     const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
 
-    t_dyds = backwardStep(t_y, Xi, dot_Xi, ddot_Xi, BPhi);
+    t_dyds = m_rod_length * backwardStep(t_y, Xi, dot_Xi, ddot_Xi, BPhi);
 }
 
 
@@ -253,9 +250,9 @@ Eigen::VectorXd ExplicitIntegrationODEs::backwardStep(const Eigen::VectorXd &t_y
 
     //  Packing state vector derivative
     Eigen::VectorXd dyds(25 + m_generalised_coordinates_dimension);
-    dyds <<  m_rod_length*kinematic_state_prime,
-             m_rod_length*Lambda_prime,
-             m_rod_length*Qa_prime;
+    dyds <<  kinematic_state_prime,
+             Lambda_prime,
+             Qa_prime;
 
 
     return dyds;
@@ -280,7 +277,7 @@ void ExplicitIntegrationODEs::tangentKinematicsODEs(const Eigen::VectorXd &t_y,
     const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
 
 
-    t_dyds = tangentKinematicsStep(t_y, Xi, dot_Xi, ddot_Xi, Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi);
+    t_dyds = m_rod_length * tangentKinematicsStep(t_y, Xi, dot_Xi, ddot_Xi, Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi);
 }
 
 
@@ -333,10 +330,10 @@ ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentK
 
     //  Packing state vector derivative
     ExplicitIntegrationODEs::TangentKinematicState dydx;
-    dydx <<  m_rod_length*kinematic_state_prime,
-             m_rod_length*Delta_zeta_prime,
-             m_rod_length*Delta_eta_prime,
-             m_rod_length*Delta_dot_eta_prime;
+    dydx <<  kinematic_state_prime,
+             Delta_zeta_prime,
+             Delta_eta_prime,
+             Delta_dot_eta_prime;
 
 
     return dydx;
@@ -376,7 +373,7 @@ void ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_y,
     const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
 
 
-    t_dyds = tangentDynamicsStep(t_y,
+    t_dyds = m_rod_length * tangentDynamicsStep(t_y,
                                        Xi, dot_Xi, ddot_Xi,
                                        Delta_Xi, Delta_dot_Xi, Delta_ddot_Xi,
                                        BPhi);
@@ -471,11 +468,11 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsStep(const Eigen::Vector
 
     //  Packing state vector derivative
     Eigen::VectorXd dydx(49 + m_generalised_coordinates_dimension);
-    dydx <<  m_rod_length*tangent_kinematic_state_prime.block<19,1>(0,0),
-             m_rod_length*Lambda_prime,
-             m_rod_length*tangent_kinematic_state_prime.block<18,1>(19,0),
-             m_rod_length*Delta_Lambda_prime,
-             m_rod_length*Delta_Qa_prime;
+    dydx <<  tangent_kinematic_state_prime.block<19,1>(0,0),
+             Lambda_prime,
+             tangent_kinematic_state_prime.block<18,1>(19,0),
+             Delta_Lambda_prime,
+             Delta_Qa_prime;
 
 
 
@@ -500,7 +497,7 @@ void ExplicitIntegrationODEs::distributedActuationODE(const Eigen::VectorXd &,
     const Eigen::Vector3d Gamma = Xi.block<3,1>(3,0);
 
 
-    t_dyds = m_distributed_actuation.getInternalActuatedStresses(K,
+    t_dyds = m_rod_length * m_distributed_actuation.getInternalActuatedStresses(K,
                                                         Gamma,
                                                         BPhi);
 }
