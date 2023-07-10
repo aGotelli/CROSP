@@ -15,11 +15,11 @@ F_bar = [zeros(3,1);R'*[0;   0; -Const.rho*Aire*Gamma_g]];
 % F_bar = [zeros(3,1);R'*[0;   0; 0]];
 F_bar_prime = zeros(6,1);
 
-if X <= 0
-    F_bar       = zeros(6,1);
-    F_bar_prime = zeros(6,1);
-end
-if X >= Config.L
-    F_bar       = zeros(6,1);
-    F_bar_prime = zeros(6,1);
-end
+% if X <= 0
+%     F_bar       = zeros(6,1);
+%     F_bar_prime = zeros(6,1);
+% end
+% if X >= Config.L
+%     F_bar       = zeros(6,1);
+%     F_bar_prime = zeros(6,1);
+% end

@@ -267,8 +267,8 @@ Eigen::VectorXd InternalForcesIntegrator::computerParametersVectorAtPoint(const 
 
 Eigen::VectorXd InternalForcesIntegrator::computeDistributedForce(const unsigned int t_point) const
 {
-    if(t_point == 0 or t_point == m_strain_parameterisation_stack->m_number_of_points-1)
-        return Eigen::Vector3d::Zero();
+//    if(t_point == 0 or t_point == m_strain_parameterisation_stack->m_number_of_points-1)
+//        return Eigen::Vector3d::Zero();
 
     Eigen::Vector4d q(m_quaternion->getStateAtPoint(t_point));
 
