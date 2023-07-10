@@ -156,11 +156,11 @@ ExplicitIntegrationODEs::ForwardKinematicState ExplicitIntegrationODEs::forwardS
     ExplicitIntegrationODEs::ForwardKinematicState dydx;
 
     //  Packing state vector derivative
-    dydx << g_prime,
-            eta_prime,
-            eta_dot_prime;
+    dydx << m_rod_length*g_prime,
+            m_rod_length*eta_prime,
+            m_rod_length*eta_dot_prime;
 
-    dydx *= m_rod_length;
+
 
     return dydx;
 }
@@ -253,11 +253,10 @@ Eigen::VectorXd ExplicitIntegrationODEs::backwardStep(const Eigen::VectorXd &t_y
 
     //  Packing state vector derivative
     Eigen::VectorXd dyds(25 + m_generalised_coordinates_dimension);
-    dyds <<  kinematic_state_prime,
-             Lambda_prime,
-             Qa_prime;
+    dyds <<  m_rod_length*kinematic_state_prime,
+             m_rod_length*Lambda_prime,
+             m_rod_length*Qa_prime;
 
-    dyds *= m_rod_length;
 
     return dyds;
 }
@@ -331,27 +330,14 @@ ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentK
     const ::LieAlgebra::Vector6d Delta_dot_eta_prime =
             - ad_Xi*Delta_dot_eta - ad_dot_Xi*Delta_eta + ad_eta*t_Delta_dot_Xi + ad_dot_eta*t_Delta_Xi + t_Delta_ddot_Xi;
 
-    if(print){
-
-        std::cout << "  ad_Xi*Delta_dot_eta : \n" << ad_Xi*Delta_dot_eta << "\n\n";
-        std::cout << "  ad_Delta_dot_Xi*Delta_eta : \n" << ad_dot_Xi*Delta_eta << "\n\n";
-        std::cout << "  ad_Delta_dot_Xi : \n" << ad_dot_Xi << "\n\n";
-        std::cout << "  Delta_eta : \n" << Delta_eta << "\n\n";
-        std::cout << "  ad_eta*t_Delta_dot_Xi : \n" << ad_eta*t_Delta_dot_Xi << "\n\n";
-        std::cout << "  ad_dot_eta*t_Delta_Xi : \n" << ad_dot_eta*t_Delta_Xi << "\n\n";
-        std::cout << "  t_Delta_ddot_Xi : \n" << t_Delta_ddot_Xi << "\n\n\n";
-    }
-
-
 
     //  Packing state vector derivative
     ExplicitIntegrationODEs::TangentKinematicState dydx;
-    dydx <<  kinematic_state_prime,
-             Delta_zeta_prime,
-             Delta_eta_prime,
-             Delta_dot_eta_prime;
+    dydx <<  m_rod_length*kinematic_state_prime,
+             m_rod_length*Delta_zeta_prime,
+             m_rod_length*Delta_eta_prime,
+             m_rod_length*Delta_dot_eta_prime;
 
-    dydx *= m_rod_length;
 
     return dydx;
 }
@@ -389,14 +375,6 @@ void ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_y,
     const ::LieAlgebra::Vector6d Delta_dot_Xi  = BPhi*m_Delta_dot_qe;
     const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
 
-    if(t_X == 0.5){
-        std::cout << "Delta_qe :\n" << m_Delta_qe << "\n"
-                     "Delta_dot_qe :\n" << m_Delta_dot_qe << "\n"
-                     "Delta_ddot_qe :\n" << m_Delta_ddot_qe << "\n\n";
-        print = true;
-    }
-    else
-        print = false;
 
     t_dyds = tangentDynamicsStep(t_y,
                                        Xi, dot_Xi, ddot_Xi,
@@ -493,14 +471,13 @@ Eigen::VectorXd ExplicitIntegrationODEs::tangentDynamicsStep(const Eigen::Vector
 
     //  Packing state vector derivative
     Eigen::VectorXd dydx(49 + m_generalised_coordinates_dimension);
-    dydx <<  tangent_kinematic_state_prime.block<19,1>(0,0),
-             Lambda_prime,
-             tangent_kinematic_state_prime.block<18,1>(19,0),
-             Delta_Lambda_prime,
-             Delta_Qa_prime;
+    dydx <<  m_rod_length*tangent_kinematic_state_prime.block<19,1>(0,0),
+             m_rod_length*Lambda_prime,
+             m_rod_length*tangent_kinematic_state_prime.block<18,1>(19,0),
+             m_rod_length*Delta_Lambda_prime,
+             m_rod_length*Delta_Qa_prime;
 
 
-    dydx *= m_rod_length;
 
     return dydx;
 }

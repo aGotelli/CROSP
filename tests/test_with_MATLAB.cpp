@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, number_of_modes_stack);
 
     ::CROSP::rod_properties::RodDimensions rod_dimension;
-    rod_dimension.m_L = 1.0;
+    rod_dimension.m_L = 2.0;
     ::CROSP::CosseratRod<::CROSP::numerical_integrators::explicit_methods::ExplicitIntegrator<>> rod(polynomial_representation, number_of_Chebyshev_points, rod_dimension);
 
 
