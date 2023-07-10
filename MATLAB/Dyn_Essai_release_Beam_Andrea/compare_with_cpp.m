@@ -285,8 +285,8 @@ for i=1:Const.dim_base
 
     error_Delta_dot_V = Delta_dot_V_cpp - Delta_eta_dot_X(4:6, :, i);
     Delta_dot_V = Delta_eta_dot_X(4:6, :, i);
-    display(Delta_dot_V_cpp)
-    display(Delta_dot_V)
+%     display(Delta_dot_V_cpp)
+%     display(Delta_dot_V)
     error_Delta_dot_V_norms_stack = [error_Delta_dot_V_norms_stack norm(error_Delta_dot_V)];
 
 

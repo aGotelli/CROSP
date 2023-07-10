@@ -317,7 +317,7 @@ ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentK
 
     const auto ad_Xi = ::LieAlgebra::ad(t_Xi);
 
-    const auto ad_Delta_dot_Xi = ::LieAlgebra::ad(t_Delta_dot_Xi);
+    const auto ad_dot_Xi = ::LieAlgebra::ad(t_dot_Xi);
 
     const auto ad_eta = ::LieAlgebra::ad(eta);
     const auto ad_dot_eta = ::LieAlgebra::ad(dot_eta);
@@ -329,7 +329,18 @@ ExplicitIntegrationODEs::TangentKinematicState ExplicitIntegrationODEs::tangentK
     const ::LieAlgebra::Vector6d Delta_eta_prime =
             - ad_Xi*Delta_eta + ad_eta*t_Delta_Xi + t_Delta_dot_Xi;
     const ::LieAlgebra::Vector6d Delta_dot_eta_prime =
-            - ad_Xi*Delta_dot_eta - ad_Delta_dot_Xi*Delta_eta + ad_eta*t_Delta_dot_Xi + ad_dot_eta*t_Delta_Xi + t_Delta_ddot_Xi;
+            - ad_Xi*Delta_dot_eta - ad_dot_Xi*Delta_eta + ad_eta*t_Delta_dot_Xi + ad_dot_eta*t_Delta_Xi + t_Delta_ddot_Xi;
+
+    if(print){
+
+        std::cout << "  ad_Xi*Delta_dot_eta : \n" << ad_Xi*Delta_dot_eta << "\n\n";
+        std::cout << "  ad_Delta_dot_Xi*Delta_eta : \n" << ad_dot_Xi*Delta_eta << "\n\n";
+        std::cout << "  ad_Delta_dot_Xi : \n" << ad_dot_Xi << "\n\n";
+        std::cout << "  Delta_eta : \n" << Delta_eta << "\n\n";
+        std::cout << "  ad_eta*t_Delta_dot_Xi : \n" << ad_eta*t_Delta_dot_Xi << "\n\n";
+        std::cout << "  ad_dot_eta*t_Delta_Xi : \n" << ad_dot_eta*t_Delta_Xi << "\n\n";
+        std::cout << "  t_Delta_ddot_Xi : \n" << t_Delta_ddot_Xi << "\n\n\n";
+    }
 
 
 
@@ -377,6 +388,15 @@ void ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_y,
     const ::LieAlgebra::Vector6d Delta_Xi      = BPhi*m_Delta_qe;
     const ::LieAlgebra::Vector6d Delta_dot_Xi  = BPhi*m_Delta_dot_qe;
     const ::LieAlgebra::Vector6d Delta_ddot_Xi = BPhi*m_Delta_ddot_qe;
+
+    if(t_X == 0.5){
+        std::cout << "Delta_qe :\n" << m_Delta_qe << "\n"
+                     "Delta_dot_qe :\n" << m_Delta_dot_qe << "\n"
+                     "Delta_ddot_qe :\n" << m_Delta_ddot_qe << "\n\n";
+        print = true;
+    }
+    else
+        print = false;
 
     t_dyds = tangentDynamicsStep(t_y,
                                        Xi, dot_Xi, ddot_Xi,

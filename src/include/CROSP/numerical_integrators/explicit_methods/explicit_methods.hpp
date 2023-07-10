@@ -182,9 +182,11 @@ private:
 
 
 
-
+    mutable bool print = false;
 
 protected:
+
+
 
     double m_rod_length { m_rod_properties->m_rod_dimensions.m_L };
 
@@ -374,7 +376,7 @@ public:
         //  Save a track of the state
         m_forward_tangent_kinematics_state_X0 = tangent_kinematics_state;
 
-        std::cout << "tangent_kinematics_state X=0 : \n" <<  tangent_kinematics_state << "\n\n";
+//        std::cout << "tangent_kinematics_state X=0 : \n" <<  tangent_kinematics_state << "\n\n";
 
     //  Forward Integration
         boost::numeric::odeint::integrate_adaptive(stepper,
@@ -388,8 +390,8 @@ public:
         //  Save a track of the state
         m_forward_tangent_kinematics_state_X1 = tangent_kinematics_state;
 
-        std::cout << "tangent_kinematics_state X=1 : \n" <<  tangent_kinematics_state << "\n\n";
-        std::cout.flush();
+//        std::cout << "tangent_kinematics_state X=1 : \n" <<  tangent_kinematics_state << "\n\n";
+//        std::cout.flush();
     }
 
 
@@ -697,6 +699,7 @@ public:
             -m_dX,
         [this, col=m_number_of_Chebyshev_points](const Eigen::VectorXd& t_y, const double)mutable{
             m_TIDM_states_observation.writeState(t_y.block(25, 0, 24+m_generalised_coordinates_dimension, 1), --col);
+
         });
 
         return m_TIDM_states_observation;

@@ -208,14 +208,47 @@ Eigen::MatrixXd DeltaLinearAccelerations::computeMatrixAtChebyshevPoint(const un
 
 Eigen::VectorXd DeltaLinearAccelerations::computerParametersVectorAtPoint(const unsigned int t_point)
 {
-    return m_Delta_ddot_Gamma_stack->at(t_point)
-            - m_hat_Gamma_stack->at(t_point) * m_Delta_angular_acceleration_integrator->getStateAtPoint(t_point)
-            - m_hat_Delta_Gamma_stack->at(t_point) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
-            - m_hat_Delta_K_stack->at(t_point) * m_linear_acceleration_integrator->getStateAtPoint(t_point)
-            - m_hat_dot_Gamma_stack->at(t_point) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
-            - m_hat_dot_K_stack->at(t_point) * m_Delta_linear_velocity_integrator->getStateAtPoint(t_point)
-            - m_hat_Delta_dot_Gamma_stack->at(t_point) * m_angular_velocity_integrator->getStateAtPoint(t_point)
-            - m_hat_Delta_dot_K_stack->at(t_point) * m_linear_velocity_integrator->getStateAtPoint(t_point);
+//    return m_Delta_ddot_Gamma_stack->at(t_point)
+//            - m_hat_Gamma_stack->at(t_point) * m_Delta_angular_acceleration_integrator->getStateAtPoint(t_point)
+//            - m_hat_Delta_Gamma_stack->at(t_point) * m_angular_acceleration_integrator->getStateAtPoint(t_point)
+//            - m_hat_Delta_K_stack->at(t_point) * m_linear_acceleration_integrator->getStateAtPoint(t_point)
+//            - m_hat_dot_Gamma_stack->at(t_point) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point)
+//            - m_hat_dot_K_stack->at(t_point) * m_Delta_linear_velocity_integrator->getStateAtPoint(t_point)
+//            - m_hat_Delta_dot_Gamma_stack->at(t_point) * m_angular_velocity_integrator->getStateAtPoint(t_point)
+//            - m_hat_Delta_dot_K_stack->at(t_point) * m_linear_velocity_integrator->getStateAtPoint(t_point);
+
+    Eigen::Vector3d Gamma_Delta_dot_Omega = m_hat_Gamma_stack->at(t_point) * m_Delta_angular_acceleration_integrator->getStateAtPoint(t_point);
+    Eigen::Vector3d dot_Gamma_Delta_Omega = m_hat_dot_Gamma_stack->at(t_point) * m_Delta_angular_velocity_integrator->getStateAtPoint(t_point);
+    Eigen::Vector3d dot_K_Delta_V = m_hat_dot_K_stack->at(t_point) * m_Delta_linear_velocity_integrator->getStateAtPoint(t_point);
+    Eigen::Vector3d V_Delta_dot_K = - m_hat_Delta_dot_K_stack->at(t_point) * m_linear_velocity_integrator->getStateAtPoint(t_point);
+    Eigen::Vector3d Omega_Delta_dot_Gamma = - m_hat_Delta_dot_Gamma_stack->at(t_point) * m_angular_velocity_integrator->getStateAtPoint(t_point);
+    Eigen::Vector3d dot_V_Delta_K = - m_hat_Delta_K_stack->at(t_point) * m_linear_acceleration_integrator->getStateAtPoint(t_point);
+    Eigen::Vector3d dot_Omega_Delta_Gamma = - m_hat_Delta_dot_Gamma_stack->at(t_point) * m_angular_acceleration_integrator->getStateAtPoint(t_point);
+    Eigen::Vector3d ddot_Gamma = m_Delta_ddot_Gamma_stack->at(t_point);
+
+    if(t_point == 15)
+        std::cout << "Point : " << t_point << "\n"
+                     "  Gamma_Delta_dot_Omega : \n" << Gamma_Delta_dot_Omega << "\n"
+                     "  dot_Gamma_Delta_Omega : \n" << dot_Gamma_Delta_Omega << "\n"
+                     "  dot_K_Delta_V : \n" << dot_K_Delta_V << "\n"
+                     "  V_Delta_dot_K : \n" << V_Delta_dot_K << "\n"
+                     "  Omega_Delta_dot_Gamma : \n" << Omega_Delta_dot_Gamma << "\n"
+                     "  dot_V_Delta_K : \n" << dot_V_Delta_K << "\n"
+                     "  dot_Omega_Delta_Gamma : \n" << dot_Omega_Delta_Gamma << "\n"
+                     "  ddot_Gamma : \n" << ddot_Gamma << "\n"
+                     "\n\n";
+
+
+    Eigen::Vector3d b = - Gamma_Delta_dot_Omega
+            - dot_Gamma_Delta_Omega
+            - dot_K_Delta_V
+            + V_Delta_dot_K
+            + Omega_Delta_dot_Gamma
+            + dot_V_Delta_K
+            + dot_Omega_Delta_Gamma
+            + ddot_Gamma;
+
+    return b;
 }
 
 
