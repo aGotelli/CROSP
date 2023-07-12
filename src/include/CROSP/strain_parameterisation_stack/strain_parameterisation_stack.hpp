@@ -41,10 +41,10 @@ struct StrainParameterisationStack {
 
     Eigen::MatrixXd m_B_Phi_stack;
 
-    Eigen::MatrixXd m_Xi_stack;
-    Eigen::MatrixXd m_dot_Xi_stack;
-    Eigen::MatrixXd m_ddot_Xi_stack;
-    Eigen::MatrixXd m_Xi_c_stack;
+    Eigen::VectorXd m_Xi_stack;
+    Eigen::VectorXd m_dot_Xi_stack;
+    Eigen::VectorXd m_ddot_Xi_stack;
+    Eigen::VectorXd m_Xi_c_stack;
 
 
 

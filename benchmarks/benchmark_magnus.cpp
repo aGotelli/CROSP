@@ -73,6 +73,66 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
 };
 
 
+
+
+
+
+
+
+
+
+struct IntegratorSO3 : public ::OMNI::MagnusIntegratorSO3{
+
+    IntegratorSO3(const unsigned int t_number_of_Chebyshev_points,
+                std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack)
+        : ::OMNI::MagnusIntegratorSO3((t_number_of_Chebyshev_points-1)*3),
+          m_strain_parameterisation_stack(t_strain_parameterisation_stack),
+          m_interpolator(::Chebyshev::ChebyshevInterpolator(t_number_of_Chebyshev_points, this->m_quadrature_points))
+    {
+
+        for(unsigned int point=0; point<m_number_of_Chebyshev_points; point++){
+            this->m_A1_stack.push_back( m_strain_parameterisation_stack->m_Xi_stack.block<3,1>(point*6 +  0, 0) );
+            this->m_A2_stack.push_back( m_strain_parameterisation_stack->m_Xi_stack.block<3,1>(point*6 +  6, 0) );
+            this->m_A3_stack.push_back( m_strain_parameterisation_stack->m_Xi_stack.block<3,1>(point*6 + 12, 0) );
+        }
+
+    }
+
+
+
+
+
+    virtual Eigen::MatrixXd getStateAtQuadraturePoint(const unsigned int t_quadrature_point)const override
+    {
+        return m_quaternions_at_quadrature_points.col(t_quadrature_point);
+    }
+
+
+
+
+    std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
+
+
+    Eigen::MatrixXd m_quaternion_stack { Eigen::MatrixXd::Zero(4, this->m_number_of_Chebyshev_points) };
+
+    ::Chebyshev::ChebyshevInterpolator m_interpolator;
+
+    Eigen::MatrixXd m_quaternions_at_quadrature_points { Eigen::MatrixXd::Zero(4, m_interpolator.getNumberOfInterpolationPoints()) };
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct PositionIntegrator : public OSNI::ODEb {
 
     PositionIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
@@ -563,10 +623,10 @@ int main(int argc, char *argv[])
 
 
 
-    ::benchmark::RegisterBenchmark("Serial", [&](::benchmark::State &t_state){
+//    ::benchmark::RegisterBenchmark("Serial", [&](::benchmark::State &t_state){
 
 
-    }
+//    });
 
 //    ::benchmark::RegisterBenchmark("Serial", [&](::benchmark::State &t_state){
 
@@ -616,38 +676,7 @@ int main(int argc, char *argv[])
 
 
 
-    ::benchmark::RegisterBenchmark("Update", [&](::benchmark::State &t_state){
-
-        t_state.counters = {
-            {"ne", ne},
-            {"na", na},
-            {"Nc", number_of_Chebyshev_points}
-        };
-
-        while(t_state.KeepRunning()){
-
-
-            m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
-
-        }
-    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
-
-
-    Eigen::Vector3d K;
-    K << 1, 2, 3;
-
-    Eigen::Matrix3d V = Eigen::Matrix3d::Identity();
-
-
-    auto res = K.selfadjointView<Eigen::Upper>() * V;
-
-    std::cout << "res : \n" << res << std::endl;
-
-
-
-
-
-//    ::benchmark::RegisterBenchmark("Integration R", [&](::benchmark::State &t_state){
+//    ::benchmark::RegisterBenchmark("Update", [&](::benchmark::State &t_state){
 
 //        t_state.counters = {
 //            {"ne", ne},
@@ -655,23 +684,74 @@ int main(int argc, char *argv[])
 //            {"Nc", number_of_Chebyshev_points}
 //        };
 
-
-
-
-
-
-//        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
-
-
-
 //        while(t_state.KeepRunning()){
 
 
-//            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
-//            integrate_rotation_matrix->integrate(R_X0);
+//            m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
 
 //        }
 //    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+
+
+
+    ::benchmark::RegisterBenchmark("Integration R", [&](::benchmark::State &t_state){
+
+        t_state.counters = {
+            {"ne", ne},
+            {"na", na},
+            {"Nc", number_of_Chebyshev_points}
+        };
+
+
+
+
+
+
+        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+
+
+        while(t_state.KeepRunning()){
+
+
+            integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+            integrate_rotation_matrix->integrate(R_X0);
+
+        }
+    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
+
+
+    std::shared_ptr<IntegratorSO3> integrate_SO3 =
+            std::make_shared<IntegratorSO3>(number_of_Chebyshev_points, m_strain_parameterisation_stack);
+
+    ::benchmark::RegisterBenchmark("Integration SO3", [&](::benchmark::State &t_state){
+
+        t_state.counters = {
+            {"ne", ne},
+            {"na", na},
+            {"Nc", number_of_Chebyshev_points}
+        };
+
+
+
+
+
+
+
+        m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+
+
+        while(t_state.KeepRunning()){
+
+
+            integrate_SO3->computesCoefficientsMatricesAtQuadraturePoints();
+            integrate_SO3->integrate(R_X0);
+
+        }
+    })->Unit(::benchmark::kMicrosecond)->Repetitions(5);
 
 
 //    ::benchmark::RegisterBenchmark("Integrations FK", [&](::benchmark::State &t_state){
@@ -760,104 +840,123 @@ int main(int argc, char *argv[])
 
 //    }
 
-    ::benchmark::Initialize(&argc, argv);
+//    ::benchmark::Initialize(&argc, argv);
 
-    ::benchmark::RunSpecifiedBenchmarks();
+//    ::benchmark::RunSpecifiedBenchmarks();
 
-    return -64;
+//    return -64;
 
-    integrate_position->integrate(r_X0);
+//    integrate_position->integrate(r_X0);
 
-    Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-    Omega_integrator->integrate(Omega);
+//    Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//    Omega_integrator->integrate(Omega);
 
-    V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-    V_integrator->integrate(V_X0);
+//    V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//    V_integrator->integrate(V_X0);
 
-    dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-    dot_Omega_integrator->integrate(dot_Omega);
+//    dot_Omega_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//    dot_Omega_integrator->integrate(dot_Omega);
 
-    dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
-    dot_V_integrator->integrate(dot_V_X0);
-
-
-
-    auto strain_parameterisation =
-            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
-
-    ::CROSP::rod_properties::CircularCrossSection cs;
-    const double length = 1.0;
-    ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, length);
-
-    //  Now use it in rod properties
-    auto rod_properties =
-            std::make_shared<::CROSP::rod_properties::RodProperties>(strain_parameterisation,
-                                                                     rod_dimensions,
-                                                                     ::CROSP::rod_properties::MaterialProperties());
+//    dot_V_integrator->computesCoefficientsMatricesAtQuadraturePoints();
+//    dot_V_integrator->integrate(dot_V_X0);
 
 
 
+//    auto strain_parameterisation =
+//            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-    //  Variables related the perturbation of the strain parameterisation
-    std::shared_ptr<::CROSP::strain_parameterisation::StrainParameterisation> strain_parameterisation_Delta {
-        std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(strain_parameterisation,
-                                                                          ::LieAlgebra::Vector6d::Zero())
-    };
+//    ::CROSP::rod_properties::CircularCrossSection cs;
+//    const double length = 1.0;
+//    ::CROSP::rod_properties::RodDimensions rod_dimensions(&cs, length);
 
-    ::CROSP::numerical_integrators::spectral_method::IntegratorsSPtr m_cosserat_rod_integrators {
-      std::make_shared<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(strain_parameterisation,
-                                                                                             strain_parameterisation_Delta,
-                                                                                             rod_properties)
-    };
-
-    m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
-
-    m_cosserat_rod_integrators->forwardKinematics();
+//    //  Now use it in rod properties
+//    auto rod_properties =
+//            std::make_shared<::CROSP::rod_properties::RodProperties>(strain_parameterisation,
+//                                                                     rod_dimensions,
+//                                                                     ::CROSP::rod_properties::MaterialProperties());
 
 
-    const Eigen::MatrixXd Q_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
-    const Eigen::MatrixXd R_magnus   = integrate_rotation_matrix->getStackAsMatrix();
 
-    Eigen::MatrixXd Q_magnus = Eigen::MatrixXd::Zero(4, R_magnus.cols()/3);
-    for(unsigned int i=0; i<Q_magnus.cols(); i++){
-        Eigen::Quaterniond q(R_magnus.block<3, 3>(0,i*3));
-        Q_magnus.col(i) << q.w(), q.x(), q.y(), q.z();
+
+//    //  Variables related the perturbation of the strain parameterisation
+//    std::shared_ptr<::CROSP::strain_parameterisation::StrainParameterisation> strain_parameterisation_Delta {
+//        std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(strain_parameterisation,
+//                                                                          ::LieAlgebra::Vector6d::Zero())
+//    };
+
+//    ::CROSP::numerical_integrators::spectral_method::IntegratorsSPtr m_cosserat_rod_integrators {
+//      std::make_shared<::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>(strain_parameterisation,
+//                                                                                             strain_parameterisation_Delta,
+//                                                                                             rod_properties)
+//    };
+
+//    m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
+
+//    m_cosserat_rod_integrators->forwardKinematics();
+
+
+//    const Eigen::MatrixXd Q_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
+//    const Eigen::MatrixXd R_magnus   = integrate_rotation_matrix->getStackAsMatrix();
+//    const Eigen::MatrixXd R_SO3      = integrate_SO3->getStackAsMatrix();
+//    Eigen::MatrixXd R_sidebyside(R_magnus.rows(), 2*R_magnus.cols());
+//    R_sidebyside << R_magnus.transpose(), R_SO3.transpose();
+
+//    std::cout << "error orientation : \n" << R_sidebyside << "\n\n";
+
+    m_strain_parameterisation_stack->updateStrainParameterisation(q, dot_q, ddot_q);
+
+
+    integrate_rotation_matrix->computesCoefficientsMatricesAtQuadraturePoints();
+    integrate_rotation_matrix->integrate(R_X0);
+
+    integrate_SO3->computesCoefficientsMatricesAtQuadraturePoints();
+    integrate_SO3->integrate(R_X0);
+
+    for(unsigned int i=0; i<number_of_Chebyshev_points; i++){
+        std::cout << "error orientation : \n" << integrate_rotation_matrix->getStateAtPoint(i) << "\n" << integrate_SO3->getStateAtPoint(i) << "\n\n";
     }
-    std::cout << "Q_spectral:\n" << Q_spectral << "\n\n";
-    std::cout << "Q_magnus:\n" << Q_magnus << "\n\n";
-    std::cout << "error orientation : \n" << (Q_spectral - Q_magnus).norm() << "\n\n";
 
 
-    const Eigen::MatrixXd r_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_position->getStackAsMatrix();
-    const Eigen::MatrixXd r_magnus   = integrate_position->getStackAsMatrix();
-    std::cout << "r_spectral:\n" << r_spectral << "\n\n";
-    std::cout << "r_magnus:\n" << r_magnus << "\n\n";
-    std::cout << "error position : \n" << (r_spectral - r_magnus).norm() << "\n\n";
-    std::cout.flush();
+//    Eigen::MatrixXd Q_magnus = Eigen::MatrixXd::Zero(4, R_magnus.cols()/3);
+//    for(unsigned int i=0; i<Q_magnus.cols(); i++){
+//        Eigen::Quaterniond q(R_magnus.block<3, 3>(0,i*3));
+//        Q_magnus.col(i) << q.w(), q.x(), q.y(), q.z();
+//    }
+//    std::cout << "Q_spectral:\n" << Q_spectral << "\n\n";
+//    std::cout << "Q_magnus:\n" << Q_magnus << "\n\n";
+//    std::cout << "error orientation : \n" << (Q_spectral - Q_magnus).norm() << "\n\n";
 
 
-    const Eigen::MatrixXd Omega_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_angular_velocity->getStackAsMatrix();
-    const Eigen::MatrixXd Omega_magnus   = Omega_integrator->getStackAsMatrix();
-    std::cout << "error angular velocity : \n" << (Omega_spectral - Omega_magnus).norm() << "\n\n";
-    std::cout.flush();
+//    const Eigen::MatrixXd r_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_position->getStackAsMatrix();
+//    const Eigen::MatrixXd r_magnus   = integrate_position->getStackAsMatrix();
+//    std::cout << "r_spectral:\n" << r_spectral << "\n\n";
+//    std::cout << "r_magnus:\n" << r_magnus << "\n\n";
+//    std::cout << "error position : \n" << (r_spectral - r_magnus).norm() << "\n\n";
+//    std::cout.flush();
 
 
-    const Eigen::MatrixXd V_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_linear_velocity->getStackAsMatrix();
-    const Eigen::MatrixXd V_magnus   = V_integrator->getStackAsMatrix();
-    std::cout << "error linear velocity : \n" << (V_spectral - V_magnus).norm() << "\n\n";
-    std::cout.flush();
+//    const Eigen::MatrixXd Omega_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_angular_velocity->getStackAsMatrix();
+//    const Eigen::MatrixXd Omega_magnus   = Omega_integrator->getStackAsMatrix();
+//    std::cout << "error angular velocity : \n" << (Omega_spectral - Omega_magnus).norm() << "\n\n";
+//    std::cout.flush();
 
 
-    const Eigen::MatrixXd dot_Omega_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_angular_acceleration->getStackAsMatrix();
-    const Eigen::MatrixXd dot_Omega_magnus   = dot_Omega_integrator->getStackAsMatrix();
-    std::cout << "error angular acceleration : \n" << (dot_Omega_spectral - dot_Omega_magnus).norm() << "\n\n";
-    std::cout.flush();
+//    const Eigen::MatrixXd V_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_linear_velocity->getStackAsMatrix();
+//    const Eigen::MatrixXd V_magnus   = V_integrator->getStackAsMatrix();
+//    std::cout << "error linear velocity : \n" << (V_spectral - V_magnus).norm() << "\n\n";
+//    std::cout.flush();
 
 
-    const Eigen::MatrixXd dot_V_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_linear_acceleration->getStackAsMatrix();
-    const Eigen::MatrixXd dot_V_magnus   = dot_V_integrator->getStackAsMatrix();
-    std::cout << "error linear acceleration : \n" << (dot_V_spectral - dot_V_magnus).norm() << "\n\n";
-    std::cout.flush();
+//    const Eigen::MatrixXd dot_Omega_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_angular_acceleration->getStackAsMatrix();
+//    const Eigen::MatrixXd dot_Omega_magnus   = dot_Omega_integrator->getStackAsMatrix();
+//    std::cout << "error angular acceleration : \n" << (dot_Omega_spectral - dot_Omega_magnus).norm() << "\n\n";
+//    std::cout.flush();
+
+
+//    const Eigen::MatrixXd dot_V_spectral = m_cosserat_rod_integrators->m_idm_integrators->m_linear_acceleration->getStackAsMatrix();
+//    const Eigen::MatrixXd dot_V_magnus   = dot_V_integrator->getStackAsMatrix();
+//    std::cout << "error linear acceleration : \n" << (dot_V_spectral - dot_V_magnus).norm() << "\n\n";
+//    std::cout.flush();
 
     ::benchmark::Initialize(&argc, argv);
 
