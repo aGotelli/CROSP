@@ -91,9 +91,12 @@ struct IntegratorSO3 : public ::OMNI::MagnusIntegratorSO3{
     {
 
         for(unsigned int point=0; point<m_number_of_Chebyshev_points; point++){
-            this->m_A1_stack.push_back( m_strain_parameterisation_stack->m_Xi_stack.block<3,1>(point*6 +  0, 0) );
-            this->m_A2_stack.push_back( m_strain_parameterisation_stack->m_Xi_stack.block<3,1>(point*6 +  6, 0) );
-            this->m_A3_stack.push_back( m_strain_parameterisation_stack->m_Xi_stack.block<3,1>(point*6 + 12, 0) );
+
+//            const unsigned int stack_index = t_Chebyshev_point*4 + t_quadrature_point+1;
+
+            this->m_A1_stack.push_back( m_strain_parameterisation_stack->m_K_stack->at(point*4 + 1) );
+            this->m_A2_stack.push_back( m_strain_parameterisation_stack->m_K_stack->at(point*4 + 2) );
+            this->m_A3_stack.push_back( m_strain_parameterisation_stack->m_K_stack->at(point*4 + 3) );
         }
 
     }
@@ -958,9 +961,9 @@ int main(int argc, char *argv[])
 //    std::cout << "error linear acceleration : \n" << (dot_V_spectral - dot_V_magnus).norm() << "\n\n";
 //    std::cout.flush();
 
-    ::benchmark::Initialize(&argc, argv);
+//    ::benchmark::Initialize(&argc, argv);
 
-    ::benchmark::RunSpecifiedBenchmarks();
+//    ::benchmark::RunSpecifiedBenchmarks();
 
 
     return 0;
