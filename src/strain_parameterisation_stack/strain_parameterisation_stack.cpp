@@ -17,6 +17,10 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
     Eigen::MatrixXd Phi = t_polynomial_representation->getPhi( 0 );
     Eigen::MatrixXd BPhi = B*Phi;
 
+    m_q_dot_q_ddot_q = Eigen::MatrixXd::Zero(t_polynomial_representation->getCoordinatesDimension(), 3);
+
+
+
 
     m_B_Phi_stack =
             Eigen::MatrixXd(t_number_of_Chebyshev_point*BPhi.rows(), BPhi.cols());
@@ -32,6 +36,9 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
 
     m_Xi_c_stack =
             Eigen::MatrixXd(t_number_of_Chebyshev_point*6, 1);
+
+
+    m_Xi_dot_Xi_ddot_Xi = Eigen::MatrixXd::Zero(m_number_of_points*6, 3);
 
 
     ::LieAlgebra::Vector6d Xi_c = ::LieAlgebra::Vector6d::Zero();
@@ -87,6 +94,10 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
     Eigen::MatrixXd BPhi = B*Phi;
 
 
+    m_q_dot_q_ddot_q = Eigen::MatrixXd::Zero(t_polynomial_representation->getCoordinatesDimension(), 3);
+
+
+
     m_B_Phi_stack =
             Eigen::MatrixXd(m_number_of_points*BPhi.rows(), BPhi.cols());
 
@@ -101,6 +112,8 @@ StrainParameterisationStack::StrainParameterisationStack(const std::shared_ptr<c
 
     m_Xi_c_stack =
             Eigen::MatrixXd(m_number_of_points*6, 1);
+
+    m_Xi_dot_Xi_ddot_Xi = Eigen::MatrixXd::Zero(m_number_of_points*6, 3);
 
 
 
@@ -149,11 +162,18 @@ void StrainParameterisationStack::updateStrainParameterisation(const Eigen::Vect
                                                                const Eigen::VectorXd &t_dot_q,
                                                                const Eigen::VectorXd &t_ddot_q)
 {
+//    m_q_dot_q_ddot_q << t_q, t_dot_q, t_ddot_q;
+//    m_Xi_dot_Xi_ddot_Xi = m_B_Phi_stack*m_q_dot_q_ddot_q;
 
+//    m_Xi_stack = m_B_Phi_stack * t_q + m_Xi_c_stack;
+//    m_dot_Xi_stack = m_B_Phi_stack * t_dot_q;
+//    m_ddot_Xi_stack = m_B_Phi_stack * t_ddot_q;
 
-    m_Xi_stack = m_B_Phi_stack * t_q + m_Xi_c_stack;
-    m_dot_Xi_stack = m_B_Phi_stack * t_dot_q;
-    m_ddot_Xi_stack = m_B_Phi_stack * t_ddot_q;
+    m_Xi_stack.noalias() = m_B_Phi_stack * t_q + m_Xi_c_stack;
+    m_dot_Xi_stack.noalias() = m_B_Phi_stack * t_dot_q;
+    m_ddot_Xi_stack.noalias() = m_B_Phi_stack * t_ddot_q;
+
+    if(copy_stack){
 
     Eigen::Vector3d K;
     Eigen::Vector3d dot_K;
@@ -192,6 +212,7 @@ void StrainParameterisationStack::updateStrainParameterisation(const Eigen::Vect
         m_hat_dot_Gamma_stack->at(step)  = ::LieAlgebra::skew( dot_Gamma );
         m_hat_ddot_Gamma_stack->at(step) = ::LieAlgebra::skew( ddot_Gamma );
 
+    }
     }
 }
 
