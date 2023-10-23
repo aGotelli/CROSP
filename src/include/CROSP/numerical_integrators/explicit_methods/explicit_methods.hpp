@@ -482,6 +482,10 @@ public:
 
 
 
+
+
+
+    [[depracted("This function should do nothing ad the Qad should be integrated with the whole ODEs\nNo need to have this long and unnecessary integration as standalone.")]]
     void updateInternalActuation(const double &t_time)
     {
         m_distributed_actuation.updateActuation(t_time);
@@ -499,6 +503,7 @@ public:
                                                     0.0,
                                                     -m_dX);
     }
+
 
     Eigen::VectorXd getQad() const
     {
