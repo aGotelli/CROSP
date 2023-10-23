@@ -24,7 +24,7 @@ unsigned int getStateSize(const Eigen::MatrixXd &t_Phi)
 }
 
 
-InternalActuationIntegrator::InternalActuationIntegrator(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack)
+IntegratorPolynomialBase::IntegratorPolynomialBase(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack)
     : OSNI::ODEb( getStateSize(t_strain_parameterisation_stack->m_Phi_stack[0]),
                  ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                  t_strain_parameterisation_stack->m_number_of_points),
@@ -35,7 +35,7 @@ InternalActuationIntegrator::InternalActuationIntegrator(std::shared_ptr<const s
 
 
 
-Eigen::VectorXd InternalActuationIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
+Eigen::VectorXd IntegratorPolynomialBase::computerParametersVectorAtPoint(const unsigned int t_point)
 {
 
     const auto Phi = m_strain_parameterisation_stack->m_Phi_stack.at( t_point );

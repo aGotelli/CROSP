@@ -19,10 +19,10 @@
 namespace CROSP::numerical_integrators::spectral_method::integration_polynomial_base {
 
 
-struct InternalActuationIntegrator : public ::OSNI::ODEb{
+struct IntegratorPolynomialBase : public ::OSNI::ODEb{
 
 
-    InternalActuationIntegrator(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack);
+    IntegratorPolynomialBase(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack);
 
 
     std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;

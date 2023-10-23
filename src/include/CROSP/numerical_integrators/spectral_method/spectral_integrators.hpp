@@ -121,25 +121,14 @@ struct SpectralIntegrators{
     };
 
 
-    std::unique_ptr<integration_polynomial_base::InternalActuationIntegrator> m_integrator_polynomial_base {
-        std::make_unique<integration_polynomial_base::InternalActuationIntegrator>(m_strain_parameterisation_stack)
+    std::unique_ptr<integration_polynomial_base::IntegratorPolynomialBase> m_integrator_polynomial_base {
+        std::make_unique<integration_polynomial_base::IntegratorPolynomialBase>(m_strain_parameterisation_stack)
     };
 
 
 
 };
 
-
-//SpectralIntegrators::SpectralIntegrators(std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-//                                         std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation_Delta,
-//                                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
-//    :   m_idm_integrators( std::make_shared<idm_integrators::IDMIntegrators>(t_strain_parameterisation,
-//                                                                             t_rod_properties) ),
-//        m_tidm_integrators( std::make_shared<tidm_integrators::TIDMIntegrators>(t_strain_parameterisation,
-//                                                                                t_strain_parameterisation_Delta,
-//                                                                                m_idm_integrators,
-//                                                                                t_rod_properties) )
-//{}
 
 
 

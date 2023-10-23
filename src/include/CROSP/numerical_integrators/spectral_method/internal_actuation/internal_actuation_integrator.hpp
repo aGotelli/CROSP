@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "CROSP/rod_properties/rod_properties.hpp"
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 
 #include "OSNI/OSNI.hpp"
 
@@ -70,15 +69,10 @@ struct NullInternalActuationIntegrator : public InternalActuationIntegrator{
 
     Eigen::VectorXd m_null_actuation;
 
-
-
-    ::ATORS::tendon_driven_actuation::TendonDrivenActuation m_distributed_actuation;
-
-
 };
 
 
-
+//std::unique_ptr<InternalActuationIntegrator> InternalActuationIntegratorUptr;
 
 
 

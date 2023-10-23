@@ -20,7 +20,7 @@
 
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+//#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
 #include "CROSP/numerical_integrators/cosserat_rod_integrators.hpp"
@@ -618,15 +618,19 @@ protected:
     Eigen::MatrixXd m_Kee { [this]()->Eigen::MatrixXd
         {
 
-            const Eigen::MatrixXd Ha = m_polynomial_representation.m_B.transpose() * m_rod_properties->m_H * m_polynomial_representation.m_B;
+            const auto B = m_polynomial_representation.m_B;
+            const Eigen::MatrixXd Ha = B.transpose() * m_rod_properties->m_H * B;
 
 
             Eigen::MatrixXd Kee = m_cosserat_rod_integrators->integratePhiTPhi();
 
 
+
+            const auto L = m_rod_properties->m_rod_dimensions.m_L;
+
             unsigned int Kee_index = 0;
             for(unsigned int i=0; i<m_polynomial_representation.m_na; i++){
-                double scale = m_rod_properties->m_rod_dimensions.m_L*Ha(i, i);
+                double scale = L*Ha(i, i);
 
                 unsigned int ne_i = m_polynomial_representation.m_number_of_modes_stack[i];
 
@@ -635,21 +639,13 @@ protected:
                 Kee_index += ne_i;
             }
 
+
             return Kee;
         }()
     };
 
     /// \brief m_Dee The matrix of the internal dumping
     Eigen::MatrixXd m_Dee { m_rod_properties->m_material_properties.m_mu*m_Kee };
-
-
-
-
-
-
-
-
-
 
 
 

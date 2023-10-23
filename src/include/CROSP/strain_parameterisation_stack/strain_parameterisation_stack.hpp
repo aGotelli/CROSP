@@ -13,6 +13,7 @@ namespace CROSP::strain_parameterisation_stack {
 typedef std::function<::LieAlgebra::Vector6d(const double&)> StrainFunction;
 
 
+
 static StrainFunction default_constrained_strain = [](const double&){return ::LieAlgebra::Vector6d::Unit(3);};
 
 static StrainFunction zero_constrained_strain = [](const double&){return ::LieAlgebra::Vector6d::Zero();};

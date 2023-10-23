@@ -18,7 +18,8 @@ namespace CROSP::polynomial_representation {
 
 
 PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                                                   const unsigned int t_number_of_modes)
+                                                   const unsigned int t_number_of_modes,
+                                                   const PolynomialBase t_polynomial_base)
     : m_admitted_deformations(t_admitted_deformations),
       m_number_of_modes_stack( [&](){
                     std::vector<unsigned int> number_of_modes_stack;
@@ -30,7 +31,8 @@ PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_a
                         if(dof == true)
                             number_of_modes_stack.push_back( t_number_of_modes );
                     });
-                    return number_of_modes_stack;}() )
+                    return number_of_modes_stack;}() ),
+      m_polynomial_base(t_polynomial_base)
 {}
 
 

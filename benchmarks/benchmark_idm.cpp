@@ -39,11 +39,34 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
 
-    ::CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, ne);
+    ::CROSP::polynomial_representation::PolynomialRepresentation
+            polynomial_representation(admitted_deformations,
+                                      ne,
+                                      //::CROSP::polynomial_representation::chebyshev_polynomial_base
+                                      ::CROSP::polynomial_representation::legendre_polynomial_base);
+
+    double radius = 0.01;
+    ::CROSP::rod_properties::CircularCrossSectionUPtr circular_cross_section =
+            std::make_unique<::CROSP::rod_properties::CircularCrossSection>(radius);
+
+    double width = 0.01;
+    double height = 0.02;
+    ::CROSP::rod_properties::RectangularCrossSectionUPtr rectangular_cross_section =
+            std::make_unique<::CROSP::rod_properties::RectangularCrossSection>(width, height);
 
 
+    double length = 2.45;
+    ::CROSP::rod_properties::RodDimensions rod_dimensions(std::move(rectangular_cross_section),
+                                                          length);
 
-    ::CROSP::CosseratRod<::CROSP::numerical_integrators::explicit_methods::ExplicitIntegrator<>> rod(polynomial_representation, number_of_Chebyshev_points);
+
+    ::CROSP::rod_properties::MaterialProperties rod_material;
+
+
+    ::CROSP::CosseratRod rod(polynomial_representation,
+                             number_of_Chebyshev_points,
+                             rod_dimensions,
+                             rod_material);
 
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -56,13 +79,6 @@ void benchmarkIDM(::benchmark::State &t_state)
 
     while(t_state.KeepRunning()){
 
-//        rod.updateParameterisation(q, dot_q, ddot_q);
-
-//        rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
-
-//        rod.m_cosserat_rod_integrators->forwardKinematics();
-
-//        rod.m_cosserat_rod_integrators->backwardDynamics(Lambda_X1);
         rod.updateParameterisation(q, dot_q, ddot_q);
 
         rod.forwardKinematics();

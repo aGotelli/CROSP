@@ -3,7 +3,7 @@
 
 
 
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+//#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 #include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
 
@@ -373,8 +373,6 @@ public:
         //  Save a track of the state
         m_forward_tangent_kinematics_state_X0 = tangent_kinematics_state;
 
-//        std::cout << "tangent_kinematics_state X=0 : \n" <<  tangent_kinematics_state << "\n\n";
-
     //  Forward Integration
         boost::numeric::odeint::integrate_adaptive(stepper,
                                                    [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
@@ -387,8 +385,6 @@ public:
         //  Save a track of the state
         m_forward_tangent_kinematics_state_X1 = tangent_kinematics_state;
 
-//        std::cout << "tangent_kinematics_state X=1 : \n" <<  tangent_kinematics_state << "\n\n";
-//        std::cout.flush();
     }
 
 

@@ -23,7 +23,7 @@
 
 #include "CROSP/rod_properties/rod_properties.hpp"
 
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+//#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
 
 #include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
 

@@ -56,7 +56,8 @@ struct PolynomialRepresentation {
 
 
     PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
-                             const unsigned int t_number_of_modes);
+                             const unsigned int t_number_of_modes,
+                             const PolynomialBase t_polynomial_base=legendre_polynomial_base);
 
 
     PolynomialRepresentation(const std::array<bool, 6> t_admitted_deformations,
