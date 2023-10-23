@@ -43,7 +43,7 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
 
-    ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points);
+    ::CROSP::CosseratRod<::CROSP::numerical_integrators::explicit_methods::ExplicitIntegrator<>> rod(polynomial_representation, number_of_Chebyshev_points);
 
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
