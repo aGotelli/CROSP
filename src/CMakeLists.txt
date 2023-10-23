@@ -101,6 +101,8 @@ add_library(${PROJECT_NAME} SHARED
 
 
                             include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/full_state_reconstructor.hpp
+                            numerical_integrators/full_state_reconstructor.cpp
 
 
                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/spectral_integrators.hpp
@@ -121,6 +123,8 @@ add_library(${PROJECT_NAME} SHARED
 
                             include/${PROJECT_NAME}/numerical_integrators/explicit_methods/explicit_methods.hpp
                             numerical_integrators/explicit_methods/explicit_methods.cpp
+
+
 
 
                             include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
