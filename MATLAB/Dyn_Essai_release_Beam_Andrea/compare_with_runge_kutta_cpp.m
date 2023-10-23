@@ -26,7 +26,7 @@ Config.Nt    = length(Config.time);
 
 
 % longueur de la poutre
-Config.L = 2.41;
+Config.L = 1.75;
 % Pas de discrétisation du corps
 Config.dX = Config.L/101;
 % Construction du corps et de ses paramètres
@@ -34,9 +34,9 @@ Config.X  = 0:Config.dX:Config.L;
 % Nombre de noeuds discrétisant le corps
 Config.Nx = length(Config.X);
 
-Config.V_a = load("../test_different_modes/deformations_stack.csv");
+Config.V_a = load("../test_runge_kutta/deformations_stack.csv");
 % Définition de la taille de la base pour chaque variable
-Const.dim_base_k = load("../test_different_modes/ne_stack.csv");
+Const.dim_base_k = load("../test_runge_kutta/ne_stack.csv");
 % Calcul de la taille de q 
 Const.dim_base   = Config.V_a'*Const.dim_base_k;
 
@@ -51,8 +51,8 @@ adapted_parametre_constant_Compare_Dominique_F_ABS;
 
 
 
-Const.B = load("../test_different_modes/B.csv");
-Const.B_bar = load("../test_different_modes/B_bar.csv");
+Const.B = load("../test_runge_kutta/B.csv");
+Const.B_bar = load("../test_runge_kutta/B_bar.csv");
 
 % Initialisation du temps à 0
 time = 0;
@@ -83,7 +83,7 @@ Dee = reshape(Dee_vec, [Const.dim_base Const.dim_base]);
 
 Const.Kee = Kee;
 % Const.Dee = Dee;
-Const.Dee = Const.mu*Kee;
+Const.Dee = 0*1e-3*Kee;
 
 % ------------------------------------------------------- %
 
@@ -100,26 +100,22 @@ q0 = zeros(Const.dim_base,1);
 % Const.q_dot     = zeros(Const.dim_base,1);
 % Const.q_dot_dot = zeros(Const.dim_base,1);
 
-Const.q = load("../test_different_modes/q.csv");
-Const.q_dot = load("../test_different_modes/dot_q.csv");
-Const.q_dot_dot = load("../test_different_modes/ddot_q.csv");
+Const.q = load("../test_runge_kutta/q.csv");
+Const.q_dot = load("../test_runge_kutta/dot_q.csv");
+Const.q_dot_dot = load("../test_runge_kutta/ddot_q.csv");
 
 display(Const.q)
 display(Const.q_dot)
 display(Const.q_dot_dot)
 
-Kee_cpp = load("../test_different_modes/Kee.csv");
-Dee_cpp = load("../test_different_modes/Dee.csv");
+Kee_cpp = load("../test_runge_kutta/Kee.csv");
+Dee_cpp = load("../test_runge_kutta/Dee.csv");
 
 error_Kee = Kee_cpp - Kee;
 error_Kee_norm = norm(error_Kee);
 display(Kee_cpp)
 display(Kee)
 display(error_Kee_norm)
-
-
-
-
 
 error_Dee = Dee_cpp - Dee;
 error_Dee_norm = norm(error_Dee);
@@ -138,10 +134,10 @@ CI = [Const.q;Const.q_dot];
 
 
 
+
+
 a = 400;
 b = 160000;
-% a = 0;
-% b = 0;
 
 time = 0;
 qn_0 = q_0;
@@ -153,23 +149,21 @@ rn_0 = r_0;
         TIDM_spectral_output_all_data(qn_0,rn_0,q_0,r_0,eta_0,eta_dot_0,a,b,time,Const,Config);
 
 
-Q_cpp = load("../test_different_modes/Q_stack.csv");
-r_cpp = load("../test_different_modes/r_stack.csv");
-Omega_cpp = load("../test_different_modes/Omega_stack.csv");
-V_cpp = load("../test_different_modes/V_stack.csv");
-dot_Omega_cpp = load("../test_different_modes/dot_Omega_stack.csv");
-dot_V_cpp = load("../test_different_modes/dot_V_stack.csv");
+Q_cpp = load("../test_runge_kutta/Q_stack.csv");
+r_cpp = load("../test_runge_kutta/r_stack.csv");
+Omega_cpp = load("../test_runge_kutta/Omega_stack.csv");
+V_cpp = load("../test_runge_kutta/V_stack.csv");
+dot_Omega_cpp = load("../test_runge_kutta/dot_Omega_stack.csv");
+dot_V_cpp = load("../test_runge_kutta/dot_V_stack.csv");
 
-N_cpp = load("../test_different_modes/N_stack.csv");
-C_cpp = load("../test_different_modes/C_stack.csv");
-Qa_cpp = load("../test_different_modes/Qa_stack.csv");
+N_cpp = load("../test_runge_kutta/N_stack.csv");
+C_cpp = load("../test_runge_kutta/C_stack.csv");
+Qa_cpp = load("../test_runge_kutta/Qa_stack.csv");
 
 
 
 error_Q = Q_cpp - QX;
 error_Q_norm = norm(error_Q);
-% display(Q_cpp)
-% display(QX)
 display(error_Q_norm)
 
 
@@ -234,7 +228,7 @@ error_Delta_Qa_norms_stack        = [];
 
 for i=1:Const.dim_base
     
-    Delta_rotations_cpp = load("../test_different_modes/Delta_rotation_stack_Delta" + (i-1) + ".csv");
+    Delta_rotations_cpp = load("../test_runge_kutta/Delta_rotation_stack_Delta" + (i-1) + ".csv");
     
     error_Delta_rotations = Delta_rotations_cpp - Delta_zeta_X(1:3, :, i);
     error_Delta_rotations_norm = norm(error_Delta_rotations);
@@ -243,7 +237,7 @@ for i=1:Const.dim_base
 
 
 
-    Delta_positions_cpp = load("../test_different_modes/Delta_position_stack_Delta" + (i-1) + ".csv");
+    Delta_positions_cpp = load("../test_runge_kutta/Delta_position_stack_Delta" + (i-1) + ".csv");
 
     error_Delta_positions = Delta_positions_cpp - Delta_zeta_X(4:6, :, i);
     error_Delta_positions_norm = norm(error_Delta_positions);
@@ -254,7 +248,7 @@ for i=1:Const.dim_base
 
 
 
-    Delta_Omega_cpp = load("../test_different_modes/Delta_Omega_stack_Delta" + (i-1) + ".csv");
+    Delta_Omega_cpp = load("../test_runge_kutta/Delta_Omega_stack_Delta" + (i-1) + ".csv");
     
     error_Delta_Omega = Delta_Omega_cpp - Delta_eta_X(1:3, :, i);
     error_Delta_Omega_norms_stack = [error_Delta_Omega_norms_stack norm(error_Delta_Omega)];
@@ -262,7 +256,7 @@ for i=1:Const.dim_base
 
 
 
-    Delta_V_cpp = load("../test_different_modes/Delta_V_stack_Delta" + (i-1) + ".csv");
+    Delta_V_cpp = load("../test_runge_kutta/Delta_V_stack_Delta" + (i-1) + ".csv");
 
     error_Delta_V = Delta_V_cpp - Delta_eta_X(4:6, :, i);
     error_Delta_V_norms_stack = [error_Delta_V_norms_stack norm(error_Delta_V)];
@@ -273,7 +267,7 @@ for i=1:Const.dim_base
 
 
 
-    Delta_dot_Omega_cpp = load("../test_different_modes/Delta_dot_Omega_stack_Delta" + (i-1) + ".csv");
+    Delta_dot_Omega_cpp = load("../test_runge_kutta/Delta_dot_Omega_stack_Delta" + (i-1) + ".csv");
     
     error_Delta_dot_Omega = Delta_dot_Omega_cpp - Delta_eta_dot_X(1:3, :, i);
     error_Delta_dot_Omega_norms_stack = [error_Delta_dot_Omega_norms_stack norm(error_Delta_dot_Omega)];
@@ -281,19 +275,16 @@ for i=1:Const.dim_base
 
 
 
-    Delta_dot_V_cpp = load("../test_different_modes/Delta_dot_V_stack_Delta" + (i-1) + ".csv");
+    Delta_dot_V_cpp = load("../test_runge_kutta/Delta_dot_V_stack_Delta" + (i-1) + ".csv");
 
     error_Delta_dot_V = Delta_dot_V_cpp - Delta_eta_dot_X(4:6, :, i);
-    Delta_dot_V = Delta_eta_dot_X(4:6, :, i);
-%     display(Delta_dot_V_cpp)
-%     display(Delta_dot_V)
     error_Delta_dot_V_norms_stack = [error_Delta_dot_V_norms_stack norm(error_Delta_dot_V)];
 
 
 
 
 
-    Delta_C_cpp = load("../test_different_modes/Delta_C_stack_Delta" + (i-1) + ".csv");
+    Delta_C_cpp = load("../test_runge_kutta/Delta_C_stack_Delta" + (i-1) + ".csv");
     
     error_Delta_C = Delta_C_cpp - Delta_Lambda_X(1:3, :, i);
     error_Delta_C_norms_stack = [error_Delta_C_norms_stack norm(error_Delta_C)];
@@ -301,7 +292,7 @@ for i=1:Const.dim_base
 
 
 
-    Delta_N_cpp = load("../test_different_modes/Delta_N_stack_Delta" + (i-1) + ".csv");
+    Delta_N_cpp = load("../test_runge_kutta/Delta_N_stack_Delta" + (i-1) + ".csv");
 
     error_Delta_N = Delta_N_cpp - Delta_Lambda_X(4:6, :, i);
     error_Delta_N_norms_stack = [error_Delta_N_norms_stack norm(error_Delta_N)];
@@ -310,7 +301,7 @@ for i=1:Const.dim_base
 
 
 
-    Delta_Qa_cpp = load("../test_different_modes/Delta_Qa_stack_Delta" + (i-1) + ".csv");
+    Delta_Qa_cpp = load("../test_runge_kutta/Delta_Qa_stack_Delta" + (i-1) + ".csv");
 
     error_Delta_Qa = Delta_Qa_cpp - Delta_Qa_X(:, :, i);
     error_Delta_Qa_norms_stack = [error_Delta_Qa_norms_stack norm(error_Delta_Qa)];

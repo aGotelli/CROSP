@@ -15,6 +15,8 @@ find_package(math_tools REQUIRED)
 
 find_package(OSNI REQUIRED)
 
+find_package(OMNI REQUIRED)
+
 find_package(ATORS REQUIRED)
 
 find_package(Qt5Charts REQUIRED)
@@ -37,13 +39,13 @@ set(CMAKE_DEBUG_POSTFIX "-debug")
 add_subdirectory(src)
 
 # testing
-if(GTest_FOUND)
-  message(STATUS "Building tests")
-  enable_testing()
+#if(GTest_FOUND)
+#  message(STATUS "Building tests")
+#  enable_testing()
 
   add_subdirectory(tests)
 
-endif(GTest_FOUND)
+#endif(GTest_FOUND)
 
 
 # benchmark

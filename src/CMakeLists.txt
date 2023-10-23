@@ -93,22 +93,51 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
                             include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
                             ${PROJECT_NAME}/cosserat_rod.cpp
-                            include/${PROJECT_NAME}/${PROJECT_NAME}/internally_actuated_cosserat_rod.hpp
-                            ${PROJECT_NAME}/internally_actuated_cosserat_rod.cpp
-#                            include/${PROJECT_NAME}/static_initialiser/static_initialiser.hpp
-#                            static_initialiser/static_initialiser.cpp
-#                            include/CROSP/CROSP/internal_actuation.hpp
-#                            ${PROJECT_NAME}/internal_actuation.cpp
+
+
+
+                            include/${PROJECT_NAME}/strain_parameterisation_stack/strain_parameterisation_stack.hpp
+                            strain_parameterisation_stack/strain_parameterisation_stack.cpp
+
+
+                            #include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
+
+
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/spectral_integrators.hpp
+#                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_odes.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/integration_polynomial_base/integration_polynomial_base.hpp
+                            numerical_integrators/spectral_method/spectral_integrators.cpp
+#                            numerical_integrators/spectral_method/idm_integrators/idm_odes.cpp
+                            numerical_integrators/spectral_method/idm_integrators/idm_integrators.cpp
+                            numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.cpp
+                            numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.cpp
+                            numerical_integrators/spectral_method/integration_polynomial_base/integration_polynomial_base.cpp
+
+
+
+
+                            include/${PROJECT_NAME}/numerical_integrators/explicit_methods/explicit_methods.hpp
+                            numerical_integrators/explicit_methods/explicit_methods.cpp
+
+
+                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_integrators.hpp
+                            numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.cpp
+                            numerical_integrators/magnus_expansion/magnus_integrators.cpp
+
+
+
+
                             include/${PROJECT_NAME}/polynomial_representation/polynomial_representation.hpp
                             polynomial_representation/polynomial_representation.cpp
                             include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
                             rod_properties/rod_properties.cpp
-                            include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
-                            strain_parameterisation/strain_parameterisation.cpp
-                            include/${PROJECT_NAME}/idm_integrators/idm_integrators.hpp
-                            idm_integrators/idm_integrators.cpp
-                            include/${PROJECT_NAME}/tidm_integrators/tidm_integrators.hpp
-                            tidm_integrators/tidm_integrators.cpp
+#                            include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
+#                            strain_parameterisation/strain_parameterisation.cpp
+
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -129,14 +158,33 @@ target_compile_options(${PROJECT_NAME}
         -Wall
         -Wextra
 )
+#target_compile_definitions(${PROJECT_NAME} PRIVATE TESTING)
 
 
-add_executable(prove prove.cpp)
-target_link_libraries(prove
-    ${PROJECT_NAME}
-    optimized ATORS
-    debug ATORS-debug
-)
+#add_executable(prove prove.cpp)
+#target_link_libraries(prove
+#    ${PROJECT_NAME}
+#    optimized ATORS
+#    debug ATORS-debug
+#)
+
+#add_executable(test_Kee CROSP/test_Kee.cpp)
+#target_link_libraries(test_Kee
+#    ${PROJECT_NAME}
+#    optimized ATORS
+#    debug ATORS-debug
+#)
+#target_compile_definitions(test_Kee PRIVATE DEVELOPER)
+
+
+#add_executable(test_integral_Phi CROSP/test_integral_Phi.cpp)
+#target_link_libraries(test_integral_Phi
+#    ${PROJECT_NAME}
+#    optimized ATORS
+#    debug ATORS-debug
+#)
+#target_compile_definitions(test_integral_Phi PRIVATE DEVELOPER)
+
 
 
 install(

@@ -19,103 +19,83 @@
 
 namespace CROSP {
 
-
-CosseratRod::CosseratRod(const std::shared_ptr<rod_properties::RodProperties> t_rod_properties)
-    : m_rod_properties( t_rod_properties )
-{}
-
-
-
-CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation)
-    : m_strain_parameterisation( t_strain_parameterisation )
-{}
-
-
-
-CosseratRod::CosseratRod(const std::shared_ptr<strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                         const std::shared_ptr<rod_properties::RodProperties> t_rod_properties)
-    : m_strain_parameterisation( t_strain_parameterisation ),
-      m_rod_properties( t_rod_properties )
-{}
+//template<class NumericalIntegrator>
+//CosseratRod<NumericalIntegrator>::CosseratRod(polynomial_representation::PolynomialRepresentation t_polynomial_represenation,
+//                                             unsigned int t_number_of_Chebyshev_points,
+//                                             rod_properties::RodDimensions t_rod_dimensions,
+//                                             rod_properties::MaterialProperties t_material_properties,
+//                                             strain_parameterisation_stack::StrainFunction t_constrained_strain)
+//    : m_polynomial_representation(t_polynomial_represenation),
+//      m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
+//      m_constrained_strain(t_constrained_strain),
+//      m_rod_properties(
+//          std::make_shared<rod_properties::RodProperties>(t_rod_dimensions,
+//                                                          t_material_properties)
+//          )
+//{}
 
 
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::updateParameterisation(const Eigen::VectorXd &t_qe,
+//                                         const Eigen::VectorXd &t_dot_qe,
+//                                         const Eigen::VectorXd &t_ddot_qe)
+//{
+//    m_cosserat_rod_integrators->updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
+//}
 
 
-void CosseratRod::updateParameterisation(const Eigen::VectorXd &t_qe,
-                                         const Eigen::VectorXd &t_dot_qe,
-                                         const Eigen::VectorXd &t_ddot_qe)
-{
-    m_strain_parameterisation->updateStacks(t_qe, t_dot_qe, t_ddot_qe);
-}
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::forwardKinematics()
+//{
+//    m_cosserat_rod_integrators->forwardKinematics();
+//}
 
 
-void CosseratRod::forwardKinematics()
-{
-    //  Integrate Quaternions
-    m_idm_integrators->m_quaternion->solveSystem();
-
-    //  Integrate Positions
-    m_idm_integrators->m_position->solveSystem();
-
-    //  Integrate twist
-    m_idm_integrators->m_angular_velocity->solveSystem();
-    m_idm_integrators->m_linear_velocity->solveSystem();
-
-    //  Integrate accelerations
-    m_idm_integrators->m_angular_acceleration->solveSystem();
-    m_idm_integrators->m_linear_acceleration->solveSystem();
-}
-
-
-void CosseratRod::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
-                                    const Eigen::Vector3d &t_initial_position,
-                                    const Eigen::Vector3d &t_initial_angular_velocity,
-                                    const Eigen::Vector3d &t_initial_linear_velocity,
-                                    const Eigen::Vector3d &t_initial_angular_acceleration,
-                                    const Eigen::Vector3d &t_initial_linear_acceleration)
-{
-    //  Integrate Quaternions
-    m_idm_integrators->m_quaternion->integrate(t_initial_quaternion);
-
-    //  Integrate Positions
-    m_idm_integrators->m_position->integrate(t_initial_position);
-
-    //  Integrate twist
-    m_idm_integrators->m_angular_velocity->integrate(t_initial_angular_velocity);
-    m_idm_integrators->m_linear_velocity->integrate(t_initial_linear_velocity);
-
-    //  Integrate accelerations
-    m_idm_integrators->m_angular_acceleration->integrate(t_initial_angular_acceleration);
-    m_idm_integrators->m_linear_acceleration->integrate(t_initial_linear_acceleration);
-}
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::forwardKinematics(const Eigen::Vector4d &t_initial_quaternion,
+//                                    const Eigen::Vector3d &t_initial_position,
+//                                    const Eigen::Vector3d &t_initial_angular_velocity,
+//                                    const Eigen::Vector3d &t_initial_linear_velocity,
+//                                    const Eigen::Vector3d &t_initial_angular_acceleration,
+//                                    const Eigen::Vector3d &t_initial_linear_acceleration)
+//{
+//    m_cosserat_rod_integrators->forwardKinematics(t_initial_quaternion,
+//                                                  t_initial_position,
+//                                                  t_initial_angular_velocity,
+//                                                  t_initial_linear_velocity,
+//                                                  t_initial_angular_acceleration,
+//                                                  t_initial_linear_acceleration);
+//}
 
 
-void CosseratRod::forwardKinematics(const Eigen::Quaterniond &t_initial_quaternion,
-                                    const Eigen::Vector3d &t_initial_position,
-                                    const Eigen::Vector3d &t_initial_angular_velocity,
-                                    const Eigen::Vector3d &t_initial_linear_velocity,
-                                    const Eigen::Vector3d &t_initial_angular_acceleration,
-                                    const Eigen::Vector3d &t_initial_linear_acceleration)
-{
-    const Eigen::Vector4d Q(t_initial_quaternion.w(),
-                            t_initial_quaternion.x(),
-                            t_initial_quaternion.y(),
-                            t_initial_quaternion.z());
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::forwardKinematics(const Eigen::Quaterniond &t_initial_quaternion,
+//                                    const Eigen::Vector3d &t_initial_position,
+//                                    const Eigen::Vector3d &t_initial_angular_velocity,
+//                                    const Eigen::Vector3d &t_initial_linear_velocity,
+//                                    const Eigen::Vector3d &t_initial_angular_acceleration,
+//                                    const Eigen::Vector3d &t_initial_linear_acceleration)
+//{
+//    const Eigen::Vector4d Q(t_initial_quaternion.w(),
+//                            t_initial_quaternion.x(),
+//                            t_initial_quaternion.y(),
+//                            t_initial_quaternion.z());
 
-    forwardKinematics(Q, t_initial_position,
-                      t_initial_angular_velocity, t_initial_linear_velocity,
-                      t_initial_angular_acceleration, t_initial_linear_acceleration);
-}
+//    forwardKinematics(Q, t_initial_position,
+//                      t_initial_angular_velocity, t_initial_linear_velocity,
+//                      t_initial_angular_acceleration, t_initial_linear_acceleration);
+//}
 
 
 
 
 
 
-void CosseratRod::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
-                                              const Eigen::VectorXd &t_Delta_dot_qe,
-                                              const Eigen::VectorXd &t_Delta_ddot_qe)
-{
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
+//                                              const Eigen::VectorXd &t_Delta_dot_qe,
+//                                              const Eigen::VectorXd &t_Delta_ddot_qe)
+//{
 
 //    if( std::find(t_Delta_qe.begin(), t_Delta_qe.end(), 1.0) == t_Delta_qe.end() or
 //        std::accumulate(t_Delta_qe.begin(), t_Delta_qe.end(), 0) != 1.0){
@@ -136,380 +116,366 @@ void CosseratRod::updateDeltaParameterisation(const Eigen::VectorXd &t_Delta_qe,
 //    }
 
 
-    m_strain_parameterisation_Delta->updateStacks(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
-}
+//    m_cosserat_rod_integrators->updateDeltaParameterisation(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
+//}
 
-void CosseratRod::forwardTangentKinematics()
-{
-    //  Integrate Delta zeta
-    m_tidm_integrators->m_Delta_rotation->solveSystem();
-    m_tidm_integrators->m_Delta_position->solveSystem();
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::forwardTangentKinematics()
+//{
+//    m_cosserat_rod_integrators->forwardTangentKinematics();
+//}
 
-    //  Integrate Delta eta
-    m_tidm_integrators->m_Delta_angular_velocity->solveSystem();
-    m_tidm_integrators->m_Delta_linear_velocity->solveSystem();
+
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
+//                                           const Eigen::Vector3d &t_initial_Delta_position,
+//                                           const Eigen::Vector3d &t_initial_Delta_angular_velocity,
+//                                           const Eigen::Vector3d &t_initial_Delta_linear_velocity,
+//                                           const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
+//                                           const Eigen::Vector3d &t_initial_Delta_linear_acceleration)
+//{
+//    m_cosserat_rod_integrators->forwardTangentKinematics(t_initial_Delta_orientation,
+//                                                         t_initial_Delta_position,
+//                                                         t_initial_Delta_angular_velocity,
+//                                                         t_initial_Delta_linear_velocity,
+//                                                         t_initial_Delta_angular_acceleration,
+//                                                         t_initial_Delta_linear_acceleration);
+//}
+
+
+
 
-    //  Integrate Delta dot eta
-    m_tidm_integrators->m_Delta_angular_acceleration->solveSystem();
-    m_tidm_integrators->m_Delta_linear_acceleration->solveSystem();
-}
+
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//::LieAlgebra::Kinematics CosseratRod<NumericalIntegrator>::getKinematicsAtTip()const
+//{
+//    return m_cosserat_rod_integrators->getKinematicsAtTip();
+//}
 
 
-void CosseratRod::forwardTangentKinematics(const Eigen::Vector3d &t_initial_Delta_orientation,
-                                           const Eigen::Vector3d &t_initial_Delta_position,
-                                           const Eigen::Vector3d &t_initial_Delta_angular_velocity,
-                                           const Eigen::Vector3d &t_initial_Delta_linear_velocity,
-                                           const Eigen::Vector3d &t_initial_Delta_angular_acceleration,
-                                           const Eigen::Vector3d &t_initial_Delta_linear_acceleration)
-{
-    //  Integrate Delta zeta
-    m_tidm_integrators->m_Delta_rotation->integrate( t_initial_Delta_orientation );
-    m_tidm_integrators->m_Delta_position->integrate( t_initial_Delta_position );
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//::LieAlgebra::TangentKinematics CosseratRod<NumericalIntegrator>::getTangentKinematicsAtTip()const
+//{
+//    return m_cosserat_rod_integrators->getTangentKinematicsAtTip();
+//}
 
-    //  Integrate Delta eta
-    m_tidm_integrators->m_Delta_angular_velocity->integrate( t_initial_Delta_angular_velocity );
-    m_tidm_integrators->m_Delta_linear_velocity->integrate( t_initial_Delta_linear_velocity );
 
-    //  Integrate Delta dot eta
-    m_tidm_integrators->m_Delta_angular_acceleration->integrate( t_initial_Delta_angular_acceleration );
-    m_tidm_integrators->m_Delta_linear_acceleration->integrate( t_initial_Delta_linear_acceleration );
-}
 
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
+//{
+//    m_cosserat_rod_integrators->backwardDynamics(t_Lambda_X1);
+//}
 
 
 
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
+//{
+//    m_cosserat_rod_integrators->backwardTangentDynamics(t_Delta_Lambda_X1);
 
+//}
 
-::LieAlgebra::Kinematics CosseratRod::getKinematicsAtTip()const
-{
-    ::LieAlgebra::Kinematics rod_tip_kinematics;
 
-    rod_tip_kinematics.m_pose = ::LieAlgebra::SE3Pose( m_idm_integrators->m_quaternion->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-                                                       m_idm_integrators->m_position->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END) );
 
 
-    rod_tip_kinematics.m_twist << m_idm_integrators->m_angular_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-                                    m_idm_integrators->m_linear_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::IDM(const Eigen::VectorXd &t_qe,
+//                                        const Eigen::VectorXd &t_dot_qe,
+//                                        const Eigen::VectorXd &t_ddot_qe,
+//                                        const Eigen::Vector4d &t_initial_quaternion,
+//                                        const Eigen::Vector3d &t_initial_position,
+//                                        const ::LieAlgebra::Vector6d &t_initial_twist,
+//                                        const ::LieAlgebra::Vector6d &t_initial_acceleration,
+//                                        const ::LieAlgebra::Vector6d &t_Lambda_X1)
+//{
+//    m_cosserat_rod_integrators->updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
 
-    rod_tip_kinematics.m_accelerations << m_idm_integrators->m_angular_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-                                            m_idm_integrators->m_linear_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
-    return rod_tip_kinematics;
-}
+//    m_cosserat_rod_integrators->forwardKinematics(t_initial_quaternion,
+//                                                  t_initial_position,
+//                                                  t_initial_twist.block<3, 1>(0, 0),
+//                                                  t_initial_twist.block<3, 1>(3, 0),
+//                                                  t_initial_acceleration.block<3, 1>(0, 0),
+//                                                  t_initial_acceleration.block<3, 1>(3, 0));
 
+//    m_cosserat_rod_integrators->backwardDynamics(t_Lambda_X1);
 
-::LieAlgebra::TangentKinematics CosseratRod::getTangentKinematicsAtTip()const
-{
-    ::LieAlgebra::TangentKinematics rod_tip_tangent_kinematics;
+//    return getLambdaAtBase();
+//}
 
-    rod_tip_tangent_kinematics.m_Delta_zeta << m_tidm_integrators->m_Delta_rotation->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-                                               m_tidm_integrators->m_Delta_position->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
 
-    rod_tip_tangent_kinematics.m_Delta_twist << m_tidm_integrators->m_Delta_angular_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-                                                m_tidm_integrators->m_Delta_linear_velocity->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::IDM(const Eigen::VectorXd &t_qe,
+//                                        const Eigen::VectorXd &t_dot_qe,
+//                                        const Eigen::VectorXd &t_ddot_qe,
+//                                        const Eigen::Quaterniond &t_initial_quaternion,
+//                                        const Eigen::Vector3d &t_initial_position,
+//                                        const ::LieAlgebra::Vector6d &t_initial_twist,
+//                                        const ::LieAlgebra::Vector6d &t_initial_acceleration,
+//                                        const ::LieAlgebra::Vector6d &t_Lambda_X1)
+//{
+//    const Eigen::Vector4d initial_quaternion(t_initial_quaternion.w(),
+//                                             t_initial_quaternion.x(),
+//                                             t_initial_quaternion.y(),
+//                                             t_initial_quaternion.z());
 
-    rod_tip_tangent_kinematics.m_Delta_acceleration << m_tidm_integrators->m_Delta_angular_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
-                                                       m_tidm_integrators->m_Delta_linear_acceleration->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);
+//    return IDM(t_qe,
+//               t_dot_qe,
+//               t_ddot_qe,
+//               initial_quaternion,
+//               t_initial_position,
+//               t_initial_twist,
+//               t_initial_acceleration,
+//               t_Lambda_X1);
+//}
 
-    return rod_tip_tangent_kinematics;
-}
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::TIDM(const Eigen::VectorXd &t_Delta_qe,
+//                                         const Eigen::VectorXd &t_Delta_dot_qe,
+//                                         const Eigen::VectorXd &t_Delta_ddot_qe,
+//                                         const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
+//{
+//    updateDeltaParameterisation(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
 
 
+//    forwardTangentKinematics();
+//    backwardTangentDynamics(t_Delta_Lambda_X1);
 
-void CosseratRod::backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1)
-{
+//    return getDeltaLambdaAtBase();
+//}
 
-    //  Map force and couple into local coordinates
-    Eigen::Vector3d couple_at_tip = t_Lambda_X1.block<3, 1>(0, 0);
-    Eigen::Vector3d force_at_tip  = t_Lambda_X1.block<3, 1>(3, 0);
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::getLambdaAtBase()const
+//{
+//    return m_cosserat_rod_integrators->getLambdaAtBase();
+//}
 
-    m_idm_integrators->m_internal_forces->integrate(force_at_tip);
-    m_idm_integrators->m_internal_couples->integrate(couple_at_tip);
 
 
-    m_idm_integrators->m_generalised_forces->solveSystem();
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//::LieAlgebra::Vector6d CosseratRod<NumericalIntegrator>::getDeltaLambdaAtBase()const
+//{
+//    return m_cosserat_rod_integrators->getDeltaLambdaAtBase();
+//}
 
-}
 
 
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//Eigen::VectorXd CosseratRod<NumericalIntegrator>::getStaticInternalBalance(const Eigen::VectorXd &t_qe) const
+//{
 
-void CosseratRod::backwardTangentDynamics(const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
-{
+//    const Eigen::VectorXd Qe = m_Kee * t_qe;
+//    const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
+//    const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
-    Eigen::Vector3d Delta_couple_at_tip = t_Delta_Lambda_X1.block<3, 1>(0, 0);
-    Eigen::Vector3d Delta_force_at_tip  = t_Delta_Lambda_X1.block<3, 1>(3, 0);
+//    const Eigen::VectorXd internal_balance = Qe - Qa - Q_ad;
+//    return internal_balance;
+//}
 
 
-    m_tidm_integrators->m_Delta_internal_forces->integrate(Delta_force_at_tip);
-    m_tidm_integrators->m_Delta_internal_couples->integrate(Delta_couple_at_tip);
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//Eigen::VectorXd CosseratRod<NumericalIntegrator>::getInternalBalance(const Eigen::VectorXd &t_qe,
+//                                                const Eigen::VectorXd &t_dot_qe) const
+//{
 
-    m_tidm_integrators->m_Delta_generalised_forces->solveSystem();
-}
+//    const Eigen::VectorXd Qe = m_Dee * t_qe;
+//    const Eigen::VectorXd Ce = m_Kee * t_dot_qe;
+//    const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
+//    const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
+//    const Eigen::VectorXd internal_balance = Qe + Ce - Qa - Q_ad;
+//    return internal_balance;
 
+//}
 
 
 
-::LieAlgebra::Vector6d CosseratRod::IDM(const Eigen::VectorXd &t_qe,
-                                        const Eigen::VectorXd &t_dot_qe,
-                                        const Eigen::VectorXd &t_ddot_qe,
-                                        const Eigen::Vector4d &t_initial_quaternion,
-                                        const Eigen::Vector3d &t_initial_position,
-                                        const ::LieAlgebra::Vector6d &t_initial_twist,
-                                        const ::LieAlgebra::Vector6d &t_initial_acceleration,
-                                        const ::LieAlgebra::Vector6d &t_Lambda_X1)
-{
-    updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
 
-    forwardKinematics(t_initial_quaternion,
-                      t_initial_position,
-                      t_initial_twist.block<3, 1>(0, 0),
-                      t_initial_twist.block<3, 1>(3, 0),
-                      t_initial_acceleration.block<3, 1>(0, 0),
-                      t_initial_acceleration.block<3, 1>(3, 0));
 
-    backwardDynamics(t_Lambda_X1);
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//Eigen::VectorXd CosseratRod<NumericalIntegrator>::getTangentStaticInternalBalance(const Eigen::VectorXd &t_Delta_qe)const
+//{
 
-    return getLambdaAtBase();
-}
+//    Eigen::VectorXd Delta_Qe = m_Kee * t_Delta_qe;
+//    Eigen::VectorXd Delta_Qa = m_cosserat_rod_integrators->getDeltaQaAtBase();
 
+//    Eigen::VectorXd Delta_internal_balance = Delta_Qe - Delta_Qa;
 
-::LieAlgebra::Vector6d CosseratRod::IDM(const Eigen::VectorXd &t_qe,
-                                        const Eigen::VectorXd &t_dot_qe,
-                                        const Eigen::VectorXd &t_ddot_qe,
-                                        const Eigen::Quaterniond &t_initial_quaternion,
-                                        const Eigen::Vector3d &t_initial_position,
-                                        const ::LieAlgebra::Vector6d &t_initial_twist,
-                                        const ::LieAlgebra::Vector6d &t_initial_acceleration,
-                                        const ::LieAlgebra::Vector6d &t_Lambda_X1)
-{
-    updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
+//    return Delta_internal_balance;
+//}
 
-    forwardKinematics(t_initial_quaternion,
-                      t_initial_position,
-                      t_initial_twist.block<3, 1>(0, 0),
-                      t_initial_twist.block<3, 1>(3, 0),
-                      t_initial_acceleration.block<3, 1>(0, 0),
-                      t_initial_acceleration.block<3, 1>(3, 0));
 
-    backwardDynamics(t_Lambda_X1);
 
-    return getLambdaAtBase();
-}
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//Eigen::VectorXd CosseratRod<NumericalIntegrator>::getTangentInternalBalance(const Eigen::VectorXd &t_Delta_qe,
+//                                                       const Eigen::VectorXd &t_Delta_dot_qe)const
+//{
 
-::LieAlgebra::Vector6d CosseratRod::TIDM(const Eigen::VectorXd &t_Delta_qe,
-                                         const Eigen::VectorXd &t_Delta_dot_qe,
-                                         const Eigen::VectorXd &t_Delta_ddot_qe,
-                                         const ::LieAlgebra::Vector6d &t_Delta_Lambda_X1)
-{
-    updateDeltaParameterisation(t_Delta_qe, t_Delta_dot_qe, t_Delta_ddot_qe);
+//    Eigen::VectorXd Delta_Qe = m_Kee * t_Delta_qe;
+//    Eigen::VectorXd Delta_Ce = m_Dee * t_Delta_dot_qe;
+//    Eigen::VectorXd Delta_Qa = m_cosserat_rod_integrators->getDeltaQaAtBase();
 
 
-    forwardTangentKinematics();
-    backwardTangentDynamics(t_Delta_Lambda_X1);
+//    Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Ce - Delta_Qa;
+//    return Delta_internal_balance;
+//}
 
-    return getDeltaLambdaAtBase();
-}
 
-::LieAlgebra::Vector6d CosseratRod::getLambdaAtBase()const
-{
-    ::LieAlgebra::Vector6d Lambda;
-    Lambda <<   m_idm_integrators->m_internal_couples->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN),
-                m_idm_integrators->m_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::updateInternalActuation(const double &t_current_time)
+//{
+//    m_cosserat_rod_integrators->updateInternalActuation(t_current_time);
+//}
 
-    return Lambda;
-}
 
 
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//Eigen::MatrixXd CosseratRod<NumericalIntegrator>::getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)
+//{
 
-LieAlgebra::Vector6d CosseratRod::getDeltaLambdaAtBase()const
-{
-    ::LieAlgebra::Vector6d Delta_Lambda;
-    Delta_Lambda <<   m_tidm_integrators->m_Delta_internal_couples->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN),
-                      m_tidm_integrators->m_Delta_internal_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+//    updateParameterisation(t_qe, 0*t_qe, 0*t_qe);
 
-    return Delta_Lambda;
-}
+//    forwardKinematics();
 
+//    return getRodPositionsAtChebyshevPoints();
+//}
 
 
 
-Eigen::VectorXd CosseratRod::getStaticInternalBalance(const Eigen::VectorXd &t_qe) const
-{
-    const Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
 
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::printProperties()
+//{
+//    std::stringstream rod_properties;
 
-    const Eigen::VectorXd Qe = Kee * t_qe;
-    const Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-    const Eigen::VectorXd Q_ad = getQad();
 
-    const Eigen::VectorXd internal_balance = Qe - Qa - Q_ad;
-    return internal_balance;
-}
 
-Eigen::VectorXd CosseratRod::getInternalBalance(const Eigen::VectorXd &t_qe,
-                                                const Eigen::VectorXd &t_dot_qe) const
-{
-    const Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
-    const Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+//    {   //  Start listing rod dimensions
+//    const auto l = m_rod_properties->m_rod_dimensions.m_L;
+//    rod_properties << "Rod dimensions :\n"
+//                      "     l : " << l << "\n" <<
+//                      m_rod_properties->m_rod_dimensions.m_cross_section->printProperties();
+//    }
 
+//    {   //  Start listing material properties
+//    const auto E = m_rod_properties->m_material_properties.m_E;
+//    const auto G = m_rod_properties->m_material_properties.m_G;
+//    const auto rho = m_rod_properties->m_material_properties.m_rho;
+//    rod_properties << "Material properties :\n"
+//                      "     E : " << std::setprecision(2) << std::scientific << E << "\n"
+//                      "     G : " << std::setprecision(2) << std::scientific << G << "\n"
+//                      "     ρ : " << std::setprecision(0) << std::fixed << rho << "\n";
+//    }
 
-    const Eigen::VectorXd Qe = Kee * t_qe;
-    const Eigen::VectorXd Ce = Dee * t_dot_qe;
-    const Eigen::VectorXd Qa = m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
-    const Eigen::VectorXd Q_ad = getQad();
 
-    const Eigen::VectorXd internal_balance = Qe + Ce - Qa - Q_ad;
-    return internal_balance;
 
-}
+//    {   //  Strain parameterisation
+//    rod_properties << "Strain parameterisation : \n";
 
 
+//       //  get the admitted deformations
+//    Eigen::VectorXi def(6);
+//    for(unsigned int i=0; i<6; i++)
+//        def[i] = m_polynomial_representation.m_admitted_deformations[i];
+//    rod_properties << "     Rod deformations : " << def.transpose() << "\n";
 
 
+//       //  Also print the number of modes
+//    Eigen::VectorXi ne_stack = Eigen::VectorXi::Zero(6);
+//    unsigned int j =0;
+//    for(unsigned int i=0; i<m_polynomial_representation.m_admitted_deformations.size(); i++)
+//        if(m_polynomial_representation.m_admitted_deformations[i])
+//            ne_stack[i] = m_polynomial_representation.m_number_of_modes_stack[j++];
+//    rod_properties << "     Number of modes  : " << ne_stack.transpose() << "\n";
 
-Eigen::VectorXd CosseratRod::getTangentStaticInternalBalance(const Eigen::VectorXd &t_Delta_qe)const
-{
-        Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
 
 
-    Eigen::VectorXd Delta_Qe = Kee * t_Delta_qe;
-    Eigen::VectorXd Delta_Qa = m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
+//       //  Details about the base
+//    const auto poly_base = m_polynomial_representation.m_polynomial_base;
 
-    Eigen::VectorXd Delta_internal_balance = Delta_Qe - Delta_Qa;
+//    rod_properties << "     Polynomial base : ";
 
-    return Delta_internal_balance;
-}
+//    std::string base = "Custom base";
+//    const unsigned int p = 5;
+//    const double x = 0.5;
+//    if( poly_base(p, x) == ::CROSP::polynomial_representation::legendre_polynomial_base(p, x) )
+//        base = "Legendre";
 
-Eigen::VectorXd CosseratRod::getTangentInternalBalance(const Eigen::VectorXd &t_Delta_qe,
-                                                       const Eigen::VectorXd &t_Delta_dot_qe)const
-{
-    Eigen::MatrixXd Dee = m_rod_properties->m_Dee;
-    Eigen::MatrixXd Kee = m_rod_properties->m_Kee;
+//    if( poly_base(p, x) == ::CROSP::polynomial_representation::chebyshev_polynomial_base(p, x) )
+//        base = "Chebyshev";
 
+//    rod_properties << base;
 
-    Eigen::VectorXd Delta_Qe = Kee * t_Delta_qe;
-    Eigen::VectorXd Delta_Ce = Dee * t_Delta_dot_qe;
-    Eigen::VectorXd Delta_Qa = m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);
 
-    Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Ce - Delta_Qa;
-    return Delta_internal_balance;
-}
+//    }
 
-void CosseratRod::updateInternalActuation([[maybe_unused]]const double &t_current_time) {};
+//    std::cout << rod_properties.str() << "\n";
+//    std::cout.flush();
+//}
 
-Eigen::VectorXd CosseratRod::getQad()const
-{
-    return Eigen::VectorXd::Zero(m_strain_parameterisation->m_polynomial_representation->getCoordinatesDimension());
-}
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::updateRodLength(const double &t_rod_lenght)
+//{
+//    const double scale = t_rod_lenght/m_rod_properties->m_rod_dimensions.m_L;
+//    m_rod_properties->m_rod_dimensions.m_L = t_rod_lenght;
 
-Eigen::MatrixXd CosseratRod::getRodShapeFromElasticCoordinates(const Eigen::VectorXd &t_qe)const
-{
-    auto rod = *this;
+//    m_Kee *= scale;
+//    m_Dee *= scale;
 
-    rod.updateParameterisation(t_qe, 0*t_qe, 0*t_qe);
+//    m_cosserat_rod_integrators->updateIntegrationDomain(t_rod_lenght);
+//}
 
-    rod.forwardKinematics();
 
-    return rod.getRodPositionsAtChebyshevPoints();
-}
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::updateRodProperties(const rod_properties::RodDimensions &t_rod_dimensions,
+//                                           const rod_properties::MaterialProperties &t_material_properties)
+//{
+////    m_rod_properties->updateRodProperties(t_rod_dimensions,
+////                                          t_material_properties,
+////                                          m_strain_parameterisation->m_polynomial_representation);
+//}
 
 
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//void CosseratRod<NumericalIntegrator>::updateRodProperties(const double &t_EI)
+//{
+//    m_rod_properties->m_H(2, 2) = t_EI;
 
+////    m_Kee = defineKee();
 
-void CosseratRod::printProperties()
-{
-    std::stringstream rod_properties;
+//    m_Dee = m_rod_properties->m_material_properties.m_mu*m_Kee;
+//}
 
 
 
-    {   //  Start listing rod dimensions
-    const auto l = m_rod_properties->m_rod_dimensions.m_L;
-    rod_properties << "Rod dimensions :\n"
-                      "     l : " << l << "\n" <<
-                      m_rod_properties->m_rod_dimensions.m_cross_section->printProperties();
-    }
+//template<numerical_integrators::CosseratIntegrator NumericalIntegrator>
+//Eigen::MatrixXd CosseratRod<NumericalIntegrator>::defineKee()
+//{
 
-    {   //  Start listing material properties
-    const auto E = m_rod_properties->m_material_properties.m_E;
-    const auto G = m_rod_properties->m_material_properties.m_G;
-    const auto rho = m_rod_properties->m_material_properties.m_rho;
-    rod_properties << "Material properties :\n"
-                      "     E : " << std::setprecision(2) << std::scientific << E << "\n"
-                      "     G : " << std::setprecision(2) << std::scientific << G << "\n"
-                      "     ρ : " << std::setprecision(0) << std::fixed << rho << "\n";
-    }
+//    const unsigned int n = m_polynomial_representation.getCoordinatesDimension();
 
+//    const Eigen::MatrixXd Ha = m_polynomial_representation.m_B.transpose() * m_rod_properties->m_H * m_polynomial_representation.m_B;
 
 
-    {   //  Strain parameterisation
-    rod_properties << "Strain parameterisation : \n";
+//    typedef boost::numeric::odeint::runge_kutta_dopri5< Eigen::MatrixXd, double,
+//                                                         Eigen::MatrixXd, double,
+//                                                         boost::numeric::odeint::vector_space_algebra> Ke_stepper;
+//    Eigen::MatrixXd Kee = Eigen::MatrixXd::Zero(n, n);
 
-    rod_properties << "     Number of Chebyshev points : " << m_strain_parameterisation->m_number_of_Chebyshev_points << "\n";
+//    const double X0 = 0.0;
+//    const double X1 = 1.0;
+//    const double dX = 0.0005;
 
-       //  get the admitted deformations
-    Eigen::VectorXi def(6);
-    for(unsigned int i=0; i<6; i++)
-        def[i] = m_strain_parameterisation->m_polynomial_representation->m_admitted_deformations[i];
-    rod_properties << "     Rod deformations : " << def.transpose() << "\n";
+//    boost::numeric::odeint::integrate_adaptive(Ke_stepper(), [&](const Eigen::MatrixXd &, Eigen::MatrixXd &t_dKeeds, const double t_X){
+//        const auto Phi = m_polynomial_representation.getPhi( t_X );
 
+//        t_dKeeds = Phi.transpose()*Ha*Phi;
+//    }, Kee, X0, X1, dX);
 
-       //  Also print the number of modes
-    Eigen::VectorXi ne_stack = Eigen::VectorXi::Zero(6);
-    unsigned int j =0;
-    for(unsigned int i=0; i<m_strain_parameterisation->m_polynomial_representation->m_admitted_deformations.size(); i++)
-        if(m_strain_parameterisation->m_polynomial_representation->m_admitted_deformations[i])
-            ne_stack[i] = m_strain_parameterisation->m_polynomial_representation->m_number_of_modes_stack[j++];
-    rod_properties << "     Number of modes  : " << ne_stack.transpose() << "\n";
+//    Kee *= m_rod_properties->m_rod_dimensions.m_L;
 
-
-
-       //  Details about the base
-    const auto poly_base = m_strain_parameterisation->m_polynomial_representation->m_polynomial_base;
-
-    rod_properties << "     Polynomial base : ";
-
-    std::string base = "Custom base";
-    const unsigned int p = 5;
-    const double x = 0.5;
-    if( poly_base(p, x) == ::CROSP::polynomial_representation::legendre_polynomial_base(p, x) )
-        base = "Legendre";
-
-    if( poly_base(p, x) == ::CROSP::polynomial_representation::chebyshev_polynomial_base(p, x) )
-        base = "Chebyshev";
-
-    rod_properties << base;
-
-
-    }
-
-    std::cout << rod_properties.str() << "\n";
-    std::cout.flush();
-}
-
-void CosseratRod::updateRodLength(const double &t_rod_lenght)
-{
-    m_rod_properties->updateRodLength( t_rod_lenght );
-
-    m_idm_integrators->updateIntegrationDomain( t_rod_lenght );
-
-    m_tidm_integrators->updateIntegrationDomain( t_rod_lenght );
-}
-
-
-void CosseratRod::updateRodProperties(const rod_properties::RodDimensions &t_rod_dimensions,
-                                           const rod_properties::MaterialProperties &t_material_properties)
-{
-    m_rod_properties->updateRodProperties(t_rod_dimensions,
-                                          t_material_properties,
-                                          m_strain_parameterisation->m_polynomial_representation);
-}
-
-
-void CosseratRod::updateRodProperties(const double &t_EI)
-{
-    m_rod_properties->updateRodProperties(t_EI,
-                                          m_strain_parameterisation->m_polynomial_representation);
-}
+//    return Kee;
+//}
 
 
 }   //  namespace CROSP

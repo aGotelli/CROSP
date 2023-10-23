@@ -18,7 +18,9 @@
 #include <math.h>
 
 
-#include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
+
+#include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
 
 
 /// \brief CROSP::rod_properties namespace contains the definition of the rod properties
@@ -67,6 +69,10 @@ struct CrossSection{
     virtual std::string printProperties() const=0;
 };
 
+
+typedef std::unique_ptr<CrossSection> CrossSectionUPtr;
+
+
 struct CircularCrossSection : public CrossSection {
 
     CircularCrossSection(const double &t_radius=0.001)
@@ -102,6 +108,8 @@ struct CircularCrossSection : public CrossSection {
 
     double m_radius;
 };
+
+typedef std::unique_ptr<CircularCrossSection> CircularCrossSectionUPtr;
 
 
 struct RectangularCrossSection : public CrossSection {
@@ -144,6 +152,8 @@ struct RectangularCrossSection : public CrossSection {
     double m_height;
 };
 
+typedef std::unique_ptr<RectangularCrossSection> RectangularCrossSectionUPtr;
+
 
 
 /*!
@@ -156,7 +166,13 @@ struct RodDimensions {
 
     RodDimensions()=default;
 
-    ~RodDimensions();
+    ~RodDimensions()=default;
+
+
+    RodDimensions(RodDimensions &t_other)
+        : m_cross_section( std::move(t_other.m_cross_section) ),
+          m_L(t_other.m_L)
+    {}
 
 
     /*!
@@ -164,11 +180,16 @@ struct RodDimensions {
      * \param t_r   Radius of the section [m]
      * \param t_L   Length of the rod [m]
      */
-    RodDimensions(CrossSection* t_cross_section, const double &t_L);
+    RodDimensions(CrossSectionUPtr t_cross_section,
+                  const double &t_L)
+        : m_cross_section( std::move(t_cross_section) ),
+          m_L(t_L)
+    {}
 
 
-    CrossSection* m_cross_section {
-        new CircularCrossSection()
+
+    CrossSectionUPtr m_cross_section {
+        std::make_unique<CircularCrossSection>()
     };
 
     /// \brief m_L  Length of the rod [m]
@@ -186,21 +207,11 @@ class RodProperties {
 
 public:
 
+    RodProperties()=default;
 
-    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation);
+    RodProperties(RodDimensions t_rod_dimensions,
+                  MaterialProperties t_material_properties);
 
-
-    RodProperties(const std::shared_ptr<const strain_parameterisation::StrainParameterisation> t_strain_parameterisation,
-                  const RodDimensions &t_rod_dimensions,
-                  const MaterialProperties &t_material_properties);
-
-
-    /*!
-     * \brief updateRodLength this funtion is used to update the length of the rod
-     * \param t_rod_lenght the new lenght of the rod.
-     */
-    [[deprecated("This function is not tested. Solve the GitHub issue before usage")]]
-    void updateRodLength(const double &t_rod_lenght);
 
 
 
@@ -253,14 +264,6 @@ public:
     Eigen::Matrix3d getHLinear()const;
 
 
-    void updateRodProperties(const RodDimensions &t_rod_dimensions,
-                             const MaterialProperties &t_material_properties,
-                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
-
-
-    void updateRodProperties(const double &t_EI,
-                             const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation);
-
 
 
     /// \brief m_H The Hookean matrix default initialised using the members m_material_properties and m_rod_dimensions
@@ -270,12 +273,6 @@ public:
      Eigen::Matrix<double, 6, 6>  m_M{ computeCrossSectionalInertiaMatrix() };
 
 
-    /// \brief m_Kee The generalised elasticity matrix
-    Eigen::MatrixXd m_Kee;
-
-    /// \brief m_Dee The matrix of the internal dumping
-    Eigen::MatrixXd m_Dee { m_material_properties.m_mu*m_Kee };
-
 
 private:
 
@@ -284,20 +281,17 @@ private:
     ::LieAlgebra::Matrix6d computeCrossSectionalInertiaMatrix()const;
 
 
-    /*!
-     * \brief defineKee defines the elasticity matrix Kee
-     * \param t_ne the number of modes per admitted deformation
-     * \param t_na the number of deformations degrees of freedom
-     * \param t_B the map matrix to map the allowed strains in the space of the full strain
-     * \return
-     */
-    Eigen::MatrixXd defineKee(const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> t_polynomial_representation)const;
 
 
     double gamma = 9.81;
 public : Eigen::Vector3d m_gravity { Eigen::Vector3d(0, 0, -gamma) };
 
 };
+
+
+typedef std::shared_ptr<RodProperties> RodPropertiesSPtr;
+
+typedef std::unique_ptr<RodProperties> RodPropertiesUPtr;
 
 
 

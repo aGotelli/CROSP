@@ -61,82 +61,11 @@ struct StrainParameterisation {
     ~StrainParameterisation()=default;
 
 
-    /*!
-     * \brief updateStacks updates the stacks of strain and its first and second derivative
-     * \param t_qe the generalised elastic coordinates
-     * \param t_dot_qe the first derivative of the generalised elastic coordinates
-     * \param t_ddot_qe the second derivative of the generalised elastic coordinates
-     */
-    void updateStacks(const Eigen::VectorXd &t_qe,
-                      const Eigen::VectorXd &t_dot_qe,
-                      const Eigen::VectorXd &t_ddot_qe);
-
-
-
-    //  The number of Chebyshev points used to represent the rod
-    const unsigned int m_number_of_Chebyshev_points { 17 };
-
 
     const Eigen::VectorXd m_constant_strain {
         (Eigen::VectorXd(6) << 0, 0, 0, 1, 0, 0 ).finished()
     };
 
-
-
-    //  The stacks for the strain, decomposed in angular and linear part
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
-    };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
-    };
-
-    //  The stacks for the first derivative of the strain, decomposed in angular and linear part
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
-    };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Gamma_stack{
-        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
-    };
-
-    //  The stacks for the first derivative of the strain, decomposed in angular and linear part
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
-    };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>(m_number_of_Chebyshev_points)
-    };
-
-
-
-    //  The polynomial representation of the field of strain
-    const std::shared_ptr<const polynomial_representation::PolynomialRepresentation> m_polynomial_representation {
-        std::make_shared<const polynomial_representation::PolynomialRepresentation>()
-    };
-
-
-
-    //  The vector stack of B Phi used to map the generalised coordinates into the strain field
-    std::vector<Eigen::MatrixXd> m_map_to_strain_stack { [this](){
-        std::vector<Eigen::MatrixXd> map_to_strain_stack(m_number_of_Chebyshev_points);
-
-        std::vector<Eigen::MatrixXd> Phi_stack( m_number_of_Chebyshev_points );
-
-        const auto Chebyshev_points = ::Chebyshev::ComputeChebyshevPoints( m_number_of_Chebyshev_points );
-
-        std::generate(Phi_stack.begin(), Phi_stack.end(), [&, index=0]()mutable{
-            const auto Phi = m_polynomial_representation->getPhi( Chebyshev_points[index] );
-            index++;
-            return Phi;
-        });
-
-
-        std::generate(map_to_strain_stack.begin(), map_to_strain_stack.end(), [&, index=0]()mutable{
-            return m_polynomial_representation->m_B*Phi_stack[index++];
-        });
-
-        return map_to_strain_stack;
-    }() };
 
 
 };

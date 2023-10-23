@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
     const std::string path = "../../../MATLAB/test_different_modes/";
 
     std::array<bool, 6> admitted_deformations = {
-            true,
-            true,
+            false,
+            false,
             true,
             false,
             false,
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     writeToFile("deformations_stack", deformations_stack, path);
 
     std::vector<unsigned int> number_of_modes_stack {
-        2, 3, 5
+        /*2, 3, */3
     };
 
     Eigen::VectorXd ne_stack = Eigen::VectorXd::Zero(6);
@@ -48,8 +48,8 @@ int main(int argc, char *argv[])
     CROSP::polynomial_representation::PolynomialRepresentation polynomial_representation(admitted_deformations, number_of_modes_stack);
 
     ::CROSP::rod_properties::RodDimensions rod_dimension;
-    rod_dimension.m_L = 2.41;
-    ::CROSP::CosseratRod<::CROSP::numerical_integrators::explicit_methods::ExplicitIntegrator<>> rod(polynomial_representation, number_of_Chebyshev_points, rod_dimension);
+    rod_dimension.m_L = 1.0;
+    ::CROSP::CosseratRod rod(polynomial_representation, number_of_Chebyshev_points, rod_dimension);
 
 
 
@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
 //        ddot_q(i) = 0.2*(ne - i);
 //    }
 
-    q.setRandom();
-    dot_q.setRandom();
-    ddot_q.setRandom();
+//    q.setRandom();
+//    dot_q.setRandom();
+//    ddot_q.setRandom();
 
 //   q(1)      = 1;
 //   dot_q(1)  = 400;

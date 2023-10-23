@@ -19,7 +19,6 @@ for i=1:n
 end
     
 for it_x = 1:N_noeuds
-    
     A_xi  = f_A(it_x);
     b_xi = f_B(it_x);
 
