@@ -155,20 +155,6 @@ struct RectangularCrossSection : public CrossSection {
 typedef std::unique_ptr<RectangularCrossSection> RectangularCrossSectionUPtr;
 
 
-template <class CrossSectionGeometry>
-concept CosseratCrossSection = requires(CrossSectionGeometry geometry){
-    double() = geometry.Area();
-
-    double() = geometry.Ixx();
-
-    double() = geometry.Iyy();
-
-    double() = geometry.Izz();
-
-    std::string() = geometry.printProperties();
-
-};
-
 
 /*!
  * \brief The RodDimensions struct contains the geometrical dimensions of the rod

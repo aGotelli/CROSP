@@ -34,10 +34,17 @@
 namespace CROSP {
 
 
+typedef ::CROSP::numerical_integrators::spectral_method::SpectralIntegrators Spectral;
+typedef ::CROSP::numerical_integrators::explicit_methods::ExplicitIntegrator<> Ode45;
+typedef ::CROSP::numerical_integrators::magnus_expansion::MagnusIntegrators Magnus;
+
+
 /*!
  * \brief The CosseratRod class implements the functionalities needed to simulate a Cosserat rod
+ *
+ * By default, this class uses the spectral integration of SpectralIntegrators
  */
-template<numerical_integrators::CosseratIntegrator NumericalIntegrator=::CROSP::numerical_integrators::spectral_method::SpectralIntegrators>
+template<numerical_integrators::CosseratIntegrator NumericalIntegrator=Spectral>
 class CosseratRod
 {
 public:

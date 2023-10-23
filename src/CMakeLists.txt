@@ -100,7 +100,7 @@ add_library(${PROJECT_NAME} SHARED
                             strain_parameterisation_stack/strain_parameterisation_stack.cpp
 
 
-                            include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
+                            #include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
 
 
                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/spectral_integrators.hpp
