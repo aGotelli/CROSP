@@ -36,9 +36,6 @@ namespace CROSP::rod_properties {
  */
 struct MaterialProperties {
 
-    MaterialProperties()=default;
-
-
     ///  \brief m_E Young modulus [Pa]
     double m_E { 210e9 };
 
