@@ -19,7 +19,7 @@ namespace CROSP::numerical_integrators::spectral_method::internal_actuation_inte
 
 
 InternalActuationIntegrator::InternalActuationIntegrator(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                                                         ::ATORS::tendon_driven_actuation::TendonDrivenActuation t_distributed_actuation,
+                                                         ::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation,
                                                          const double &t_rod_length)
     : OSNI::ODEb(t_strain_parameterisation_stack->m_B_Phi_stack.cols(),
                  ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
@@ -28,7 +28,7 @@ InternalActuationIntegrator::InternalActuationIntegrator(std::shared_ptr<const s
       m_K_stack(t_strain_parameterisation_stack->m_K_stack),
       m_Gamma_stack(t_strain_parameterisation_stack->m_Gamma_stack),
       m_BPhi_stack(t_strain_parameterisation_stack->m_B_Phi_stack),
-      m_distributed_actuation(t_distributed_actuation)
+      m_distributed_actuation(std::move(t_distributed_actuation))
 {}
 
 InternalActuationIntegrator::InternalActuationIntegrator(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack)
@@ -40,7 +40,7 @@ InternalActuationIntegrator::InternalActuationIntegrator(std::shared_ptr<const s
 
 void InternalActuationIntegrator::updateActuation(const double &t_time)
 {
-    m_distributed_actuation.updateActuation(t_time);
+    m_distributed_actuation->updateActuation(t_time);
 
     this->solveSystem();
 }
@@ -56,9 +56,9 @@ Eigen::VectorXd InternalActuationIntegrator::computerParametersVectorAtPoint(con
     const auto start_row_index = t_point*rows;
     const auto BPhi = m_BPhi_stack.block(start_row_index, 0, rows, cols);
     const Eigen::VectorXd b_at_point =
-            m_distributed_actuation.getInternalActuatedStresses(K,
-                                                                Gamma,
-                                                                BPhi);
+            m_distributed_actuation->getInternalActuatedStresses(K,
+                                                                 Gamma,
+                                                                 BPhi);
 
     return b_at_point;
 

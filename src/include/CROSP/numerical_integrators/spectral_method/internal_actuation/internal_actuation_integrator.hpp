@@ -26,7 +26,7 @@ struct InternalActuationIntegrator : public ::ATORS::ActuatorBase, ::OSNI::ODEb{
 
 
     InternalActuationIntegrator(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                                ::ATORS::tendon_driven_actuation::TendonDrivenActuation t_distributed_actuation,
+                                ::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation,
                                 const double &t_rod_length);
 
 protected:
@@ -47,7 +47,7 @@ public:
 
 
 
-    ::ATORS::tendon_driven_actuation::TendonDrivenActuation m_distributed_actuation;
+    ::ATORS::distributed_actuation::DistributedActuationUptr m_distributed_actuation;
 
 
 };
