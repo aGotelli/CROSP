@@ -12,6 +12,7 @@
 
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 #include "CROSP/rod_properties/rod_properties.hpp"
+#include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
 
 #include <ATORS/ATORS.hpp>
 
@@ -27,13 +28,14 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
 
         NumericalIntegrator(polynomial_representation::PolynomialRepresentation(),
                             int(),
-                            std::shared_ptr<rod_properties::RodProperties>());
+                            std::shared_ptr<rod_properties::RodProperties>(),
+                            ::CROSP::strain_parameterisation_stack::StrainFunction());
 
 
         integrator.addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr());
 
 
-        integrator.printIntegratorProperties();
+        std::string() = integrator.printIntegratorProperties();
 
 
         integrator.updateParameterisation(Eigen::VectorXd(),

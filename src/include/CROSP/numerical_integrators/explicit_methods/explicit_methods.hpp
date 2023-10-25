@@ -53,6 +53,7 @@ typedef boost::numeric::odeint::modified_midpoint< Eigen::VectorXd, double,
 
 
 
+
 std::string extractBoostSignatureFromtypeid(std::string t_method_type);
 
 /*!
@@ -64,7 +65,8 @@ public:
     ExplicitIntegrationODEs()=default;
 
     ExplicitIntegrationODEs(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                            ::CROSP::strain_parameterisation_stack::StrainFunction t_Xi_c);
 
     //  Define a compiled time known dimension for the state of the pose (quaternion + position)
     typedef Eigen::Matrix<double, 7, 1> PoseState;
@@ -180,7 +182,7 @@ private:
 
 
     polynomial_representation::PolynomialRepresentation m_polynomial_representation;
-    ::LieAlgebra::Vector6d m_constant_strain { ::LieAlgebra::Vector6d::Unit(3) };
+    ::CROSP::strain_parameterisation_stack::StrainFunction m_constant_strain;
 
 
 
@@ -249,9 +251,11 @@ public:
 
     ExplicitIntegrator(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                        const unsigned int t_number_of_Chebyshev_points,
-                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                       ::CROSP::strain_parameterisation_stack::StrainFunction t_Xi_c=::CROSP::strain_parameterisation_stack::default_constrained_strain)
         : ExplicitIntegrationODEs(t_polynomial_representation,
-                                  t_rod_properties),
+                                  t_rod_properties,
+                                  t_Xi_c),
           m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
     {}
 
@@ -282,11 +286,11 @@ public:
 
 
         std::stringstream integrator_properties;
-        integrator_properties << "Stepper integrator\n"
-                                 "      Method : " << method_type << "   Order : " << stepper.order() << "\n"
-                                 "      Adaptive step with initial value of : " << m_dX << "\n"
-                                 "Integration domain : [0, 1]\n"
-                                 "Observerving using : " << m_number_of_Chebyshev_points << " Chebyshev points";
+        integrator_properties << "      Stepper integrator\n"
+                                 "          Method : " << method_type << "   Order : " << stepper.order() << "\n"
+                                 "          Adaptive step with initial value of : " << m_dX << "\n"
+                                 "          Integration domain : [0, 1]\n"
+                                 "          Observerving using : " << m_number_of_Chebyshev_points << " Chebyshev points";
 
         return integrator_properties.str();
 

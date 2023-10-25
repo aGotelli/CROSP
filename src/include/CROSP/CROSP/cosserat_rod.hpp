@@ -63,11 +63,15 @@ public:
                 rod_properties::MaterialProperties t_material_properties=rod_properties::MaterialProperties(),
                 strain_parameterisation_stack::StrainFunction t_constrained_strain=strain_parameterisation_stack::default_constrained_strain)
         : m_polynomial_representation(t_polynomial_represenation),
-          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-          m_constrained_strain(t_constrained_strain),
           m_rod_properties(
               std::make_shared<rod_properties::RodProperties>(t_rod_dimensions,
                                                               t_material_properties)
+              ),
+          m_cosserat_rod_integrators (
+                std::make_unique<NumericalIntegrator>(m_polynomial_representation,
+                                                     t_number_of_Chebyshev_points,
+                                                     m_rod_properties,
+                                                     t_constrained_strain)
               )
     {}
 
@@ -538,7 +542,99 @@ public:
     /*!
      * \brief printProperties a function to log the rod properties with a MATLAB like layout
      */
-    void printProperties();
+    void printProperties()
+    {
+        std::stringstream rod_properties;
+
+
+
+        {   //  Start listing rod dimensions
+        const auto l = m_rod_properties->m_rod_dimensions.m_L;
+        rod_properties << "Rod dimensions :\n"
+                          "     l : " << l << "\n" <<
+                          m_rod_properties->m_rod_dimensions.m_cross_section->printProperties();
+        }
+
+        {   //  Start listing material properties
+        const auto E = m_rod_properties->m_material_properties.m_E;
+        const auto G = m_rod_properties->m_material_properties.m_G;
+        const auto rho = m_rod_properties->m_material_properties.m_rho;
+        rod_properties << "Material properties :\n"
+                          "     E : " << std::setprecision(2) << std::scientific << E << "\n"
+                          "     G : " << std::setprecision(2) << std::scientific << G << "\n"
+                          "     ρ : " << std::setprecision(0) << std::fixed << rho << "\n";
+        }
+
+
+
+        {   //  Strain parameterisation
+        rod_properties << "Strain parameterisation : \n";
+
+        Eigen::MatrixXi parameterization_details_matrix = Eigen::MatrixXi::Zero(2, 6);
+
+
+        Eigen::VectorXi def(6);
+        for(unsigned int i=0; i<6; i++)
+            parameterization_details_matrix.row(0)[i] = m_polynomial_representation.m_admitted_deformations[i];
+
+
+        unsigned int j =0;
+        for(unsigned int i=0; i<m_polynomial_representation.m_admitted_deformations.size(); i++)
+            if(m_polynomial_representation.m_admitted_deformations[i])
+                parameterization_details_matrix.row(1)[i] = m_polynomial_representation.m_number_of_modes_stack[j++];
+
+
+        std::stringstream parameterization_details;
+        parameterization_details << parameterization_details_matrix;
+
+        std::string log = parameterization_details.str();
+        auto newline = log.find('\n');
+        std::string admitted_deformations = log.substr(0, newline);
+        std::string number_of_modes = log.substr(++newline);
+
+
+            //  Print the admitted deformations
+        rod_properties << "     Rod deformations : " << admitted_deformations << "\n";
+
+
+           //  Also print the number of modes
+        rod_properties << "     Number of modes  : " << number_of_modes << "\n";
+
+
+
+           //  Details about the base
+        const auto poly_base = m_polynomial_representation.m_polynomial_base;
+
+        rod_properties << "     Polynomial base : ";
+
+        std::string base = "Custom base";
+        const unsigned int p = 5;
+        const double x = 0.5;
+        if( poly_base(p, x) == ::CROSP::polynomial_representation::legendre_polynomial_base(p, x) )
+            base = "Legendre";
+
+        if( poly_base(p, x) == ::CROSP::polynomial_representation::chebyshev_polynomial_base(p, x) )
+            base = "Chebyshev";
+
+        rod_properties << base << "\n";
+
+
+        }
+
+
+
+        {   //  Integrators
+
+
+            rod_properties << "Numerical Integration:\n" << m_cosserat_rod_integrators->printIntegratorProperties();
+
+        }
+
+
+
+        std::cout << rod_properties.str() << "\n";
+        std::cout.flush();
+    }
 
 
     /*!
@@ -607,26 +703,13 @@ protected:
 
     polynomial_representation::PolynomialRepresentation m_polynomial_representation;
 
-    unsigned int m_number_of_Chebyshev_points { 21 };
-
-
-    strain_parameterisation_stack::StrainFunction m_constrained_strain {
-        strain_parameterisation_stack::default_constrained_strain
-    };
-
 
     //  The set of rod properties
-    rod_properties::RodPropertiesSPtr m_rod_properties {
-        std::make_shared<rod_properties::RodProperties>()
-    };
+    rod_properties::RodPropertiesSPtr m_rod_properties;
 
 
 
-    std::unique_ptr<NumericalIntegrator> m_cosserat_rod_integrators {
-      std::make_unique<NumericalIntegrator>(m_polynomial_representation,
-                                           m_number_of_Chebyshev_points,
-                                           m_rod_properties)
-    };
+    std::unique_ptr<NumericalIntegrator> m_cosserat_rod_integrators;
 
 
 
