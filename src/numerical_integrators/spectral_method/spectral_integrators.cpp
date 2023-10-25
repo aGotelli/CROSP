@@ -23,6 +23,15 @@ SpectralIntegrators::SpectralIntegrators(const polynomial_representation::Polyno
 {}
 
 
+void SpectralIntegrators::addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation)
+{
+    m_internal_actuation_integrator =
+            std::make_unique<internal_actuation_integrator::InternalActuationIntegrator>(m_strain_parameterisation_stack,
+                                                                                         std::move(t_distributed_actuation),
+                                                                                         m_idm_integrators->m_rod_properties->m_rod_dimensions.m_L);
+}
+
+
 std::string SpectralIntegrators::printIntegratorProperties()const
 {
     std::stringstream integrator_properties;

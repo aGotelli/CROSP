@@ -71,6 +71,22 @@ public:
               )
     {}
 
+
+    /*!
+     * \brief addInternalActuation adds an internal actuation to the Cosserat rod
+     * \param t_distributed_actuation the internal distributed actuation acting on the rod
+     *
+     * This function adds an internal distributed actuation to the rod.
+     * It modifies the integrators routines accordingly in order to obtain the projection of the
+     * internal actuation on the generalised coordinates space; namely Q_ad.
+     * In case this function is not called, Q_ad=0 and does not add any step to the numerical integrations
+     */
+    void addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation)
+    {
+        m_cosserat_rod_integrators->addInternalActuation( std::move(t_distributed_actuation) );
+    }
+
+
     /*!
      * \brief updateParameterisation updates the parameterisation of the strain describing the rod shape
      * \param t_qe the set of generalised coordinates

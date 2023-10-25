@@ -8,6 +8,8 @@
 #include "internal_actuation/internal_actuation_integrator.hpp"
 #include "integration_polynomial_base/integration_polynomial_base.hpp"
 
+
+
 namespace CROSP::numerical_integrators::spectral_method {
 
 
@@ -18,6 +20,8 @@ struct SpectralIntegrators{
                         const unsigned int t_number_of_Chebyshev_points,
                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
+
+    void addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation);
 
 
     std::string printIntegratorProperties()const;

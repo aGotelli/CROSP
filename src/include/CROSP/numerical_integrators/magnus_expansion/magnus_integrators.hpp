@@ -3,7 +3,7 @@
 
 #include "CROSP/numerical_integrators/cosserat_rod_integrators.hpp"
 
-//#include "magnus_idm_integrators/magnus_idm_integrators.hpp"
+#include "ATORS/ATORS.hpp"
 
 #include "CROSP/rod_properties/rod_properties.hpp"
 #include "CROSP/strain_parameterisation/strain_parameterisation.hpp"
@@ -28,6 +28,8 @@ struct MagnusIntegrators {
                       std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
 
 
+    void addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation)
+    {}
 
     std::string printIntegratorProperties()const;
 

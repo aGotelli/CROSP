@@ -18,6 +18,9 @@
 
 
 
+
+
+
 namespace CROSP::numerical_integrators::explicit_methods {
 
 
@@ -222,10 +225,13 @@ protected:
     Eigen::VectorXd m_tangent_dynamics_state_X1 { Eigen::VectorXd::Zero(49+m_generalised_coordinates_dimension) };
 
 
-    ::ATORS::tendon_driven_actuation::TendonDrivenActuation m_distributed_actuation;
+    //::ATORS::tendon_driven_actuation::TendonDrivenActuation m_distributed_actuation;
+    ::ATORS::distributed_actuation::DistributedActuationUptr m_distributed_actuation;
 
-    Eigen::VectorXd m_Qad_X0 { Eigen::VectorXd::Zero(25+m_generalised_coordinates_dimension) };
+    Eigen::VectorXd m_Qad_X0 { Eigen::VectorXd::Zero(m_generalised_coordinates_dimension) };
 
+
+    std::function<void()> m_integrate_Qad { [](){} };
 };
 
 
@@ -248,6 +254,22 @@ public:
                                   t_rod_properties),
           m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
     {}
+
+
+    void addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation)
+    {
+        m_distributed_actuation = std::move(t_distributed_actuation);
+
+        m_integrate_Qad = [this]() {
+            boost::numeric::odeint::integrate_adaptive(stepper,
+                                                       [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
+                                                        {this->distributedActuationODE(t_y, t_dyds, t_s);},
+                                                         m_Qad_X0,
+                                                         1.0,
+                                                         0.0,
+                                                         -m_dX);
+        };
+    }
 
 
 
@@ -482,23 +504,20 @@ public:
 
 
 
+
+
+
     void updateInternalActuation(const double &t_time)
     {
-        m_distributed_actuation.updateActuation(t_time);
+        m_distributed_actuation->updateActuation(t_time);
 
         m_Qad_X0.setZero();
 
-
-
         //  Backward Integration
-        boost::numeric::odeint::integrate_adaptive(stepper,
-                                                   [this](const Eigen::VectorXd &t_y, Eigen::VectorXd &t_dyds, const double t_s)
-                                                    {this->distributedActuationODE(t_y, t_dyds, t_s);},
-                                                    m_Qad_X0,
-                                                    1.0,
-                                                    0.0,
-                                                    -m_dX);
+        m_integrate_Qad();
+
     }
+
 
     Eigen::VectorXd getQad() const
     {

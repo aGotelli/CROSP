@@ -23,8 +23,17 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
 constexpr unsigned int number_of_Chebyshev_points = 21;
 
 
+struct A {
+
+    int i { 1 };
+    double d { 0.12 };
+};
+
+
 void benchmarkIDM(::benchmark::State &t_state)
 {
+
+    A a{.i=0};
 
     const unsigned int ne =/* t_state.range(0)*/15;
 
@@ -61,6 +70,14 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
     ::CROSP::rod_properties::MaterialProperties rod_material;
+    rod_material.m_E = 210e9;
+
+
+
+//    Eigen::VectorXd Xi_c = Eigen::VectorXd::Random(6);
+//    ::CROSP::strain_parameterisation_stack::StrainFunction constant_constrained_strain =
+//            [Xi_c](const double& t_X)
+//                    {   return Xi_c*t_X;    };
 
 
     ::CROSP::CosseratRod rod(polynomial_representation,

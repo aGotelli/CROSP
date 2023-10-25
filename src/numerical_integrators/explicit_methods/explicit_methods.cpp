@@ -497,9 +497,9 @@ void ExplicitIntegrationODEs::distributedActuationODE(const Eigen::VectorXd &,
     const Eigen::Vector3d Gamma = Xi.block<3,1>(3,0);
 
 
-    t_dyds = m_rod_length * m_distributed_actuation.getInternalActuatedStresses(K,
-                                                        Gamma,
-                                                        BPhi);
+    t_dyds = m_rod_length * m_distributed_actuation->getInternalActuatedStresses(K,
+                                                                                 Gamma,
+                                                                                 BPhi);
 }
 
 void ExplicitIntegrationODEs::PhiTPhiODE(const Eigen::VectorXd &,
