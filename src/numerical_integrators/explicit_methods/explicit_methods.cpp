@@ -47,9 +47,11 @@ Eigen::Matrix4d getA(const Eigen::Vector3d t_k){
 
 
 ExplicitIntegrationODEs::ExplicitIntegrationODEs(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
-                                                     std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+                                                 std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                                                 strain_parameterisation_stack::StrainFunction t_Xi_c)
     : m_rod_properties(t_rod_properties),
-      m_polynomial_representation(t_polynomial_representation)
+      m_polynomial_representation(t_polynomial_representation),
+      m_constant_strain(t_Xi_c)
 {}
 
 
@@ -62,7 +64,7 @@ void ExplicitIntegrationODEs::forwardStaticODEs(const Eigen::VectorXd &t_y,
     Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
     //  Get the strains for the rod
-    const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain;
+    const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain(t_X);
 
     t_dyds = m_rod_length * forwardStaticStep(t_y, Xi);
 }
@@ -114,7 +116,7 @@ void ExplicitIntegrationODEs::forwardODEs(const Eigen::VectorXd &t_y,
     Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
     //  Get the strains for the rod
-    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
+    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain(t_X);
     const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
     const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
@@ -201,7 +203,7 @@ void ExplicitIntegrationODEs::backwardODEs(const Eigen::VectorXd &t_y,
     Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
     //  Get the strains for the rod
-    const Eigen::VectorXd Xi      = BPhi*m_qe + m_constant_strain;
+    const Eigen::VectorXd Xi      = BPhi*m_qe + m_constant_strain(t_X);
     const Eigen::VectorXd dot_Xi  = BPhi*m_dot_qe;
     const Eigen::VectorXd ddot_Xi = BPhi*m_ddot_qe;
 
@@ -266,7 +268,7 @@ void ExplicitIntegrationODEs::tangentKinematicsODEs(const Eigen::VectorXd &t_y,
     Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
     //  Get the strains for the rod
-    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
+    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain(t_X);
     const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
     const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
@@ -362,7 +364,7 @@ void ExplicitIntegrationODEs::tangentDynamicsODEs(const Eigen::VectorXd &t_y,
     Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
     //  Get the strains for the rod
-    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain;
+    const ::LieAlgebra::Vector6d Xi      = BPhi*m_qe + m_constant_strain(t_X);
     const ::LieAlgebra::Vector6d dot_Xi  = BPhi*m_dot_qe;
     const ::LieAlgebra::Vector6d ddot_Xi = BPhi*m_ddot_qe;
 
@@ -489,7 +491,7 @@ void ExplicitIntegrationODEs::distributedActuationODE(const Eigen::VectorXd &,
     Eigen::MatrixXd BPhi = m_polynomial_representation.m_B*m_polynomial_representation.getPhi(t_X);
 
     //  Get the strains for the rod
-    const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain;
+    const Eigen::VectorXd Xi = BPhi*m_qe + m_constant_strain(t_X);
 
 
     //  Decompose the strain

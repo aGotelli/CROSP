@@ -5,10 +5,12 @@ namespace CROSP::numerical_integrators::spectral_method {
 
 SpectralIntegrators::SpectralIntegrators(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                                          const unsigned int t_number_of_Chebyshev_points,
-                                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+                                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                                         ::CROSP::strain_parameterisation_stack::StrainFunction t_Xi_c)
     : m_strain_parameterisation_stack(
           std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
-                                                                                                t_number_of_Chebyshev_points)),
+                                                                                                t_number_of_Chebyshev_points,
+                                                                                                t_Xi_c)),
       m_Delta_strain_parameterisation_stack(
           std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
                                                                                                 t_number_of_Chebyshev_points,

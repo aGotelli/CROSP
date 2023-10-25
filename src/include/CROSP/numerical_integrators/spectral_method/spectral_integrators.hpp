@@ -18,7 +18,8 @@ struct SpectralIntegrators{
 
     SpectralIntegrators(const polynomial_representation::PolynomialRepresentation t_polynomial_representation,
                         const unsigned int t_number_of_Chebyshev_points,
-                        std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+                        std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+                        strain_parameterisation_stack::StrainFunction t_Xi_c=::CROSP::strain_parameterisation_stack::default_constrained_strain);
 
 
     void addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation);

@@ -63,11 +63,15 @@ public:
                 rod_properties::MaterialProperties t_material_properties=rod_properties::MaterialProperties(),
                 strain_parameterisation_stack::StrainFunction t_constrained_strain=strain_parameterisation_stack::default_constrained_strain)
         : m_polynomial_representation(t_polynomial_represenation),
-          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points),
-          m_constrained_strain(t_constrained_strain),
           m_rod_properties(
               std::make_shared<rod_properties::RodProperties>(t_rod_dimensions,
                                                               t_material_properties)
+              ),
+          m_cosserat_rod_integrators (
+                std::make_unique<NumericalIntegrator>(m_polynomial_representation,
+                                                     t_number_of_Chebyshev_points,
+                                                     m_rod_properties,
+                                                     t_constrained_strain)
               )
     {}
 
@@ -607,26 +611,13 @@ protected:
 
     polynomial_representation::PolynomialRepresentation m_polynomial_representation;
 
-    unsigned int m_number_of_Chebyshev_points { 21 };
-
-
-    strain_parameterisation_stack::StrainFunction m_constrained_strain {
-        strain_parameterisation_stack::default_constrained_strain
-    };
-
 
     //  The set of rod properties
-    rod_properties::RodPropertiesSPtr m_rod_properties {
-        std::make_shared<rod_properties::RodProperties>()
-    };
+    rod_properties::RodPropertiesSPtr m_rod_properties;
 
 
 
-    std::unique_ptr<NumericalIntegrator> m_cosserat_rod_integrators {
-      std::make_unique<NumericalIntegrator>(m_polynomial_representation,
-                                           m_number_of_Chebyshev_points,
-                                           m_rod_properties)
-    };
+    std::unique_ptr<NumericalIntegrator> m_cosserat_rod_integrators;
 
 
 
