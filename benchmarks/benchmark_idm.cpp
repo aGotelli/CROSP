@@ -23,17 +23,11 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
 constexpr unsigned int number_of_Chebyshev_points = 21;
 
 
-struct A {
-
-    int i { 1 };
-    double d { 0.12 };
-};
 
 
 void benchmarkIDM(::benchmark::State &t_state)
 {
 
-    A a{.i=0};
 
     const unsigned int ne =/* t_state.range(0)*/15;
 
@@ -69,7 +63,7 @@ void benchmarkIDM(::benchmark::State &t_state)
                                                           length);
 
 
-    ::CROSP::rod_properties::MaterialProperties rod_material;
+    ::CROSP::rod_properties::MaterialProperties rod_material{.m_G=0};
     rod_material.m_E = 210e9;
 
 
@@ -85,6 +79,9 @@ void benchmarkIDM(::benchmark::State &t_state)
                              rod_dimensions,
                              rod_material);
 
+    rod.printProperties();
+
+    return;
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
 

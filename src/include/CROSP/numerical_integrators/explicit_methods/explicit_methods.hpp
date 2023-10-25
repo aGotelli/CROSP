@@ -286,11 +286,11 @@ public:
 
 
         std::stringstream integrator_properties;
-        integrator_properties << "Stepper integrator\n"
-                                 "      Method : " << method_type << "   Order : " << stepper.order() << "\n"
-                                 "      Adaptive step with initial value of : " << m_dX << "\n"
-                                 "Integration domain : [0, 1]\n"
-                                 "Observerving using : " << m_number_of_Chebyshev_points << " Chebyshev points";
+        integrator_properties << "      Stepper integrator\n"
+                                 "          Method : " << method_type << "   Order : " << stepper.order() << "\n"
+                                 "          Adaptive step with initial value of : " << m_dX << "\n"
+                                 "          Integration domain : [0, 1]\n"
+                                 "          Observerving using : " << m_number_of_Chebyshev_points << " Chebyshev points";
 
         return integrator_properties.str();
 

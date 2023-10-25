@@ -35,7 +35,7 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
         integrator.addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr());
 
 
-        integrator.printIntegratorProperties();
+        std::string() = integrator.printIntegratorProperties();
 
 
         integrator.updateParameterisation(Eigen::VectorXd(),

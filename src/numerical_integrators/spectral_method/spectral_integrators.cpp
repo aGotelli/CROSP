@@ -37,7 +37,10 @@ void SpectralIntegrators::addInternalActuation(::ATORS::distributed_actuation::D
 std::string SpectralIntegrators::printIntegratorProperties()const
 {
     std::stringstream integrator_properties;
-    integrator_properties << "     Number of Chebyshev points : " << m_strain_parameterisation_stack->m_number_of_points << "\n";
+
+    integrator_properties << "      Spectral integrator\n"
+                             "          Number of Chebyshev points : " << m_strain_parameterisation_stack->m_number_of_points << "\n"
+                             "          Integration domain : [0, 1]\n";
 
     return integrator_properties.str();
 

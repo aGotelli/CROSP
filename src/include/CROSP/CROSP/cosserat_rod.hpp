@@ -570,21 +570,35 @@ public:
         {   //  Strain parameterisation
         rod_properties << "Strain parameterisation : \n";
 
+        Eigen::MatrixXi parameterization_details_matrix = Eigen::MatrixXi::Zero(2, 6);
 
-           //  get the admitted deformations
+
         Eigen::VectorXi def(6);
         for(unsigned int i=0; i<6; i++)
-            def[i] = m_polynomial_representation.m_admitted_deformations[i];
-        rod_properties << "     Rod deformations : " << def.transpose() << "\n";
+            parameterization_details_matrix.row(0)[i] = m_polynomial_representation.m_admitted_deformations[i];
 
 
-           //  Also print the number of modes
-        Eigen::VectorXi ne_stack = Eigen::VectorXi::Zero(6);
         unsigned int j =0;
         for(unsigned int i=0; i<m_polynomial_representation.m_admitted_deformations.size(); i++)
             if(m_polynomial_representation.m_admitted_deformations[i])
-                ne_stack[i] = m_polynomial_representation.m_number_of_modes_stack[j++];
-        rod_properties << "     Number of modes  : " << ne_stack.transpose() << "\n";
+                parameterization_details_matrix.row(1)[i] = m_polynomial_representation.m_number_of_modes_stack[j++];
+
+
+        std::stringstream parameterization_details;
+        parameterization_details << parameterization_details_matrix;
+
+        std::string log = parameterization_details.str();
+        auto newline = log.find('\n');
+        std::string admitted_deformations = log.substr(0, newline);
+        std::string number_of_modes = log.substr(++newline);
+
+
+            //  Print the admitted deformations
+        rod_properties << "     Rod deformations : " << admitted_deformations << "\n";
+
+
+           //  Also print the number of modes
+        rod_properties << "     Number of modes  : " << number_of_modes << "\n";
 
 
 
@@ -602,10 +616,21 @@ public:
         if( poly_base(p, x) == ::CROSP::polynomial_representation::chebyshev_polynomial_base(p, x) )
             base = "Chebyshev";
 
-        rod_properties << base;
+        rod_properties << base << "\n";
 
 
         }
+
+
+
+        {   //  Integrators
+
+
+            rod_properties << "Numerical Integration:\n" << m_cosserat_rod_integrators->printIntegratorProperties();
+
+        }
+
+
 
         std::cout << rod_properties.str() << "\n";
         std::cout.flush();
