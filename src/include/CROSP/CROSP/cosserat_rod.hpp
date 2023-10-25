@@ -542,7 +542,74 @@ public:
     /*!
      * \brief printProperties a function to log the rod properties with a MATLAB like layout
      */
-    void printProperties();
+    void printProperties()
+    {
+        std::stringstream rod_properties;
+
+
+
+        {   //  Start listing rod dimensions
+        const auto l = m_rod_properties->m_rod_dimensions.m_L;
+        rod_properties << "Rod dimensions :\n"
+                          "     l : " << l << "\n" <<
+                          m_rod_properties->m_rod_dimensions.m_cross_section->printProperties();
+        }
+
+        {   //  Start listing material properties
+        const auto E = m_rod_properties->m_material_properties.m_E;
+        const auto G = m_rod_properties->m_material_properties.m_G;
+        const auto rho = m_rod_properties->m_material_properties.m_rho;
+        rod_properties << "Material properties :\n"
+                          "     E : " << std::setprecision(2) << std::scientific << E << "\n"
+                          "     G : " << std::setprecision(2) << std::scientific << G << "\n"
+                          "     ρ : " << std::setprecision(0) << std::fixed << rho << "\n";
+        }
+
+
+
+        {   //  Strain parameterisation
+        rod_properties << "Strain parameterisation : \n";
+
+
+           //  get the admitted deformations
+        Eigen::VectorXi def(6);
+        for(unsigned int i=0; i<6; i++)
+            def[i] = m_polynomial_representation.m_admitted_deformations[i];
+        rod_properties << "     Rod deformations : " << def.transpose() << "\n";
+
+
+           //  Also print the number of modes
+        Eigen::VectorXi ne_stack = Eigen::VectorXi::Zero(6);
+        unsigned int j =0;
+        for(unsigned int i=0; i<m_polynomial_representation.m_admitted_deformations.size(); i++)
+            if(m_polynomial_representation.m_admitted_deformations[i])
+                ne_stack[i] = m_polynomial_representation.m_number_of_modes_stack[j++];
+        rod_properties << "     Number of modes  : " << ne_stack.transpose() << "\n";
+
+
+
+           //  Details about the base
+        const auto poly_base = m_polynomial_representation.m_polynomial_base;
+
+        rod_properties << "     Polynomial base : ";
+
+        std::string base = "Custom base";
+        const unsigned int p = 5;
+        const double x = 0.5;
+        if( poly_base(p, x) == ::CROSP::polynomial_representation::legendre_polynomial_base(p, x) )
+            base = "Legendre";
+
+        if( poly_base(p, x) == ::CROSP::polynomial_representation::chebyshev_polynomial_base(p, x) )
+            base = "Chebyshev";
+
+        rod_properties << base;
+
+
+        }
+
+        std::cout << rod_properties.str() << "\n";
+        std::cout.flush();
+    }
 
 
     /*!
