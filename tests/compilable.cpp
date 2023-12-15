@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
     ::CROSP::CosseratRod rod(polynomial_representation,
                              number_of_Chebyshev_points,
-                             rod_dimensions.makeCopy(),
+                             rod_dimensions,
                              rod_material);
 
     rod.printProperties();

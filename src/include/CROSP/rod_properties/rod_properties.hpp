@@ -179,9 +179,17 @@ struct RodDimensions {
 
 
     RodDimensions(RodDimensions &t_other)
+        : m_cross_section( t_other.m_cross_section->clone() ),
+          m_L(t_other.m_L)
+    {}
+
+
+    RodDimensions(RodDimensions &&t_other)
         : m_cross_section( std::move(t_other.m_cross_section) ),
           m_L(t_other.m_L)
     {}
+
+
 
 
     /*!
@@ -196,12 +204,41 @@ struct RodDimensions {
     {}
 
 
-    RodDimensions makeCopy()const
-    {
-        std::unique_ptr<CrossSection> cs_uptr(m_cross_section->clone());
 
-        return RodDimensions(std::move(cs_uptr), m_L);
+
+
+    RodDimensions operator=(RodDimensions &t_other)
+    {
+
+        // Guard self assignment
+        if (this == &t_other)
+            return *this;
+
+
+        this->m_L = t_other.m_L;
+        this->m_cross_section =
+                std::unique_ptr<CrossSection>(t_other.m_cross_section->clone());
+
+
+        return *this;
     }
+
+
+
+
+
+    RodDimensions& operator=(RodDimensions &&t_other) {
+        // Guard self assignment
+        if(this==&t_other)
+            return *this;
+
+        this->m_L = t_other.m_L;
+        this->m_cross_section =
+                std::unique_ptr<CrossSection>( std::move(t_other.m_cross_section) );
+
+        return *this;
+    }
+
 
 
 

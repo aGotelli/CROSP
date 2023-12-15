@@ -93,22 +93,64 @@ public:
 //    {}
 
 
-    // copy constructor
-    CosseratRod(const CosseratRod& other)
-        : m_polynomial_representation(other.m_polynomial_represenation),
+//    // copy constructor
+//    CosseratRod(const CosseratRod& other)
+//        : m_polynomial_representation(other.m_polynomial_represenation),
+//          m_rod_properties(
+//              std::make_shared<rod_properties::RodProperties>(other.m_rod_dimensions,
+//                                                              other.m_material_properties)
+//              ),
+//          m_constrained_strain(other.m_constrained_strain),
+//          m_number_of_Chebyshev_points(other.m_number_of_Chebyshev_points)
+//    {}
+
+
+    CosseratRod(CosseratRod &t_other)
+        : m_polynomial_representation(t_other.m_polynomial_representation),
           m_rod_properties(
-              std::make_shared<rod_properties::RodProperties>(other.m_rod_dimensions,
-                                                              other.m_material_properties)
+              std::make_shared<rod_properties::RodProperties>(t_other.m_rod_properties->m_rod_dimensions,
+                                                              t_other.m_rod_properties->m_material_properties)
               ),
-          m_constrained_strain(other.m_constrained_strain),
-          m_number_of_Chebyshev_points(other.m_number_of_Chebyshev_points)
+          m_constrained_strain(t_other.m_constrained_strain),
+          m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
     {}
 
 
-    CosseratRod operator=(CosseratRod) const
+    CosseratRod(CosseratRod &&t_other)
+        : m_polynomial_representation(t_other.m_polynomial_represenation),
+          m_rod_properties( std::move(t_other.m_rod_properties) ),
+          m_constrained_strain(t_other.m_constrained_strain),
+          m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
+    {}
+
+
+
+
+    CosseratRod operator=(CosseratRod &t_other)
     {
 
-        auto rod_dimensions = this->m_rod_properties->m_rod_dimensions.clone();
+        return CosseratRod(t_other.m_polynomial_representation,
+                           t_other.m_number_of_Chebyshev_points,
+                           t_other.m_rod_properties->m_rod_dimensions,
+                           t_other.m_rod_properties->m_material_properties,
+                           t_other.m_constrained_strain);
+    }
+
+    CosseratRod operator=(CosseratRod &&t_other)
+    {
+
+        return CosseratRod(t_other.m_polynomial_representation,
+                           t_other.m_number_of_Chebyshev_points,
+                           std::move(t_other.m_rod_properties->m_rod_dimensions),
+                           t_other.m_rod_properties->m_material_properties,
+                           t_other.m_constrained_strain);
+    }
+
+
+    CosseratRod makeCopy() const
+    {
+
+        auto rod_dimensions = this->m_rod_properties->m_rod_dimensions;
         auto rod_material   = this->m_rod_properties->m_material_properties;
 
         const auto polynomial_representation = this->m_polynomial_representation;
