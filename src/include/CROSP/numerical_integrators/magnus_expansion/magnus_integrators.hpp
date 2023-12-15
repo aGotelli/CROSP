@@ -25,7 +25,8 @@ struct MagnusIntegrators {
 
     MagnusIntegrators(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
                       std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_Delta_strain_parameterisation_stack,
-                      std::shared_ptr<const rod_properties::RodProperties> t_rod_properties);
+                      //std::shared_ptr<const rod_properties::RodProperties> t_rod_properties
+                      const rod_properties::RodProperties* t_rod_properties);
 
 
     void addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation)

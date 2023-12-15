@@ -28,7 +28,7 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
 
         NumericalIntegrator(polynomial_representation::PolynomialRepresentation(),
                             int(),
-                            std::shared_ptr<rod_properties::RodProperties>(),
+                            std::declval<const rod_properties::RodProperties*>(),
                             ::CROSP::strain_parameterisation_stack::StrainFunction());
 
 

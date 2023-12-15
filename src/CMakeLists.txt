@@ -121,16 +121,16 @@ add_library(${PROJECT_NAME} SHARED
 
 
 
-                            include/${PROJECT_NAME}/numerical_integrators/explicit_methods/explicit_methods.hpp
-                            numerical_integrators/explicit_methods/explicit_methods.cpp
+#                            include/${PROJECT_NAME}/numerical_integrators/explicit_methods/explicit_methods.hpp
+#                            numerical_integrators/explicit_methods/explicit_methods.cpp
 
 
 
 
-                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
-                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_integrators.hpp
-                            numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.cpp
-                            numerical_integrators/magnus_expansion/magnus_integrators.cpp
+#                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
+#                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_integrators.hpp
+#                            numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.cpp
+#                            numerical_integrators/magnus_expansion/magnus_integrators.cpp
 
 
 
