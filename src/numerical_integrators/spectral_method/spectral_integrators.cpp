@@ -25,6 +25,29 @@ SpectralIntegrators::SpectralIntegrators(const polynomial_representation::Polyno
 {}
 
 
+//SpectralIntegrators::SpectralIntegrators(SpectralIntegrators &t_other)
+//{
+
+
+
+
+////    this->m_strain_parameterisation_stack = t_other.m_strain_parameterisation_stack;
+
+////    this->m_Delta_strain_parameterisation_stack = t_other.m_Delta_strain_parameterisation_stack;
+
+
+////    this->m_idm_integrators = t_other.m_idm_integrators;
+
+////    this->m_tidm_integrators = t_other.m_tidm_integrators;
+
+
+////    this->m_internal_actuation_integrator = nullptr;
+
+
+////    this->m_integrator_polynomial_base = nullptr;
+//}
+
+
 void SpectralIntegrators::addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation)
 {
     m_internal_actuation_integrator =
