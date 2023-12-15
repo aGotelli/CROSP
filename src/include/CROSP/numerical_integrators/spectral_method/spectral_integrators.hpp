@@ -21,6 +21,8 @@ struct SpectralIntegrators{
                         std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
                         strain_parameterisation_stack::StrainFunction t_Xi_c=::CROSP::strain_parameterisation_stack::default_constrained_strain);
 
+//    SpectralIntegrators(SpectralIntegrators &t_other);
+
 
     void addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr t_distributed_actuation);
 
@@ -121,11 +123,12 @@ struct SpectralIntegrators{
     std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators;
 
 
-    std::unique_ptr<internal_actuation_integrator::InternalActuationIntegrator> m_internal_actuation_integrator {
+    internal_actuation_integrator::InternalActuationIntegratorUptr m_internal_actuation_integrator {
         std::make_unique<internal_actuation_integrator::NullInternalActuationIntegrator>(m_strain_parameterisation_stack)
     };
 
 
+    [[deprecated("This member should be deleted as it is not safe to do the integration at once but is should be done with Hcal")]]
     std::unique_ptr<integration_polynomial_base::IntegratorPolynomialBase> m_integrator_polynomial_base {
         std::make_unique<integration_polynomial_base::IntegratorPolynomialBase>(m_strain_parameterisation_stack)
     };

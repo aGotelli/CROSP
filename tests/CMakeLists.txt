@@ -77,42 +77,42 @@ include_directories(include)
 #        DEVELOPER
 #)
 
-add_executable(test_with_MATLAB test_with_MATLAB.cpp)
-target_link_libraries(test_with_MATLAB
-    PRIVATE
-        utilities
-        ${PROJECT_NAME}
-)
-target_compile_definitions(test_with_MATLAB
-    PRIVATE
-        DEVELOPER
-)
+#add_executable(test_with_MATLAB test_with_MATLAB.cpp)
+#target_link_libraries(test_with_MATLAB
+#    PRIVATE
+#        utilities
+#        ${PROJECT_NAME}
+#)
+#target_compile_definitions(test_with_MATLAB
+#    PRIVATE
+#        DEVELOPER
+#)
 
-add_executable(test_tmp_stepper test_tmp_stepper.cpp)
-target_link_libraries(test_tmp_stepper
-    PRIVATE
-        utilities
-        ${PROJECT_NAME}
-        benchmark::benchmark
-)
-target_compile_definitions(test_tmp_stepper
-    PRIVATE
-        DEVELOPER
-)
-
-
+#add_executable(test_tmp_stepper test_tmp_stepper.cpp)
+#target_link_libraries(test_tmp_stepper
+#    PRIVATE
+#        utilities
+#        ${PROJECT_NAME}
+#        benchmark::benchmark
+#)
+#target_compile_definitions(test_tmp_stepper
+#    PRIVATE
+#        DEVELOPER
+#)
 
 
-add_executable(test_with_MATLAB_copy test_with_MATLAB_copy.cpp)
-target_link_libraries(test_with_MATLAB_copy
-    PRIVATE
-        utilities
-        ${PROJECT_NAME}
-)
-target_compile_definitions(test_with_MATLAB_copy
-    PRIVATE
-        DEVELOPER
-)
+
+
+#add_executable(test_with_MATLAB_copy test_with_MATLAB_copy.cpp)
+#target_link_libraries(test_with_MATLAB_copy
+#    PRIVATE
+#        utilities
+#        ${PROJECT_NAME}
+#)
+#target_compile_definitions(test_with_MATLAB_copy
+#    PRIVATE
+#        DEVELOPER
+#)
 
 
 
@@ -128,3 +128,14 @@ target_compile_definitions(test_with_MATLAB_copy
 #        TESTING
 #)
 
+
+add_executable(copy_rod_change_integrator compilable.cpp)
+target_link_libraries(copy_rod_change_integrator
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+)
+target_compile_definitions(copy_rod_change_integrator
+    PRIVATE
+        DEVELOPER
+)

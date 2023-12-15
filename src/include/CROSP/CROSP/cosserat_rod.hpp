@@ -67,13 +67,61 @@ public:
               std::make_shared<rod_properties::RodProperties>(t_rod_dimensions,
                                                               t_material_properties)
               ),
-          m_cosserat_rod_integrators (
-                std::make_unique<NumericalIntegrator>(m_polynomial_representation,
-                                                     t_number_of_Chebyshev_points,
-                                                     m_rod_properties,
-                                                     t_constrained_strain)
-              )
+          m_constrained_strain(t_constrained_strain),
+          m_number_of_Chebyshev_points(t_number_of_Chebyshev_points)
     {}
+
+
+//    template<numerical_integrators::CosseratIntegrator OtherIntegrator=Spectral>
+//    CosseratRod(CosseratRod<OtherIntegrator>& t_other)
+//        : m_polynomial_representation(t_other.m_polynomial_representation),
+//          m_rod_properties(
+//              std::make_shared<rod_properties::RodProperties>(t_other.m_rod_properties->m_rod_dimensions,
+//                                                              t_other.m_rod_properties->m_material_properties)),
+//          m_constrained_strain(t_other.m_constrained_strain),
+//          m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
+
+//    {}
+
+
+//    CosseratRod(CosseratRod&& t_other)
+//        : m_polynomial_representation(t_other.m_polynomial_representation),
+//          m_rod_properties(std::move(t_other.m_rod_properties)),
+//          m_constrained_strain(t_other.m_constrained_strain),
+//          m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
+
+//    {}
+
+
+    // copy constructor
+    CosseratRod(const CosseratRod& other)
+        : m_polynomial_representation(other.m_polynomial_represenation),
+          m_rod_properties(
+              std::make_shared<rod_properties::RodProperties>(other.m_rod_dimensions,
+                                                              other.m_material_properties)
+              ),
+          m_constrained_strain(other.m_constrained_strain),
+          m_number_of_Chebyshev_points(other.m_number_of_Chebyshev_points)
+    {}
+
+
+    CosseratRod operator=(CosseratRod) const
+    {
+
+        auto rod_dimensions = this->m_rod_properties->m_rod_dimensions.clone();
+        auto rod_material   = this->m_rod_properties->m_material_properties;
+
+        const auto polynomial_representation = this->m_polynomial_representation;
+        const auto number_of_Chebyshev_points = this->m_number_of_Chebyshev_points;
+
+        const auto constrained_strain = this->m_constrained_strain;
+
+        return CosseratRod(polynomial_representation,
+                           number_of_Chebyshev_points,
+                           rod_dimensions,
+                           rod_material,
+                           constrained_strain);
+    }
 
 
     /*!
@@ -324,11 +372,11 @@ public:
     ::LieAlgebra::Vector6d IDM(const Eigen::VectorXd &t_qe,
                                const Eigen::VectorXd &t_dot_qe,
                                const Eigen::VectorXd &t_ddot_qe,
-                               const Eigen::Vector4d &t_initial_quaternion,
-                               const Eigen::Vector3d &t_initial_position,
-                               const ::LieAlgebra::Vector6d &t_initial_twist,
-                               const ::LieAlgebra::Vector6d &t_initial_acceleration,
-                               const LieAlgebra::Vector6d &t_Lambda_X1)
+                               const Eigen::Vector4d &t_initial_quaternion=Eigen::Vector4d(1, 0, 0, 0),
+                               const Eigen::Vector3d &t_initial_position=Eigen::Vector3d::Zero(),
+                               const ::LieAlgebra::Vector6d &t_initial_twist=::LieAlgebra::Vector6d::Zero(),
+                               const ::LieAlgebra::Vector6d &t_initial_acceleration=::LieAlgebra::Vector6d::Zero(),
+                               const LieAlgebra::Vector6d &t_Lambda_X1=::LieAlgebra::Vector6d::Zero())
     {
         m_cosserat_rod_integrators->updateParameterisation(t_qe, t_dot_qe, t_ddot_qe);
 
@@ -708,8 +756,21 @@ protected:
     rod_properties::RodPropertiesSPtr m_rod_properties;
 
 
+    unsigned int m_number_of_Chebyshev_points { 21 };
 
-    std::unique_ptr<NumericalIntegrator> m_cosserat_rod_integrators;
+
+    strain_parameterisation_stack::StrainFunction m_constrained_strain {
+        strain_parameterisation_stack::default_constrained_strain
+    };
+
+
+
+    std::unique_ptr<NumericalIntegrator> m_cosserat_rod_integrators {
+        std::make_unique<NumericalIntegrator>(m_polynomial_representation,
+                                             m_number_of_Chebyshev_points,
+                                             m_rod_properties,
+                                             m_constrained_strain)
+    };
 
 
 

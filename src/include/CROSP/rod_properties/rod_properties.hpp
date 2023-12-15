@@ -55,6 +55,8 @@ struct CrossSection{
 
     virtual ~CrossSection()=default;
 
+    virtual CrossSection* clone()const=0;
+
     virtual double Area()const=0;
 
     virtual double Ixx()const=0;
@@ -75,6 +77,11 @@ struct CircularCrossSection : public CrossSection {
     CircularCrossSection(const double &t_radius=0.001)
         : m_radius(t_radius)
     {}
+
+    virtual CircularCrossSection* clone()const override
+    {
+        return new CircularCrossSection(*this);
+    }
 
     virtual double Area()const final
     {
@@ -116,6 +123,11 @@ struct RectangularCrossSection : public CrossSection {
         : m_width(t_width),
           m_height(t_height)
     {}
+
+    virtual RectangularCrossSection* clone()const override
+    {
+        return new RectangularCrossSection(*this);
+    }
 
     virtual double Area()const final
     {
@@ -182,6 +194,14 @@ struct RodDimensions {
         : m_cross_section( std::move(t_cross_section) ),
           m_L(t_L)
     {}
+
+
+    RodDimensions makeCopy()const
+    {
+        std::unique_ptr<CrossSection> cs_uptr(m_cross_section->clone());
+
+        return RodDimensions(std::move(cs_uptr), m_L);
+    }
 
 
 

@@ -32,6 +32,11 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
                             ::CROSP::strain_parameterisation_stack::StrainFunction());
 
 
+        //NumericalIntegrator(NumericalIntegrator());
+
+        //std::is_copy_constructible<NumericalIntegrator>();
+
+
         integrator.addInternalActuation(::ATORS::distributed_actuation::DistributedActuationUptr());
 
 

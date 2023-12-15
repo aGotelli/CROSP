@@ -24,6 +24,9 @@ int main(int argc, char *argv[])
                                                                                t_number_of_Chebyshev_points,
                                                                                rod_properties);
 
+
+    auto cp = integrator;
+
     std::cout << integrator.printIntegratorProperties() << std::endl;
 
 

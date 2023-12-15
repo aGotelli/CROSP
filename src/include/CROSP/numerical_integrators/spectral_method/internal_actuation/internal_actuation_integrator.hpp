@@ -72,7 +72,9 @@ struct NullInternalActuationIntegrator : public InternalActuationIntegrator{
 };
 
 
-//std::unique_ptr<InternalActuationIntegrator> InternalActuationIntegratorUptr;
+typedef std::unique_ptr<InternalActuationIntegrator> InternalActuationIntegratorUptr;
+
+typedef std::unique_ptr<NullInternalActuationIntegrator> NullInternalActuationIntegratorUptr;
 
 
 
