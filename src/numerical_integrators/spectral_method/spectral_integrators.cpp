@@ -30,16 +30,16 @@ SpectralIntegrators::SpectralIntegrators(const polynomial_representation::Polyno
                                          const rod_properties::RodProperties* t_rod_properties,
                                          ::CROSP::strain_parameterisation_stack::StrainFunction t_Xi_c)
     : m_strain_parameterisation_stack(
-          std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
+          std::make_unique<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
                                                                                                 t_number_of_Chebyshev_points,
                                                                                                 t_Xi_c)),
       m_Delta_strain_parameterisation_stack(
-          std::make_shared<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
+          std::make_unique<::CROSP::strain_parameterisation_stack::StrainParameterisationStack>(t_polynomial_representation,
                                                                                                 t_number_of_Chebyshev_points,
-                                                                                                ::CROSP::strain_parameterisation_stack::zero_constrained_strain))/*,
+                                                                                                ::CROSP::strain_parameterisation_stack::zero_constrained_strain)),
 
-      m_idm_integrators( std::make_shared<idm_integrators::IDMIntegrators>(m_strain_parameterisation_stack,
-                                                                           t_rod_properties) ),
+      m_idm_integrators( std::make_unique<idm_integrators::IDMIntegrators>(m_strain_parameterisation_stack,
+                                                                           t_rod_properties) )/*,
       m_tidm_integrators( std::make_shared<tidm_integrators::TIDMIntegrators>(m_strain_parameterisation_stack,
                                                                               m_Delta_strain_parameterisation_stack,
                                                                               m_idm_integrators,

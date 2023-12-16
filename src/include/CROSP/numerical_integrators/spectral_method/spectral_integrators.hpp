@@ -112,18 +112,18 @@ struct SpectralIntegrators{
     Eigen::MatrixXd integratePhiTPhi()const;
 
 
-    std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
+    std::unique_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
 
-    std::shared_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_Delta_strain_parameterisation_stack;
+    std::unique_ptr<::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_Delta_strain_parameterisation_stack;
 
 
 
 
     //  The set of integrators needed for the IDM
-    std::shared_ptr<idm_integrators::IDMIntegrators> m_idm_integrators;
+    std::unique_ptr<idm_integrators::IDMIntegrators> m_idm_integrators;
 
     //  The set of integrators needed for the TIDM
-    std::shared_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators;
+    std::unique_ptr<tidm_integrators::TIDMIntegrators> m_tidm_integrators;
 
 
     internal_actuation_integrator::InternalActuationIntegratorUptr m_internal_actuation_integrator {
