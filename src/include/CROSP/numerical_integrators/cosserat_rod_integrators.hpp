@@ -101,11 +101,11 @@ concept CosseratIntegrator = requires(NumericalIntegrator integrator){
         LieAlgebra::Vector6d() = integrator.getDeltaLambdaAtBase();
 
 
-        ::LieAlgebra::Vector6d() = integrator.getQaAtBase();
+        Eigen::VectorXd() = integrator.getQaAtBase();
 
 
 
-        LieAlgebra::Vector6d() = integrator.getDeltaQaAtBase();
+        Eigen::VectorXd() = integrator.getDeltaQaAtBase();
 
 
         integrator.updateIntegrationDomain(double());

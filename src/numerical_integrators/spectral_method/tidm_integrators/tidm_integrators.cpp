@@ -226,17 +226,17 @@ Eigen::VectorXd DeltaLinearAccelerations::computerParametersVectorAtPoint(const 
     Eigen::Vector3d dot_Omega_Delta_Gamma = - m_hat_Delta_dot_Gamma_stack->at(t_point) * m_angular_acceleration_integrator->getStateAtPoint(t_point);
     Eigen::Vector3d ddot_Gamma = m_Delta_ddot_Gamma_stack->at(t_point);
 
-    if(t_point == 15)
-        std::cout << "Point : " << t_point << "\n"
-                     "  Gamma_Delta_dot_Omega : \n" << Gamma_Delta_dot_Omega << "\n"
-                     "  dot_Gamma_Delta_Omega : \n" << dot_Gamma_Delta_Omega << "\n"
-                     "  dot_K_Delta_V : \n" << dot_K_Delta_V << "\n"
-                     "  V_Delta_dot_K : \n" << V_Delta_dot_K << "\n"
-                     "  Omega_Delta_dot_Gamma : \n" << Omega_Delta_dot_Gamma << "\n"
-                     "  dot_V_Delta_K : \n" << dot_V_Delta_K << "\n"
-                     "  dot_Omega_Delta_Gamma : \n" << dot_Omega_Delta_Gamma << "\n"
-                     "  ddot_Gamma : \n" << ddot_Gamma << "\n"
-                     "\n\n";
+//    if(t_point == 15)
+//        std::cout << "Point : " << t_point << "\n"
+//                     "  Gamma_Delta_dot_Omega : \n" << Gamma_Delta_dot_Omega << "\n"
+//                     "  dot_Gamma_Delta_Omega : \n" << dot_Gamma_Delta_Omega << "\n"
+//                     "  dot_K_Delta_V : \n" << dot_K_Delta_V << "\n"
+//                     "  V_Delta_dot_K : \n" << V_Delta_dot_K << "\n"
+//                     "  Omega_Delta_dot_Gamma : \n" << Omega_Delta_dot_Gamma << "\n"
+//                     "  dot_V_Delta_K : \n" << dot_V_Delta_K << "\n"
+//                     "  dot_Omega_Delta_Gamma : \n" << dot_Omega_Delta_Gamma << "\n"
+//                     "  ddot_Gamma : \n" << ddot_Gamma << "\n"
+//                     "\n\n";
 
 
     Eigen::Vector3d b = - Gamma_Delta_dot_Omega

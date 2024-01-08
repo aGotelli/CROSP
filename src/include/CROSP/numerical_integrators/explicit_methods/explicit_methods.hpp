@@ -587,14 +587,14 @@ public:
     }
 
 
-    ::LieAlgebra::Vector6d getQaAtBase()const
+    Eigen::VectorXd getQaAtBase()const
     {
         return m_backward_integration_state_X0.block(25, 0, m_generalised_coordinates_dimension, 1);
     }
 
 
 
-    LieAlgebra::Vector6d getDeltaQaAtBase()const
+    Eigen::VectorXd getDeltaQaAtBase()const
     {
         return m_tangent_dynamics_state_X0.block(49, 0, m_generalised_coordinates_dimension, 1);
     }

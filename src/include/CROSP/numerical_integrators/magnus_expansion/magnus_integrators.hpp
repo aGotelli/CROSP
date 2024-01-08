@@ -87,11 +87,11 @@ struct MagnusIntegrators {
     LieAlgebra::Vector6d getDeltaLambdaAtBase()const;
 
 
-    ::LieAlgebra::Vector6d getQaAtBase()const;
+    Eigen::VectorXd getQaAtBase()const;
 
 
 
-    LieAlgebra::Vector6d getDeltaQaAtBase()const;
+    Eigen::VectorXd getDeltaQaAtBase()const;
 
 
     void updateIntegrationDomain(const double &t_rod_lenght);

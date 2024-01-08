@@ -123,6 +123,11 @@ int main(int argc, char *argv[])
     writeToFile("Qad_stack", IDM_ODE_states_stacks.Qad_stack, path);
 
 
+    Eigen::VectorXd Qa = rod.m_cosserat_rod_integrators->getQaAtBase();
+    Eigen::VectorXd error1 = Qa - IDM_ODE_states_stacks.Qa_stack.col(0);
+    Eigen::VectorXd error2 = Qa - IDM_ODE_states_stacks.Qa_stack.col(IDM_ODE_states_stacks.Qa_stack.cols()-1);
+
+
 
     Eigen::VectorXd Delta_q      = Eigen::VectorXd::Zero(ne);
     Eigen::VectorXd Delta_dot_q  = Eigen::VectorXd::Zero(ne);

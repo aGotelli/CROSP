@@ -285,14 +285,14 @@ LieAlgebra::Vector6d SpectralIntegrators::getDeltaLambdaAtBase()const
 }
 
 
-::LieAlgebra::Vector6d SpectralIntegrators::getQaAtBase()const
+Eigen::VectorXd SpectralIntegrators::getQaAtBase()const
 {
-    return m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
+    return m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
 }
 
 
 
-LieAlgebra::Vector6d SpectralIntegrators::getDeltaQaAtBase()const
+Eigen::VectorXd SpectralIntegrators::getDeltaQaAtBase()const
 {
     return m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
 }
