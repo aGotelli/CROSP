@@ -5,7 +5,6 @@
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
-#include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
 
 namespace CROSP::strain_parameterisation_stack {
 
@@ -49,7 +48,7 @@ struct StrainParameterisationStack {
     Eigen::MatrixXd m_Xi_c_stack;
 
 
-
+    std::unique_ptr<std::vector<Eigen::Ref<Eigen::Vector3d>>> m_k_stack_;
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack {
         std::make_shared<std::vector<Eigen::Vector3d>>()
     };

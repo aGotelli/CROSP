@@ -1,4 +1,5 @@
 #include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
+#include <math_tools/Chebyshev/chebyshev_differentiation.hpp>
 
 namespace CROSP::strain_parameterisation_stack {
 
