@@ -551,8 +551,8 @@ public:
                                        const Eigen::VectorXd &t_dot_qe)const
     {
 
-        const Eigen::VectorXd Qe = m_Dee * t_qe;
-        const Eigen::VectorXd Ce = m_Kee * t_dot_qe;
+        const Eigen::VectorXd Qe = m_Kee * t_qe;
+        const Eigen::VectorXd Ce = m_Dee * t_dot_qe;
         const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
         const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
