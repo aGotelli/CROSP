@@ -139,3 +139,16 @@ target_compile_definitions(copy_rod_change_integrator
     PRIVATE
         DEVELOPER
 )
+
+
+
+add_executable(test_strain_references test_strain_references.cpp)
+target_link_libraries(test_strain_references
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+)
+target_compile_definitions(test_strain_references
+    PRIVATE
+        DEVELOPER
+)

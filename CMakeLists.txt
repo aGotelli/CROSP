@@ -53,7 +53,7 @@ if(benchmark_FOUND)
   message(STATUS "Building benchmark")
   enable_testing()
 
-  #add_subdirectory(benchmarks)
+  add_subdirectory(benchmarks)
 
 endif(benchmark_FOUND)
 

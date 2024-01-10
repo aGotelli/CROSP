@@ -48,9 +48,8 @@ struct StrainParameterisationStack {
     Eigen::MatrixXd m_Xi_c_stack;
 
 
-    std::unique_ptr<std::vector<Eigen::Ref<Eigen::Vector3d>>> m_k_stack_;
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_K_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>()
+    std::shared_ptr<std::vector<Eigen::Ref<Eigen::Vector3d>>> m_K_stack {
+        std::make_shared<std::vector<Eigen::Ref<Eigen::Vector3d>>>()
     };
     std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack {
         std::make_shared<std::vector<Eigen::Vector3d>>()
