@@ -1,0 +1,10 @@
+date                runge-kutta                 spectral                        magnus
+
+RETRIVE PROGESS OF BEFORE :)))
+
+08/01/2024          IDM    4253 us              IDM     479 us                  IDM
+                    TIDM   7326 us              TIDM    477 us                  TIDM
+
+
+
+Benchmark of the rod IDM and TIDM with one admitted deformation, using 5 modes and 21 Chebyshev points, results obtained using the Google Benchmark

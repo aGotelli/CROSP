@@ -29,33 +29,33 @@ void benchmarkIDM(::benchmark::State &t_state)
 {
 
 
-    const unsigned int ne =/* t_state.range(0)*/15;
+    const unsigned int ne =/* t_state.range(0)*/5;
 
     const unsigned int coordinated_dimension = na * ne;
 
 
     t_state.counters = {
-      {"na", na},
-      {"ne", ne},
-      {"Nc", number_of_Chebyshev_points}
+        {"na", na},
+        {"ne", ne},
+        {"Nc", number_of_Chebyshev_points}
     };
 
 
 
     ::CROSP::polynomial_representation::PolynomialRepresentation
-            polynomial_representation(admitted_deformations,
-                                      ne,
-                                      //::CROSP::polynomial_representation::chebyshev_polynomial_base
-                                      ::CROSP::polynomial_representation::legendre_polynomial_base);
+        polynomial_representation(admitted_deformations,
+                                  ne,
+                                  //::CROSP::polynomial_representation::chebyshev_polynomial_base
+                                  ::CROSP::polynomial_representation::legendre_polynomial_base);
 
     double radius = 0.01;
     ::CROSP::rod_properties::CircularCrossSectionUPtr circular_cross_section =
-            std::make_unique<::CROSP::rod_properties::CircularCrossSection>(radius);
+        std::make_unique<::CROSP::rod_properties::CircularCrossSection>(radius);
 
     double width = 0.01;
     double height = 0.02;
     ::CROSP::rod_properties::RectangularCrossSectionUPtr rectangular_cross_section =
-            std::make_unique<::CROSP::rod_properties::RectangularCrossSection>(width, height);
+        std::make_unique<::CROSP::rod_properties::RectangularCrossSection>(width, height);
 
 
     double length = 2.45;
@@ -68,20 +68,20 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
 
-//    Eigen::VectorXd Xi_c = Eigen::VectorXd::Random(6);
-//    ::CROSP::strain_parameterisation_stack::StrainFunction constant_constrained_strain =
-//            [Xi_c](const double& t_X)
-//                    {   return Xi_c*t_X;    };
+    //    Eigen::VectorXd Xi_c = Eigen::VectorXd::Random(6);
+    //    ::CROSP::strain_parameterisation_stack::StrainFunction constant_constrained_strain =
+    //            [Xi_c](const double& t_X)
+    //                    {   return Xi_c*t_X;    };
 
 
-    ::CROSP::CosseratRod rod(polynomial_representation,
+    ::CROSP::CosseratRod<::CROSP::Ode45> rod(polynomial_representation,
                              number_of_Chebyshev_points,
                              rod_dimensions,
                              rod_material);
 
-    rod.printProperties();
+    // rod.printProperties();
 
-    return;
+    // return;
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
 
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 {
 
 
-//    const unsigned int repetitions = 20;
+   const unsigned int repetitions = 10;
 
 
 //    std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 //        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
-    ::benchmark::RegisterBenchmark("IDM", benchmarkIDM)->Unit(::benchmark::kMicrosecond);
+    ::benchmark::RegisterBenchmark("IDM", benchmarkIDM)->Unit(::benchmark::kMicrosecond)->Repetitions(repetitions);
 
 
 

@@ -8,9 +8,9 @@
 
 
 static constexpr std::array<bool, 6> admitted_deformations = {
+    false,
     true,
-    true,
-    true,
+    false,
 
     false,
     false,
@@ -21,25 +21,58 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
-constexpr unsigned int number_of_Chebyshev_points = 17;
+constexpr unsigned int number_of_Chebyshev_points = 21;
+
 
 
 void benchmarkTIDM(::benchmark::State &t_state)
 {
 
-    const unsigned int ne = /*t_state.range(0)*/5;
+
+
+    const unsigned int ne =/* t_state.range(0)*/5;
 
     const unsigned int coordinated_dimension = na * ne;
 
 
+    t_state.counters = {
+        {"na", na},
+        {"ne", ne},
+        {"Nc", number_of_Chebyshev_points}
+    };
 
-    auto polynomial_representation =
-            std::make_shared<::CROSP::polynomial_representation::PolynomialRepresentation>(admitted_deformations, ne);
 
-    auto strain_param =
-            std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-    ::CROSP::CosseratRod rod;
+    ::CROSP::polynomial_representation::PolynomialRepresentation
+        polynomial_representation(admitted_deformations,
+                                  ne,
+                                  //::CROSP::polynomial_representation::chebyshev_polynomial_base
+                                  ::CROSP::polynomial_representation::legendre_polynomial_base);
+
+    double radius = 0.01;
+    ::CROSP::rod_properties::CircularCrossSectionUPtr circular_cross_section =
+        std::make_unique<::CROSP::rod_properties::CircularCrossSection>(radius);
+
+    double width = 0.01;
+    double height = 0.02;
+    ::CROSP::rod_properties::RectangularCrossSectionUPtr rectangular_cross_section =
+        std::make_unique<::CROSP::rod_properties::RectangularCrossSection>(width, height);
+
+
+    double length = 2.45;
+    ::CROSP::rod_properties::RodDimensions rod_dimensions(std::move(rectangular_cross_section),
+                                                          length);
+
+
+    ::CROSP::rod_properties::MaterialProperties rod_material{.m_G=0};
+    rod_material.m_E = 210e9;
+
+
+
+    ::CROSP::CosseratRod<::CROSP::Ode45> rod(polynomial_representation,
+                             number_of_Chebyshev_points,
+                             rod_dimensions,
+                             rod_material);
 
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -47,6 +80,7 @@ void benchmarkTIDM(::benchmark::State &t_state)
     Eigen::VectorXd q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd dot_q = Eigen::VectorXd::Zero(coordinated_dimension);
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(coordinated_dimension);
+
 
     rod.m_cosserat_rod_integrators->updateParameterisation(q, dot_q, ddot_q);
 
@@ -96,7 +130,7 @@ int main(int argc, char *argv[])
 {
 
 
-//    const unsigned int repetitions = 20;
+   const unsigned int repetitions = 10;
 
 
 //    std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
@@ -109,7 +143,7 @@ int main(int argc, char *argv[])
 //        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkTIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
-    ::benchmark::RegisterBenchmark("TIDM", benchmarkTIDM)->Unit(::benchmark::kMicrosecond)->Repetitions(10);
+    ::benchmark::RegisterBenchmark("TIDM", benchmarkTIDM)->Unit(::benchmark::kMicrosecond)->Repetitions(repetitions);
 
 
     ::benchmark::Initialize(&argc, argv);
