@@ -12,6 +12,12 @@ namespace CROSP::strain_parameterisation_stack {
 typedef std::function<::LieAlgebra::Vector6d(const double&)> StrainFunction;
 
 
+
+typedef Eigen::Ref<Eigen::Vector3d> EigenRef3;
+typedef std::vector<EigenRef3> EigenRef3Stack;
+
+
+
 static StrainFunction default_constrained_strain = [](const double&){return ::LieAlgebra::Vector6d::Unit(3);};
 
 static StrainFunction zero_constrained_strain = [](const double&){return ::LieAlgebra::Vector6d::Zero();};
@@ -48,48 +54,27 @@ struct StrainParameterisationStack {
     Eigen::MatrixXd m_Xi_c_stack;
 
 
-    std::shared_ptr<std::vector<Eigen::Ref<Eigen::Vector3d>>> m_K_stack {
-        std::make_shared<std::vector<Eigen::Ref<Eigen::Vector3d>>>()
+    std::unique_ptr<EigenRef3Stack> m_K_stack {
+        std::make_unique<EigenRef3Stack>()
     };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_K_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>()
+    std::unique_ptr<EigenRef3Stack> m_dot_K_stack {
+        std::make_unique<EigenRef3Stack>()
     };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_K_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>()
-    };
-
-
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>()
-    };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_dot_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>()
-    };
-    std::shared_ptr<std::vector<Eigen::Vector3d>> m_ddot_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Vector3d>>()
+    std::unique_ptr<EigenRef3Stack> m_ddot_K_stack {
+        std::make_unique<EigenRef3Stack>()
     };
 
 
-    std::shared_ptr<std::vector<Eigen::Matrix3d>> m_hat_K_stack {
-        std::make_shared<std::vector<Eigen::Matrix3d>>()
+    std::unique_ptr<EigenRef3Stack> m_Gamma_stack {
+        std::make_unique<EigenRef3Stack>()
     };
-    std::shared_ptr<std::vector<Eigen::Matrix3d>> m_hat_dot_K_stack {
-        std::make_shared<std::vector<Eigen::Matrix3d>>()
+    std::unique_ptr<EigenRef3Stack> m_dot_Gamma_stack {
+        std::make_unique<EigenRef3Stack>()
     };
-    std::shared_ptr<std::vector<Eigen::Matrix3d>> m_hat_ddot_K_stack {
-        std::make_shared<std::vector<Eigen::Matrix3d>>()
+    std::unique_ptr<EigenRef3Stack> m_ddot_Gamma_stack {
+        std::make_unique<EigenRef3Stack>()
     };
 
-
-    std::shared_ptr<std::vector<Eigen::Matrix3d>> m_hat_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Matrix3d>>()
-    };
-    std::shared_ptr<std::vector<Eigen::Matrix3d>> m_hat_dot_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Matrix3d>>()
-    };
-    std::shared_ptr<std::vector<Eigen::Matrix3d>> m_hat_ddot_Gamma_stack {
-        std::make_shared<std::vector<Eigen::Matrix3d>>()
-    };
 
 
 };

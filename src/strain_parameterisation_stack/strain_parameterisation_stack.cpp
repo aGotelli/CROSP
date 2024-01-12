@@ -28,25 +28,27 @@ StrainParameterisationStack::StrainParameterisationStack(const polynomial_repres
 
 
     m_B_Phi_stack =
-            Eigen::MatrixXd(m_number_of_points*BPhi.rows(), BPhi.cols());
+        Eigen::MatrixXd::Zero(m_number_of_points*BPhi.rows(), BPhi.cols());
 
     m_Xi_stack =
-            Eigen::MatrixXd(m_number_of_points*6, 1);
+            Eigen::MatrixXd::Zero(m_number_of_points*6, 1);
 
     m_dot_Xi_stack =
-            Eigen::MatrixXd(m_number_of_points*6, 1);
+            Eigen::MatrixXd::Zero(m_number_of_points*6, 1);
 
     m_ddot_Xi_stack =
-            Eigen::MatrixXd(m_number_of_points*6, 1);
+            Eigen::MatrixXd::Zero(m_number_of_points*6, 1);
 
     m_Xi_c_stack =
-            Eigen::MatrixXd(m_number_of_points*6, 1);
+            Eigen::MatrixXd::Zero(m_number_of_points*6, 1);
 
 
     ::LieAlgebra::Vector6d Xi_c = ::LieAlgebra::Vector6d::Zero();
     Xi_c(3) = 1;
 
-    unsigned int row;
+    unsigned int start_row;
+    constexpr unsigned int block_row_se3 = 6;
+    constexpr unsigned int block_row_vector = 3;
     for(unsigned int step=0; const auto point : t_observation_points){
 
             //  Compute the base
@@ -56,34 +58,25 @@ StrainParameterisationStack::StrainParameterisationStack(const polynomial_repres
             m_Phi_stack.push_back(Phi);
 
             //  Compute corresponding row
-            row = step * BPhi.rows();
+            start_row = step * block_row_se3;
 
             //  Add BPhi to matrix
-            m_B_Phi_stack.block(row, 0, BPhi.rows(), BPhi.cols()) = B*Phi;
+            m_B_Phi_stack.block(start_row, 0, block_row_se3, BPhi.cols()) = B*Phi;
 
             //  Add all the constrained strains in matrix form
-            m_Xi_c_stack.block(row, 0, BPhi.rows(), 1) = m_Xi_c(point);
+            m_Xi_c_stack.block(start_row, 0, block_row_se3, 1) = m_Xi_c(point);
 
 
+            start_row = block_row_se3*step;
+            m_K_stack->push_back(           m_Xi_stack.block<block_row_vector, 1>(start_row, 0) );
+            m_dot_K_stack->push_back(   m_dot_Xi_stack.block<block_row_vector, 1>(start_row, 0) );
+            m_ddot_K_stack->push_back( m_ddot_Xi_stack.block<block_row_vector, 1>(start_row, 0) );
 
-            m_K_stack->push_back( m_Xi_stack.block<3, 1>(3*step, 0) );
-            m_dot_K_stack->push_back( Eigen::Vector3d::Zero() );
-            m_ddot_K_stack->push_back( Eigen::Vector3d::Zero() );
+            start_row += block_row_vector;
+            m_Gamma_stack->push_back(           m_Xi_stack.block<block_row_vector, 1>(start_row, 0) );
+            m_dot_Gamma_stack->push_back(   m_dot_Xi_stack.block<block_row_vector, 1>(start_row, 0) );
+            m_ddot_Gamma_stack->push_back( m_ddot_Xi_stack.block<block_row_vector, 1>(start_row, 0) );
 
-            m_Gamma_stack->push_back( Eigen::Vector3d::Zero() );
-            m_dot_Gamma_stack->push_back( Eigen::Vector3d::Zero() );
-            m_ddot_Gamma_stack->push_back( Eigen::Vector3d::Zero() );
-
-
-
-
-            m_hat_K_stack->push_back( Eigen::Matrix3d::Zero() );
-            m_hat_dot_K_stack->push_back( Eigen::Matrix3d::Zero() );
-            m_hat_ddot_K_stack->push_back( Eigen::Matrix3d::Zero() );
-
-            m_hat_Gamma_stack->push_back( Eigen::Matrix3d::Zero() );
-            m_hat_dot_Gamma_stack->push_back( Eigen::Matrix3d::Zero() );
-            m_hat_ddot_Gamma_stack->push_back( Eigen::Matrix3d::Zero() );
 
             step++;
     }
@@ -96,47 +89,23 @@ void StrainParameterisationStack::updateStrainParameterisation(const Eigen::Vect
                                                                const Eigen::VectorXd &t_dot_q,
                                                                const Eigen::VectorXd &t_ddot_q)
 {
+    for(unsigned int step=0; step<m_number_of_points; step++){
+
+        std::cout << m_Gamma_stack->at(step) << "\n\n";
+    }
+
+
     m_Xi_stack = m_B_Phi_stack * t_q + m_Xi_c_stack;
     m_dot_Xi_stack = m_B_Phi_stack * t_dot_q;
     m_ddot_Xi_stack = m_B_Phi_stack * t_ddot_q;
 
-    Eigen::Vector3d K;
-    Eigen::Vector3d dot_K;
-    Eigen::Vector3d ddot_K;
+    std::cout << "Update in Xi : \n" << m_Xi_stack << "\n\n\n";
 
-    Eigen::Vector3d Gamma;
-    Eigen::Vector3d dot_Gamma;
-    Eigen::Vector3d ddot_Gamma;
 
+    std::cout << "\n now K stack : \n";
     for(unsigned int step=0; step<m_number_of_points; step++){
 
-        K      =      m_Xi_stack.block<3, 1>(step*6, 0);
-        dot_K  =  m_dot_Xi_stack.block<3, 1>(step*6, 0);
-        ddot_K = m_ddot_Xi_stack.block<3, 1>(step*6, 0);
-
-        Gamma      =      m_Xi_stack.block<3, 1>(step*6 + 3, 0);
-        dot_Gamma  =  m_dot_Xi_stack.block<3, 1>(step*6 + 3, 0);
-        ddot_Gamma = m_ddot_Xi_stack.block<3, 1>(step*6 + 3, 0);
-
-
-        m_K_stack->at(step)      = K;
-        m_dot_K_stack->at(step)  = dot_K;
-        m_ddot_K_stack->at(step) = ddot_K;
-
-        m_Gamma_stack->at(step)      = Gamma;
-        m_dot_Gamma_stack->at(step)  = dot_Gamma;
-        m_ddot_Gamma_stack->at(step) = ddot_Gamma;
-
-
-
-        m_hat_K_stack->at(step)      = ::LieAlgebra::skew( K );
-        m_hat_dot_K_stack->at(step)  = ::LieAlgebra::skew( dot_K );
-        m_hat_ddot_K_stack->at(step) = ::LieAlgebra::skew( ddot_K );
-
-        m_hat_Gamma_stack->at(step)      = ::LieAlgebra::skew( Gamma );
-        m_hat_dot_Gamma_stack->at(step)  = ::LieAlgebra::skew( dot_Gamma );
-        m_hat_ddot_Gamma_stack->at(step) = ::LieAlgebra::skew( ddot_Gamma );
-
+        std::cout << m_Gamma_stack->at(step) << "\n\n";
     }
 }
 
