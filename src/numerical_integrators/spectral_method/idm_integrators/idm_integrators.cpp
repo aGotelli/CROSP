@@ -21,7 +21,7 @@ namespace CROSP::numerical_integrators::spectral_method::idm_integrators {
 
 
 
-QuaternionIntegrator::QuaternionIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+QuaternionIntegrator::QuaternionIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
                                            const double &t_upper_integration_limit,
                                            const Eigen::Vector4d &t_initial_condition)
     : OSNI::ODEA(4,
@@ -49,7 +49,7 @@ Eigen::MatrixXd QuaternionIntegrator::computeMatrixAtChebyshevPoint(const unsign
 
 
 
-PositionIntegrator::PositionIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+PositionIntegrator::PositionIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
                                        std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
                                        const double &t_upper_integration_limit,
                                        const Eigen::Vector3d &t_initial_condition)
@@ -79,7 +79,7 @@ Eigen::VectorXd PositionIntegrator::computerParametersVectorAtPoint(const unsign
 
 
 
-AngularVelocityIntegrator::AngularVelocityIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+AngularVelocityIntegrator::AngularVelocityIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
                                                      const double &t_upper_integration_limit,
                                                      const Eigen::Vector3d &t_initial_condition)
     : OSNI::ODEAb(3,
@@ -107,7 +107,7 @@ Eigen::VectorXd AngularVelocityIntegrator::computerParametersVectorAtPoint(const
 
 
 
-LinearVelocityIntegrator::LinearVelocityIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+LinearVelocityIntegrator::LinearVelocityIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                    const double &t_upper_integration_limit,
                                                    const Eigen::Vector3d &t_initial_condition)
@@ -133,14 +133,14 @@ Eigen::VectorXd LinearVelocityIntegrator::computerParametersVectorAtPoint(const 
     Eigen::Vector3d dot_Gamma = m_dot_Gamma_stack->at(t_point);
     Eigen::Vector3d Omega = m_angular_velocity->getStateAtPoint(t_point);
 
-    return dot_Gamma - m_hat_Gamma_stack->at(t_point)*Omega;
+    return dot_Gamma - m_Gamma_stack->at(t_point).cross3( Omega );
 }
 
 
 
 
 
-AngularAccelerationIntegrator::AngularAccelerationIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+AngularAccelerationIntegrator::AngularAccelerationIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
                                                              std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                              const double &t_upper_integration_limit,
                                                              const Eigen::Vector3d &t_initial_condition)
@@ -165,7 +165,7 @@ Eigen::MatrixXd AngularAccelerationIntegrator::computeMatrixAtChebyshevPoint(con
 Eigen::VectorXd AngularAccelerationIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
     return m_ddot_K_stack->at(t_point)
-            - m_hat_dot_K_stack->at(t_point) * m_angular_velocity->getStateAtPoint(t_point);
+           - m_dot_K_stack->at(t_point).cross3( m_angular_velocity->getStateAtPoint(t_point) );
 }
 
 
@@ -176,7 +176,7 @@ Eigen::VectorXd AngularAccelerationIntegrator::computerParametersVectorAtPoint(c
 
 
 
-LinearAccelerationIntegrator::LinearAccelerationIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+LinearAccelerationIntegrator::LinearAccelerationIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                                                            std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
@@ -205,9 +205,9 @@ Eigen::MatrixXd LinearAccelerationIntegrator::computeMatrixAtChebyshevPoint(cons
 Eigen::VectorXd LinearAccelerationIntegrator::computerParametersVectorAtPoint(const unsigned int t_point)
 {
     return m_ddot_Gamma_stack->at(t_point)
-            - m_hat_Gamma_stack->at(t_point) * m_angular_acceleration->getStateAtPoint(t_point)
-            - m_hat_dot_Gamma_stack->at(t_point) * m_angular_velocity->getStateAtPoint(t_point)
-            - m_hat_dot_K_stack->at(t_point) * m_linear_velocity->getStateAtPoint(t_point);
+           - m_Gamma_stack->at(t_point).cross3( m_angular_acceleration->getStateAtPoint(t_point) )
+           - m_dot_Gamma_stack->at(t_point).cross3( m_angular_velocity->getStateAtPoint(t_point) )
+           - m_dot_K_stack->at(t_point).cross3( m_linear_velocity->getStateAtPoint(t_point) );
 }
 
 
@@ -215,8 +215,8 @@ Eigen::VectorXd LinearAccelerationIntegrator::computerParametersVectorAtPoint(co
 
 
 
-InternalForcesIntegrator::InternalForcesIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                                                   std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+InternalForcesIntegrator::InternalForcesIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
+                                                   const rod_properties::RodProperties* t_rod_properties,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_linear_acceleration_integrator,
@@ -287,8 +287,8 @@ Eigen::VectorXd InternalForcesIntegrator::computeDistributedForce(const unsigned
 
 
 
-InternalCouplesIntegrator::InternalCouplesIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                                                     std::shared_ptr<const rod_properties::RodProperties> t_rod_properties,
+InternalCouplesIntegrator::InternalCouplesIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
+                                                     const rod_properties::RodProperties *t_rod_properties,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_angular_velocity_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_linear_velocity_integrator,
                                                      std::shared_ptr<const OSNI::ODESolverInterface> t_angular_acceleration_integrator,
@@ -344,7 +344,7 @@ Eigen::VectorXd InternalCouplesIntegrator::computeDistributedCouple(const unsign
 
 
 
-GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
+GeneralisedForcesIntegrator::GeneralisedForcesIntegrator(const  ::CROSP::strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_couples_integrator,
                                                          std::shared_ptr<const OSNI::ODESolverInterface> t_internal_forces_integrator,
                                                          const double &t_upper_integration_limit)
@@ -376,8 +376,8 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
 
 
 
-IDMIntegrators::IDMIntegrators(std::shared_ptr<const strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                               std::shared_ptr<const rod_properties::RodProperties> t_rod_properties)
+IDMIntegrators::IDMIntegrators(const strain_parameterisation_stack::StrainParameterisationStack* t_strain_parameterisation_stack,
+                               const rod_properties::RodProperties* t_rod_properties)
     : m_strain_parameterisation_stack( t_strain_parameterisation_stack ),
       m_rod_properties(t_rod_properties)
 {}
