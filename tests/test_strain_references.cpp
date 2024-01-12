@@ -1,18 +1,9 @@
-#include "CROSP/CROSP/cosserat_rod.hpp"
-
-#include "utilities/Eigen/eigen_io.hpp"
 
 
+#include "CROSP/polynomial_representation/polynomial_representation.hpp"
+#include "CROSP/strain_parameterisation_stack/strain_parameterisation_stack.hpp"
+#include "CROSP/rod_properties/rod_properties.hpp"
 
-struct ContinuumJoint {
-
-    ContinuumJoint(std::unique_ptr<::CROSP::CosseratRod<>> t_rod)
-        : m_rod(std::move(t_rod))
-    {}
-
-
-    std::unique_ptr<::CROSP::CosseratRod<>> m_rod;
-};
 
 
 
@@ -24,19 +15,19 @@ struct ContinuumJoint {
 int main(int argc, char *argv[])
 {
 
-    const unsigned int number_of_Chebyshev_points = 21;
+    const unsigned int number_of_Chebyshev_points = 6;
 
 
     const unsigned int ne = 5;
 
 
     const std::array<bool, 6> admitted_deformations = {
-        false,
         true,
-        false,
+        true,
+        true,
 
-        false,
-        false,
+        true,
+        true,
         false
     };
 
@@ -80,7 +71,13 @@ int main(int argc, char *argv[])
 
 
 
+    Eigen::VectorXd q = Eigen::VectorXd::Random(coordinated_dimension);
+    Eigen::VectorXd dot_q = Eigen::VectorXd::Random(coordinated_dimension);
+    Eigen::VectorXd ddot_q = Eigen::VectorXd::Random(coordinated_dimension);
 
+
+
+    m_strain_parameterisation_stack.updateStrainParameterisation(q, dot_q, ddot_q);
 
 
     return 0;

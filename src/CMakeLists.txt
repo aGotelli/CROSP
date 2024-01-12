@@ -91,8 +91,8 @@ include_directories(include)
 
 
 add_library(${PROJECT_NAME} SHARED
-                            include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
-                            ${PROJECT_NAME}/cosserat_rod.cpp
+                            # include/${PROJECT_NAME}/${PROJECT_NAME}/cosserat_rod.hpp
+                            # ${PROJECT_NAME}/cosserat_rod.cpp
 
 
 
@@ -100,37 +100,37 @@ add_library(${PROJECT_NAME} SHARED
                             strain_parameterisation_stack/strain_parameterisation_stack.cpp
 
 
-                            include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
-                            include/${PROJECT_NAME}/numerical_integrators/full_state_reconstructor.hpp
-                            numerical_integrators/full_state_reconstructor.cpp
+#                             include/${PROJECT_NAME}/numerical_integrators/cosserat_rod_integrators.hpp
+#                             include/${PROJECT_NAME}/numerical_integrators/full_state_reconstructor.hpp
+#                             numerical_integrators/full_state_reconstructor.cpp
 
 
-                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/spectral_integrators.hpp
-#                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_odes.hpp
-                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp
-                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.hpp
-                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.hpp
-                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/integration_polynomial_base/integration_polynomial_base.hpp
-                            numerical_integrators/spectral_method/spectral_integrators.cpp
-#                            numerical_integrators/spectral_method/idm_integrators/idm_odes.cpp
-                            numerical_integrators/spectral_method/idm_integrators/idm_integrators.cpp
-                            numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.cpp
-                            numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.cpp
-                            numerical_integrators/spectral_method/integration_polynomial_base/integration_polynomial_base.cpp
-
-
-
-
-                            include/${PROJECT_NAME}/numerical_integrators/explicit_methods/explicit_methods.hpp
-                            numerical_integrators/explicit_methods/explicit_methods.cpp
+#                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/spectral_integrators.hpp
+# #                            include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_odes.hpp
+#                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/idm_integrators/idm_integrators.hpp
+#                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.hpp
+#                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.hpp
+#                             include/${PROJECT_NAME}/numerical_integrators/spectral_method/integration_polynomial_base/integration_polynomial_base.hpp
+#                             numerical_integrators/spectral_method/spectral_integrators.cpp
+# #                            numerical_integrators/spectral_method/idm_integrators/idm_odes.cpp
+#                             numerical_integrators/spectral_method/idm_integrators/idm_integrators.cpp
+#                             numerical_integrators/spectral_method/tidm_integrators/tidm_integrators.cpp
+#                             numerical_integrators/spectral_method/internal_actuation/internal_actuation_integrator.cpp
+#                             numerical_integrators/spectral_method/integration_polynomial_base/integration_polynomial_base.cpp
 
 
 
 
-                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
-                            include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_integrators.hpp
-                            numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.cpp
-                            numerical_integrators/magnus_expansion/magnus_integrators.cpp
+#                             include/${PROJECT_NAME}/numerical_integrators/explicit_methods/explicit_methods.hpp
+#                             numerical_integrators/explicit_methods/explicit_methods.cpp
+
+
+
+
+#                             include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.hpp
+#                             include/${PROJECT_NAME}/numerical_integrators/magnus_expansion/magnus_integrators.hpp
+#                             numerical_integrators/magnus_expansion/magnus_idm_integrators/magnus_idm_integrators.cpp
+#                             numerical_integrators/magnus_expansion/magnus_integrators.cpp
 
 
 
