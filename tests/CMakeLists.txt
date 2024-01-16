@@ -152,3 +152,18 @@ target_compile_definitions(test_strain_references
     PRIVATE
         DEVELOPER
 )
+
+
+
+
+add_executable(test_rank_A_spectral test_rank_A_spectral.cpp)
+target_link_libraries(test_rank_A_spectral
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+        math_tools
+)
+target_compile_definitions(test_rank_A_spectral
+    PRIVATE
+        DEVELOPER
+)
