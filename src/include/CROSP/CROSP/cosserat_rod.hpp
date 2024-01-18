@@ -280,6 +280,21 @@ public:
     }
 
 
+
+    /*!
+     * \brief forwardKinematics computes the forward kinematics of the rod starting from the given states
+     * \param t_base_kinematics is the kinematics of the first cross section in its local coordinates
+
+     * This function is a warper for forwardKinematics(const ::LieAlgebra::SE3Pose &, const ::LieAlgebra::Vector6d &, const ::LieAlgebra::Vector6d)
+     */
+    inline void forwardKinematics(const ::LieAlgebra::Kinematics &t_base_kinematics)
+    {
+        forwardKinematics(t_base_kinematics.m_pose,
+                          t_base_kinematics.m_twist,
+                          t_base_kinematics.m_accelerations);
+    }
+
+
     /*!
      * \brief updateDeltaParameterisation updates the variation of the strain due to the delta
      * \param t_Delta_qe the variation on the generalised coordinates
