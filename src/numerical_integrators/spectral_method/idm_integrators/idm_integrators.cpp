@@ -369,7 +369,7 @@ Eigen::VectorXd GeneralisedForcesIntegrator::computerParametersVectorAtPoint(con
     Lambda << C,
               N;
 
-    const Eigen::VectorXd b_at_point = -m_strain_parameterisation_stack->m_B_Phi_stack.block(6*t_point, 0, 6, m_coordinates_dimension).transpose()*Lambda;
+    const Eigen::VectorXd b_at_point = m_strain_parameterisation_stack->m_B_Phi_stack.block(6*t_point, 0, 6, m_coordinates_dimension).transpose()*Lambda;
     return b_at_point;
 }
 
