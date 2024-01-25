@@ -107,6 +107,9 @@ struct CircularCrossSection : public CrossSection {
     {
         std::stringstream properties;
         properties << "     r : " << m_radius << "\n";
+        properties << "     Ixx : " << Ixx() << "\n";
+        properties << "     Iyy : " << Iyy() << "\n";
+        properties << "     Izz : " << Izz() << "\n";
         return properties.str();
     }
 
@@ -136,17 +139,17 @@ struct RectangularCrossSection : public CrossSection {
 
     virtual double Ixx()const final
     {
-        return (m_width*m_height/12)*(m_width*m_width + m_height*m_height);
+        return (m_width*m_height/12.0)*(m_width*m_width + m_height*m_height);
     }
 
     virtual double Iyy()const final
     {
-        return m_width*pow(m_height, 3)/12;
+        return m_width*pow(m_height, 3)/12.0;
     }
 
     virtual double Izz()const final
     {
-        return pow(m_width, 3)*m_height/12;
+        return pow(m_width, 3)*m_height/12.0;
     }
 
     virtual std::string printProperties() const final
@@ -154,6 +157,9 @@ struct RectangularCrossSection : public CrossSection {
         std::stringstream properties;
         properties << "     width : " << m_width << ",";
         properties << "     height : " << m_height << "\n";
+        properties << "     Ixx : " << Ixx() << "\n";
+        properties << "     Iyy : " << Iyy() << "\n";
+        properties << "     Izz : " << Izz() << "\n";
         return properties.str();
     }
 
