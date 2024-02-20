@@ -67,6 +67,10 @@ struct SpectralIntegrators{
 
 
 
+    void updateKinematics(const ::LieAlgebra::Kinematics &t_kinematics_at_base);
+
+
+
     void backwardDynamics(const ::LieAlgebra::Vector6d &t_Lambda_X1);
 
 
