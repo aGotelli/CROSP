@@ -172,8 +172,10 @@ void SpectralIntegrators::forwardTangentKinematics(const Eigen::Vector3d &t_init
 {
     ::LieAlgebra::Kinematics rod_tip_kinematics;
 
+
+
     rod_tip_kinematics.m_pose =
-            ::LieAlgebra::SE3Pose( m_idm_integrators->m_quaternion->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END),
+            ::LieAlgebra::SE3Pose( Eigen::Vector4d(m_idm_integrators->m_quaternion->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END)),
                                    m_idm_integrators->m_position->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END) );
 
 
