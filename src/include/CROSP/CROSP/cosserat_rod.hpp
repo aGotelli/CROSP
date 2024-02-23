@@ -116,12 +116,12 @@ public:
     {}
 
 
-//    CosseratRod(CosseratRod &&t_other)
-//        : m_polynomial_representation(t_other.m_polynomial_represenation),
-//          m_rod_properties( std::move(t_other.m_rod_properties) ),
-//          m_constrained_strain(t_other.m_constrained_strain),
-//          m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
-//    {}
+   CosseratRod(CosseratRod &&t_other)
+       : m_polynomial_representation(t_other.m_polynomial_represenation),
+         m_rod_properties( std::move(t_other.m_rod_properties) ),
+         m_constrained_strain(t_other.m_constrained_strain),
+         m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
+   {}
 
 
 
