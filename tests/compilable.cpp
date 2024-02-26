@@ -24,6 +24,8 @@ struct ContinuumJoint {
 int main(int argc, char *argv[])
 {
 
+    ::CROSP::CosseratRod rod_init;
+
     const unsigned int number_of_Chebyshev_points = 21;
 
 

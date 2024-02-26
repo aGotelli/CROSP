@@ -116,12 +116,7 @@ public:
     {}
 
 
-   CosseratRod(CosseratRod &&t_other)
-       : m_polynomial_representation(t_other.m_polynomial_represenation),
-         m_rod_properties( std::move(t_other.m_rod_properties) ),
-         m_constrained_strain(t_other.m_constrained_strain),
-         m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
-   {}
+    CosseratRod(CosseratRod &&t_other)=default;
 
 
 
@@ -810,7 +805,10 @@ protected:
 
 
     //  The set of rod properties
-    rod_properties::RodPropertiesSPtr m_rod_properties;
+    rod_properties::RodPropertiesSPtr m_rod_properties {
+        std::make_shared<rod_properties::RodProperties>(rod_properties::RodDimensions(),
+                                                        rod_properties::MaterialProperties())
+    };
 
 
     unsigned int m_number_of_Chebyshev_points { 21 };
