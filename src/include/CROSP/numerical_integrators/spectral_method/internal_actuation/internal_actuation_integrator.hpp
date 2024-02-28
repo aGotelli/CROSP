@@ -35,6 +35,8 @@ public:
 
     virtual void updateActuation(const double &t_time)override;
 
+    virtual void setActuation(const Eigen::VectorXd &)override{}
+
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point)override;
 
 
@@ -63,6 +65,7 @@ struct NullInternalActuationIntegrator : public InternalActuationIntegrator{
 
     virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int )final{ return m_null_actuation;};
 
+    virtual void setActuation(const Eigen::VectorXd &)final{}
 
     virtual Eigen::VectorXd getActuation()const final{ return m_null_actuation; };
 

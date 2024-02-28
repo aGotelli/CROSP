@@ -57,6 +57,13 @@ PolynomialRepresentation::PolynomialRepresentation(const std::array<bool, 6> t_a
 }
 
 
+PolynomialRepresentation::PolynomialRepresentation(const PolynomialRepresentation &t_other)
+    : m_admitted_deformations(t_other.m_admitted_deformations),
+      m_number_of_modes_stack(t_other.m_number_of_modes_stack),
+      m_polynomial_base(t_other.m_polynomial_base)
+{}
+
+
 
 
 Eigen::MatrixXd PolynomialRepresentation::getPhi(const double& t_X,
