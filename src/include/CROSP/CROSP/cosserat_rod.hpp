@@ -116,12 +116,7 @@ public:
     {}
 
 
-//    CosseratRod(CosseratRod &&t_other)
-//        : m_polynomial_representation(t_other.m_polynomial_represenation),
-//          m_rod_properties( std::move(t_other.m_rod_properties) ),
-//          m_constrained_strain(t_other.m_constrained_strain),
-//          m_number_of_Chebyshev_points(t_other.m_number_of_Chebyshev_points)
-//    {}
+    CosseratRod(CosseratRod &&t_other)=default;
 
 
 
@@ -556,7 +551,7 @@ public:
         const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
         const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
-        const Eigen::VectorXd internal_balance = Qe - Qa - Q_ad;
+        const Eigen::VectorXd internal_balance = Qe + Qa - Q_ad;
         return internal_balance;
     }
 
@@ -571,7 +566,7 @@ public:
         const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
         const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
-        const Eigen::VectorXd internal_balance = Qe + Ce - Qa - Q_ad;
+        const Eigen::VectorXd internal_balance = Qe + Ce + Qa - Q_ad;
         return internal_balance;
 
     }
@@ -584,7 +579,7 @@ public:
         Eigen::VectorXd Delta_Qe = m_Kee * t_Delta_qe;
         Eigen::VectorXd Delta_Qa = m_cosserat_rod_integrators->getDeltaQaAtBase();
 
-        Eigen::VectorXd Delta_internal_balance = Delta_Qe - Delta_Qa;
+        Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Qa;
 
         return Delta_internal_balance;
     }
@@ -599,7 +594,7 @@ public:
         Eigen::VectorXd Delta_Qa = m_cosserat_rod_integrators->getDeltaQaAtBase();
 
 
-        Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Ce - Delta_Qa;
+        Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Ce + Delta_Qa;
         return Delta_internal_balance;
     }
 
@@ -810,7 +805,10 @@ protected:
 
 
     //  The set of rod properties
-    rod_properties::RodPropertiesSPtr m_rod_properties;
+    rod_properties::RodPropertiesSPtr m_rod_properties {
+        std::make_shared<rod_properties::RodProperties>(rod_properties::RodDimensions(),
+                                                        rod_properties::MaterialProperties())
+    };
 
 
     unsigned int m_number_of_Chebyshev_points { 21 };

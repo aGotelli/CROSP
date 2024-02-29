@@ -64,6 +64,8 @@ struct PolynomialRepresentation {
                              const std::vector<unsigned int> t_number_of_modes_stack,
                              const PolynomialBase t_polynomial_base=legendre_polynomial_base);
 
+    PolynomialRepresentation(const PolynomialRepresentation &t_other);
+
 
     /*!
      * \brief getCoordinatesDimension computes the dimention of q_e the vector of generalised coordinates describing thr rod shape

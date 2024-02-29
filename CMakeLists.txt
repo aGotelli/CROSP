@@ -19,7 +19,7 @@ find_package(OMNI REQUIRED)
 
 find_package(ATORS REQUIRED)
 
-find_package(Qt5Charts REQUIRED)
+#find_package(Qt5Charts REQUIRED)
 
 find_package(benchmark QUIET)
 
