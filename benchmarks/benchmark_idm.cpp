@@ -45,43 +45,14 @@ void benchmarkIDM(::benchmark::State &t_state)
     ::CROSP::polynomial_representation::PolynomialRepresentation
             polynomial_representation(admitted_deformations,
                                       ne,
-                                      //::CROSP::polynomial_representation::chebyshev_polynomial_base
                                       ::CROSP::polynomial_representation::legendre_polynomial_base);
 
-    double radius = 0.01;
-    ::CROSP::rod_properties::CircularCrossSectionUPtr circular_cross_section =
-            std::make_unique<::CROSP::rod_properties::CircularCrossSection>(radius);
 
-    double width = 0.01;
-    double height = 0.02;
-    ::CROSP::rod_properties::RectangularCrossSectionUPtr rectangular_cross_section =
-            std::make_unique<::CROSP::rod_properties::RectangularCrossSection>(width, height);
-
-
-    double length = 2.45;
-    ::CROSP::rod_properties::RodDimensions rod_dimensions(std::move(rectangular_cross_section),
-                                                          length);
-
-
-    ::CROSP::rod_properties::MaterialProperties rod_material{.m_G=0};
-    rod_material.m_E = 210e9;
-
-
-
-//    Eigen::VectorXd Xi_c = Eigen::VectorXd::Random(6);
-//    ::CROSP::strain_parameterisation_stack::StrainFunction constant_constrained_strain =
-//            [Xi_c](const double& t_X)
-//                    {   return Xi_c*t_X;    };
-
-
-    ::CROSP::CosseratRod rod(polynomial_representation,
-                             number_of_Chebyshev_points,
-                             rod_dimensions,
-                             rod_material);
+    ::CROSP::CosseratRod<::CROSP::Ode45> rod(polynomial_representation,
+                             number_of_Chebyshev_points);
 
     //rod.printProperties();
 
-    return;
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();
 
 
@@ -104,47 +75,23 @@ void benchmarkIDM(::benchmark::State &t_state)
 
 
 
-struct PositionIntegrator : public OSNI::ODEb {
-
-    PositionIntegrator(std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> t_strain_parameterisation_stack,
-                       std::shared_ptr<const OSNI::ODESolverInterface> t_quaternion_integrator,
-                       const double &t_upper_integration_limit=1.0f,
-                       const Eigen::Vector3d &t_initial_condition=Eigen::Vector3d::Zero());
-
-
-    virtual Eigen::VectorXd computerParametersVectorAtPoint(const unsigned int t_point) final;
-
-
-    std::shared_ptr<const ::CROSP::strain_parameterisation_stack::StrainParameterisationStack> m_strain_parameterisation_stack;
-
-    std::shared_ptr<const std::vector<Eigen::Vector3d>> m_Gamma_stack {
-        m_strain_parameterisation_stack->m_Gamma_stack
-    };
-
-    std::shared_ptr<const OSNI::ODESolverInterface> m_quaternion;
-
-    Eigen::Quaterniond m_quaternion_at_point;
-
-};
-
-
 
 
 int main(int argc, char *argv[])
 {
 
 
-//    const unsigned int repetitions = 20;
+   const unsigned int repetitions = 20;
 
 
-//    std::vector<unsigned int> ne_stack = {3, 4, 5, 6};
+   // std::vector<unsigned int> ne_stack = {1, 3, 6};
 
 
-//    const std::string benchmark_name = "IDM";
+   // const std::string benchmark_name = "IDM";
 
 
-//    for(const auto ne : ne_stack)
-//        ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
+   // for(const auto ne : ne_stack)
+   //     ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
 
 
     ::benchmark::RegisterBenchmark("IDM", benchmarkIDM)->Unit(::benchmark::kMicrosecond);
