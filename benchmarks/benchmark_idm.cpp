@@ -79,7 +79,7 @@ void benchmarkIDM(::benchmark::State &t_state)
                              rod_dimensions,
                              rod_material);
 
-    rod.printProperties();
+    //rod.printProperties();
 
     return;
     ::LieAlgebra::Vector6d Lambda_X1 = ::LieAlgebra::Vector6d::Zero();

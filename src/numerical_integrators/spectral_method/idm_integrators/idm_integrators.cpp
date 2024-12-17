@@ -255,6 +255,12 @@ Eigen::VectorXd InternalForcesIntegrator::computerParametersVectorAtPoint(const 
     Eigen::Vector3d inertial_velocities = ::LieAlgebra::skew( m_angular_velocity->getStateAtPoint(t_point) ).transpose() * M_linear * m_linear_velocity->getStateAtPoint(t_point);
     Eigen::Vector3d distributed_forces = computeDistributedForce(t_point);
 
+
+    // std::cout << "At point : " << t_point << "\n" <<
+    //     "\t dot_V : \n" << m_linear_acceleration->getStateAtPoint(t_point) << "\n" << std::endl;
+    //     // "\t inertial_velocities : \n" << inertial_velocities << "\n" <<
+    //     // "\t distributed_forces : \n" << distributed_forces << std::endl;
+
     Eigen::Vector3d b = inertial_acceleration
                         - inertial_velocities
                         - distributed_forces
