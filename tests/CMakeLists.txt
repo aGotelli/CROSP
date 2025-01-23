@@ -88,6 +88,22 @@ target_compile_definitions(test_with_MATLAB
         DEVELOPER
 )
 
+
+add_executable(test_hybrid_integrator test_hybrid_integrator.cpp)
+target_link_libraries(test_hybrid_integrator
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+)
+target_compile_definitions(test_hybrid_integrator
+    PRIVATE
+        DEVELOPER
+)
+
+
+
+
+
 #add_executable(test_tmp_stepper test_tmp_stepper.cpp)
 #target_link_libraries(test_tmp_stepper
 #    PRIVATE

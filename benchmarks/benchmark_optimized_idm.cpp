@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
     ::CROSP::rod_properties::RodProperties rod_properties;
 
     //  Integration parameters
-    const unsigned int Nc = 31;
+    const unsigned int Nc = 7;
     const unsigned int state_dim = 3;
 
 
@@ -475,11 +475,15 @@ int main(int argc, char *argv[])
 
     //  Generalized elastic coordinates
 
+    srand( 7 );
     Eigen::VectorXd q      = Eigen::VectorXd::Random(ne);
     Eigen::VectorXd dot_q  = Eigen::VectorXd::Random(ne)*10;
     Eigen::VectorXd ddot_q = Eigen::VectorXd::Random(ne)*100;
 
-
+    //  Print values
+    std::cout << "q : \n" << q << "\n\n";
+    std::cout << "dot_q : \n" << dot_q << "\n\n";
+    std::cout << "ddot_q : \n" << ddot_q << "\n\n";
 
 
 
@@ -929,22 +933,22 @@ int main(int argc, char *argv[])
     toMatrixForward(Quaternion_stack, Quaternion_matrix, 4, Nc);
 
 
-    //  Compare rotation to quaternion
-    compareSolutionsQandR(Quaternion_matrix, integratorR.getStack(), Nc);
+    // //  Compare rotation to quaternion
+    // compareSolutionsQandR(Quaternion_matrix, integratorR.getStack(), Nc);
 
 
-    // rod.m_rod_properties->m_gravity.setZero();
-    // rod.updateParameterisation(q, dot_q, ddot_q);
-    // rod.forwardKinematics(Eigen::Vector4d::UnitX(), r_X0,
-    //                         Omega_X0, V_X0,
-    //                       dot_Omega_X0, dot_V_X0);
+    rod.m_rod_properties->m_gravity.setZero();
+    rod.updateParameterisation(q, dot_q, ddot_q);
+    rod.forwardKinematics(Eigen::Vector4d::UnitX(), r_X0,
+                            Omega_X0, V_X0,
+                          dot_Omega_X0, dot_V_X0);
     // rod.backwardDynamics(::LieAlgebra::Vector6d::Zero());
 
-    // const auto N_reference = rod.m_cosserat_rod_integrators->m_idm_integrators->m_internal_forces->getStackAsMatrix();
+    const auto Omega_reference = rod.m_cosserat_rod_integrators->m_idm_integrators->m_angular_velocity->getStackAsMatrix();
     // const auto Q_reference = rod.m_cosserat_rod_integrators->m_idm_integrators->m_quaternion->getStackAsMatrix();
 
 
-    // std::cout << "Q_reference : \n" << Q_reference << "\nQ :\n" << Quaternion_matrix << "\n\n";
+    std::cout << "Omega_reference : \n" << Omega_reference << "\n\n\n";
 
 
     return -1;

@@ -139,6 +139,17 @@ add_library(${PROJECT_NAME} SHARED
                             polynomial_representation/polynomial_representation.cpp
                             include/${PROJECT_NAME}/rod_properties/rod_properties.hpp
                             rod_properties/rod_properties.cpp
+
+
+
+
+
+
+                            include/CROSP/numerical_integrators/hybrid_integrator/hybrid_integrator.hpp
+                            include/${PROJECT_NAME}/numerical_integrators/hybrid_integrator/idm_integrators/idm_integrators.hpp
+                            numerical_integrators/hybrid_integrator/hybrid_integrator.cpp
+                            numerical_integrators/hybrid_integrator/idm_integrators/idm_integrators.cpp
+
 #                            include/${PROJECT_NAME}/strain_parameterisation/strain_parameterisation.hpp
 #                            strain_parameterisation/strain_parameterisation.cpp
 
