@@ -23,6 +23,7 @@
 #include "OSNI/OSNI.hpp"
 
 #include "math_tools/LieAlgebra/lie_algebra_utilities.hpp"
+#include "math_tools/Chebyshev/chebyshev_differentiation.hpp"
 
 #include "CROSP/polynomial_representation/polynomial_representation.hpp"
 
@@ -61,9 +62,9 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
 
     Eigen::MatrixXd m_quaternion_stack { Eigen::MatrixXd::Zero(4, this->m_quadrature_points.size()) };
 
-    ::Chebyshev::ChebyshevInterpolator m_interpolator;
+    ::Chebyshev::ChebyshevReconstructor m_interpolator;
 
-    Eigen::MatrixXd m_quaternions_at_quadrature_points { Eigen::MatrixXd::Zero(4, m_interpolator.getNumberOfInterpolationPoints()) };
+    Eigen::MatrixXd m_quaternions_at_quadrature_points { Eigen::MatrixXd::Zero(4, m_interpolator.getNumberOfReconstructionPoints()) };
 
 
 

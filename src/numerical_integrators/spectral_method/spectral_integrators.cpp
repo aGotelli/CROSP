@@ -85,17 +85,13 @@ void SpectralIntegrators::forwardKinematics()
     //  Integrate Positions
     m_idm_integrators->m_position->solveSystem();
 
-    // //  Integrate twist
+     //  Integrate twist
     m_idm_integrators->m_angular_velocity->solveSystem();
+    m_idm_integrators->m_linear_velocity->solveSystem();
 
-    const auto C_NN = m_idm_integrators->m_angular_velocity->getCNN();
-    m_idm_integrators->m_angular_velocity->getbNN();
-    m_idm_integrators->m_angular_velocity->getIVPNN();
-    // m_idm_integrators->m_linear_velocity->solveSystem();
-
-    // //  Integrate accelerations
-    // m_idm_integrators->m_angular_acceleration->solveSystem();
-    // m_idm_integrators->m_linear_acceleration->solveSystem();
+    //  Integrate accelerations
+    m_idm_integrators->m_angular_acceleration->solveSystem();
+    m_idm_integrators->m_linear_acceleration->solveSystem();
 }
 
 
