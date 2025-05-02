@@ -62,9 +62,9 @@ struct IntegratorRotationMatrix : public ::OMNI::ODEA<3, 3>{
 
     Eigen::MatrixXd m_quaternion_stack { Eigen::MatrixXd::Zero(4, this->m_quadrature_points.size()) };
 
-    ::Chebyshev::ChebyshevReconstructor m_interpolator;
+    ::Chebyshev::ChebyshevInterpolator m_interpolator;
 
-    Eigen::MatrixXd m_quaternions_at_quadrature_points { Eigen::MatrixXd::Zero(4, m_interpolator.getNumberOfReconstructionPoints()) };
+    Eigen::MatrixXd m_quaternions_at_quadrature_points { Eigen::MatrixXd::Zero(4, m_interpolator.getNumberOfInterpolationPoints()) };
 
 
 
