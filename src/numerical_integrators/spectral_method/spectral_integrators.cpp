@@ -243,7 +243,7 @@ void SpectralIntegrators::updateInternalActuation(const double &t_time)
 
 Eigen::VectorXd SpectralIntegrators::getQad()const
 {
-    const Eigen::VectorXd Q_ad = m_internal_actuation_integrator->getActuation();
+    const Eigen::VectorXd Q_ad = - m_internal_actuation_integrator->getActuation();
 
     return Q_ad;
 }
@@ -289,14 +289,14 @@ LieAlgebra::Vector6d SpectralIntegrators::getDeltaLambdaAtBase()const
 
 Eigen::VectorXd SpectralIntegrators::getQaAtBase()const
 {
-    return m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
+    return m_idm_integrators->m_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);;
 }
 
 
 
 Eigen::VectorXd SpectralIntegrators::getDeltaQaAtBase()const
 {
-    return m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::BEGIN);;
+    return m_tidm_integrators->m_Delta_generalised_forces->getStateAtPoint(::OSNI::INTEGRATION_DOMAIN::END);;
 }
 
 
@@ -331,7 +331,7 @@ FullODEStatesObservations SpectralIntegrators::getIDMStatesObservations()
     ODE_states_observations.C_stack = m_idm_integrators->m_internal_couples->getStackAsMatrix();
     ODE_states_observations.N_stack = m_idm_integrators->m_internal_forces->getStackAsMatrix();
 
-    ODE_states_observations.Qa_stack = m_idm_integrators->m_generalised_forces->getStackAsMatrix();
+    ODE_states_observations.Qa_stack  = m_idm_integrators->m_generalised_forces->getStackAsMatrix();
     ODE_states_observations.Qad_stack = m_internal_actuation_integrator->getStackAsMatrix();
 
     return ODE_states_observations;

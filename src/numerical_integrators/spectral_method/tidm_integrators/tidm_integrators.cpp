@@ -397,7 +397,7 @@ DeltaGeneralisedForcesIntegrator::DeltaGeneralisedForcesIntegrator(std::shared_p
                                                                    std::shared_ptr<const OSNI::ODESolverInterface> t_Delta_internal_forces_integrator,
                                                                    const double &t_upper_integration_limit)
     : OSNI::ODEb(t_strain_parameterisation_stack->m_B_Phi_stack.cols(),
-                 ::Chebyshev::INTEGRATION_DIRECTION::BACKWARD,
+                 ::Chebyshev::INTEGRATION_DIRECTION::FORWARD,
                  t_strain_parameterisation_stack->m_number_of_points,
                  t_upper_integration_limit),
       m_strain_parameterisation_stack(t_strain_parameterisation_stack),

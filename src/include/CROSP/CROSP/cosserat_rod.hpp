@@ -551,7 +551,7 @@ public:
         const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
         const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
-        const Eigen::VectorXd internal_balance = Qe + Qa - Q_ad;
+        const Eigen::VectorXd internal_balance = Qa - Q_ad - Qe ;
         return internal_balance;
     }
 
@@ -566,7 +566,8 @@ public:
         const Eigen::VectorXd Qa = m_cosserat_rod_integrators->getQaAtBase();
         const Eigen::VectorXd Q_ad = m_cosserat_rod_integrators->getQad();
 
-        const Eigen::VectorXd internal_balance = Qe + Ce + Qa - Q_ad;
+
+        const Eigen::VectorXd internal_balance = Qa - Q_ad - Qe - Ce;
         return internal_balance;
 
     }
@@ -579,7 +580,7 @@ public:
         Eigen::VectorXd Delta_Qe = m_Kee * t_Delta_qe;
         Eigen::VectorXd Delta_Qa = m_cosserat_rod_integrators->getDeltaQaAtBase();
 
-        Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Qa;
+        Eigen::VectorXd Delta_internal_balance = Delta_Qa - Delta_Qe;
 
         return Delta_internal_balance;
     }
@@ -594,7 +595,7 @@ public:
         Eigen::VectorXd Delta_Qa = m_cosserat_rod_integrators->getDeltaQaAtBase();
 
 
-        Eigen::VectorXd Delta_internal_balance = Delta_Qe + Delta_Ce + Delta_Qa;
+        Eigen::VectorXd Delta_internal_balance = Delta_Qa - Delta_Qe - Delta_Ce;
         return Delta_internal_balance;
     }
 
