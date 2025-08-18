@@ -88,6 +88,33 @@ target_compile_definitions(test_with_MATLAB
         DEVELOPER
 )
 
+add_executable(cosserat_rod_integrations cosserat_rod_integrations.cpp)
+target_link_libraries(cosserat_rod_integrations
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+)
+target_compile_definitions(cosserat_rod_integrations
+    PRIVATE
+        DEVELOPER
+)
+
+
+add_executable(ShermanMorrisonWoodbury ShermanMorrisonWoodbury.cpp)
+target_link_libraries(ShermanMorrisonWoodbury
+    PRIVATE
+        utilities
+        ${PROJECT_NAME}
+        benchmark::benchmark
+)
+target_compile_definitions(ShermanMorrisonWoodbury
+    PRIVATE
+        DEVELOPER
+)
+
+
+
+
 #add_executable(test_tmp_stepper test_tmp_stepper.cpp)
 #target_link_libraries(test_tmp_stepper
 #    PRIVATE

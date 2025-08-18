@@ -22,9 +22,9 @@ int main(int argc, char *argv[])
     const unsigned int repetitions = 20;
 
     std::array<bool, 6> admitted_deformations = {
-        false,
         true,
-        false,
+        true,
+        true,
 
         false,
         false,
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
                                  true);
 
 
-    unsigned int number_of_Chebyshev_points = 17;
+    unsigned int number_of_Chebyshev_points = 21;
 
     std::string benchmark_name;
     const std::string benchmark_name_base = "IDM_na" + std::to_string(na) + "_ne" + std::to_string(ne) + "_Nc" + std::to_string(number_of_Chebyshev_points);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -64,10 +64,12 @@ int main(int argc, char *argv[])
         Eigen::VectorXd dot_q = Eigen::VectorXd::Zero(ne);
         Eigen::VectorXd ddot_q = Eigen::VectorXd::Zero(ne);
 
-        rod.updateParameterisation(q, dot_q, ddot_q);
+
 
 
         while(t_state.KeepRunning()){
+            rod.updateParameterisation(q, dot_q, ddot_q);
+
             rod.m_idm_integrators->m_quaternion->solveSystem();
 
             if(std::isnan(rod.m_idm_integrators->m_quaternion->getStateAtPoint(0).x()) ||
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -122,7 +124,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -152,7 +154,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -183,7 +185,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -216,7 +218,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -250,7 +252,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -284,7 +286,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 
@@ -319,7 +321,7 @@ int main(int argc, char *argv[])
         auto strain_param =
                 std::make_shared<::CROSP::strain_parameterisation::StrainParameterisation>(polynomial_representation, number_of_Chebyshev_points);
 
-        ::CROSP::CosseratRod rod(strain_param);
+        ::CROSP::CosseratRod<> rod(strain_param);
 
         ::LieAlgebra::Vector6d F1 = ::LieAlgebra::Vector6d::Zero();
 

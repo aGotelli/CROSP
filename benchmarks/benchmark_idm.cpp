@@ -7,9 +7,9 @@
 
 
 static constexpr std::array<bool, 6> admitted_deformations = {
-    false,
     true,
-    false,
+    true,
+    true,
 
     false,
     false,
@@ -20,7 +20,7 @@ static constexpr unsigned int na = std::count(admitted_deformations.begin(),
                                               admitted_deformations.end(),
                                               true);
 
-constexpr unsigned int number_of_Chebyshev_points = 21;
+//constexpr unsigned int number_of_Chebyshev_points = 21;
 
 
 
@@ -29,7 +29,9 @@ void benchmarkIDM(::benchmark::State &t_state)
 {
 
 
-    const unsigned int ne =/* t_state.range(0)*/15;
+    const unsigned int ne = 3;
+
+    const unsigned int number_of_Chebyshev_points = 31;//t_state.range(0);
 
     const unsigned int coordinated_dimension = na * ne;
 
@@ -48,7 +50,7 @@ void benchmarkIDM(::benchmark::State &t_state)
                                       ::CROSP::polynomial_representation::legendre_polynomial_base);
 
 
-    ::CROSP::CosseratRod<::CROSP::Ode45> rod(polynomial_representation,
+    ::CROSP::CosseratRod<> rod(polynomial_representation,
                              number_of_Chebyshev_points);
 
     //rod.printProperties();
@@ -65,13 +67,16 @@ void benchmarkIDM(::benchmark::State &t_state)
     while(t_state.KeepRunning()){
 
         rod.updateParameterisation(q, dot_q, ddot_q);
+//        rod.updateParameterisation(q, dot_q, ddot_q);
+//        rod.updateParameterisation(q, dot_q, ddot_q);
+//        rod.updateParameterisation(q, dot_q, ddot_q);
 
         rod.forwardKinematics();
 
-        rod.backwardDynamics(Lambda_X1);
+//        rod.backwardDynamics(Lambda_X1);
 
     }
-};
+}
 
 
 
@@ -81,20 +86,13 @@ int main(int argc, char *argv[])
 {
 
 
-   const unsigned int repetitions = 20;
+    const unsigned int repetitions = 5;
+    const unsigned int Nc_min = 11;
+    const unsigned int Nc_step = 2;
+    const unsigned int Nc_max = 35;
 
 
-   // std::vector<unsigned int> ne_stack = {1, 3, 6};
-
-
-   // const std::string benchmark_name = "IDM";
-
-
-   // for(const auto ne : ne_stack)
-   //     ::benchmark::RegisterBenchmark(benchmark_name.c_str(), benchmarkIDM)->Arg(ne)->Repetitions(repetitions)->Unit(::benchmark::kMicrosecond);
-
-
-    ::benchmark::RegisterBenchmark("IDM", benchmarkIDM)->Unit(::benchmark::kMicrosecond);
+    ::benchmark::RegisterBenchmark("IDM", benchmarkIDM)->Unit(::benchmark::kMicrosecond)->Repetitions(repetitions)/*->DenseRange(Nc_min, Nc_max, Nc_step)*/;
 
 
 

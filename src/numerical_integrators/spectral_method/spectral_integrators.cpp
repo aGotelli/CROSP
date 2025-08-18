@@ -80,18 +80,18 @@ void SpectralIntegrators::updateParameterisation(const Eigen::VectorXd &t_qe,
 void SpectralIntegrators::forwardKinematics()
 {
     //  Integrate Quaternions
-    m_idm_integrators->m_quaternion->solveSystem();
+//    m_idm_integrators->m_quaternion->solveSystem();
 
-    //  Integrate Positions
-    m_idm_integrators->m_position->solveSystem();
+//    //  Integrate Positions
+//    m_idm_integrators->m_position->solveSystem();
 
-     //  Integrate twist
+//     //  Integrate twist
     m_idm_integrators->m_angular_velocity->solveSystem();
-    m_idm_integrators->m_linear_velocity->solveSystem();
+//    m_idm_integrators->m_linear_velocity->solveSystem();
 
-    //  Integrate accelerations
-    m_idm_integrators->m_angular_acceleration->solveSystem();
-    m_idm_integrators->m_linear_acceleration->solveSystem();
+//    //  Integrate accelerations
+//    m_idm_integrators->m_angular_acceleration->solveSystem();
+//    m_idm_integrators->m_linear_acceleration->solveSystem();
 }
 
 
